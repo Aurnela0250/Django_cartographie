@@ -1,0 +1,62 @@
+.
+├── apps
+│   ├── __init__.py
+│   └── users
+│       ├── __init__.py
+│       ├── admin.py
+│       ├── apps.py
+│       ├── migrations
+│       ├── models.py
+│       ├── tests.py
+│       └── models.py
+├── config
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── core
+│   ├── __init__.py
+│   ├── domain
+│   │   ├── __init__.py
+│   │   └── entities
+│   │       └── **_entity.py
+│   ├── interfaces
+│   │   ├── __init__.py
+│   │   └── **_repository.py
+│   └── use_cases
+│       ├── __init__.py
+│       └── **_use_case.py
+├── infrastructure
+│   ├── __init__.py
+│   ├── db
+│   │   ├── __init__.py
+│   │   └── **_user_repository.py
+│   └── external_services
+│       ├── __init__.py
+│       ├── **_service.py
+│       └── **_service.py
+├── logs
+│   └── debug.log
+├── presentation
+│   ├── __init__.py
+│   ├── api
+│   │   ├── __init__.py
+│   │   ├── auth_utils.py
+│   │   ├── exception_handlers.py
+│   │   ├── routes.py
+│   │   └── v1
+│   │       ├── __init__.py
+│   │       └── auth_controller.py
+│   ├── exceptions.py
+│   └── schemas
+│       ├── __init__..py
+│       └── **_schemas.py
+├── manage.py
+├── openFga.fga
+├── pgadmin.yml
+├── GitHub Flow Documentation.md
+├── Makefile
+├── docker-compose.yml
+├── requirements.txt
+└── tree.txt

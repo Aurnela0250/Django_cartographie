@@ -116,18 +116,14 @@ class EntityError(Generic[ModelType]):
     def not_found(
         cls, model: Type[ModelType], identifier: Union[str, int, UUID, None] = None
     ) -> NotFoundError:
-        detail = f"{model.__name__} not found"
-        if identifier:
-            detail += f" with identifier: {identifier}"
+        detail = "Resource not found"
         return NotFoundError(detail=detail)
 
     @classmethod
     def already_exists(
         cls, model: Type[ModelType], identifier: Union[str, int, UUID, None] = None
     ) -> ConflictError:
-        detail = f"{model.__name__} already exists"
-        if identifier:
-            detail += f" with identifier: {identifier}"
+        detail = "This resource already exists"
         return ConflictError(detail=detail)
 
 
@@ -177,7 +173,7 @@ class ExternalServiceError(InternalServerError):
 
 
 def format_validation_errors(
-    exc: Union[PydanticValidationError, Exception]
+    exc: Union[PydanticValidationError, Exception],
 ) -> dict[str, Any]:
     if isinstance(exc, PydanticValidationError):
         errors = {}

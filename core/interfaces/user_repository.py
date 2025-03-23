@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID
 
-from core.domain.entities.user import ClientEntity, UserEntity
+from core.domain.entities.user import UserEntity
 
 
 class UserRepository(ABC):
@@ -11,15 +11,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def create_client(self, client: ClientEntity) -> ClientEntity:
-        pass
-
-    @abstractmethod
     def get_user_by_email(self, email: str) -> Optional[UserEntity]:
-        pass
-
-    @abstractmethod
-    def get_user_by_username(self, username: str) -> Optional[UserEntity]:
         pass
 
     @abstractmethod

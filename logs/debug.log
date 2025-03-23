@@ -1,0 +1,82 @@
+INFO 2025-03-23 11:43:38,836 autoreload 11199 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 11:43:45,475 auth_use_cases 11199 6191411200 Signup attempt with existing email: user@example.com
+WARNING 2025-03-23 11:43:45,476 auth_controller 11199 6191411200 Validation error during sign up for email user@example.com: {'message': 'Erreur de validation', 'errors': {'email': ['Un utilisateur avec cet email existe déjà']}}
+INFO 2025-03-23 11:43:45,476 operation 11199 6191411200 "POST - AuthController[sign_up_client] /api/auth/signin" 0.013271093368530273
+WARNING 2025-03-23 11:43:45,476 log 11199 6191411200 Unprocessable Entity: /api/auth/signin
+INFO 2025-03-23 12:01:20,211 autoreload 11199 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_cases.py changed, reloading.
+INFO 2025-03-23 12:01:21,340 autoreload 19310 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:03:30,705 autoreload 19310 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:03:31,705 autoreload 20206 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:03:40,058 autoreload 20206 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:03:40,870 autoreload 20272 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:05:02,345 auth_use_cases 20272 6198931456 Signup attempt with existing email: user@example.com
+WARNING 2025-03-23 12:05:02,345 auth_controller 20272 6198931456 User already exists during sign up for email user@example.com: UserEntity already exists with identifier: user@example.com
+INFO 2025-03-23 12:05:02,346 operation 20272 6198931456 "POST - AuthController[sign_up_client] /api/auth/signin" 0.014094114303588867
+WARNING 2025-03-23 12:05:02,346 log 20272 6198931456 Conflict: /api/auth/signin
+INFO 2025-03-23 12:08:01,463 autoreload 20272 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_cases.py changed, reloading.
+INFO 2025-03-23 12:08:02,382 autoreload 22480 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:08:13,742 autoreload 22480 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:08:14,331 autoreload 22602 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:09:23,717 autoreload 22602 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_cases.py changed, reloading.
+INFO 2025-03-23 12:09:24,344 autoreload 23113 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:09:34,714 autoreload 23113 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:09:35,616 autoreload 23206 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:11:23,742 autoreload 23206 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:11:24,333 autoreload 23961 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:12:40,616 auth_use_cases 23961 6129102848 Signup attempt with existing email: user@example.com
+WARNING 2025-03-23 12:12:40,616 auth_controller 23961 6129102848 User already exists during sign up: user@example.com
+INFO 2025-03-23 12:12:40,616 operation 23961 6129102848 "POST - AuthController[sign_up_client] /api/auth/signin" 0.013859987258911133
+WARNING 2025-03-23 12:12:40,617 log 23961 6129102848 Conflict: /api/auth/signin
+INFO 2025-03-23 12:13:27,898 autoreload 23961 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_cases.py changed, reloading.
+INFO 2025-03-23 12:13:28,713 autoreload 24835 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:13:51,292 autoreload 24835 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:13:51,866 autoreload 24995 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:14:02,223 autoreload 24995 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:14:02,865 autoreload 25070 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:14:11,198 autoreload 25070 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:14:11,782 autoreload 25151 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:14:21,122 autoreload 25151 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py changed, reloading.
+INFO 2025-03-23 12:14:22,595 autoreload 25227 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:14:47,201 autoreload 25227 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/exceptions.py changed, reloading.
+INFO 2025-03-23 12:14:47,807 autoreload 25423 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:15:03,288 autoreload 25423 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/exceptions.py changed, reloading.
+INFO 2025-03-23 12:15:03,981 autoreload 25559 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:15:18,247 auth_use_cases 25559 6196752384 Signup attempt with existing account
+WARNING 2025-03-23 12:15:18,247 auth_controller 25559 6196752384 User already exists during sign up
+INFO 2025-03-23 12:15:18,247 operation 25559 6196752384 "POST - AuthController[sign_up_client] /api/auth/signin" 0.019083738327026367
+WARNING 2025-03-23 12:15:18,248 log 25559 6196752384 Conflict: /api/auth/signin
+INFO 2025-03-23 12:28:59,171 autoreload 25559 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/exceptions.py changed, reloading.
+INFO 2025-03-23 12:28:59,970 autoreload 31193 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:29:10,323 autoreload 31193 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/exceptions.py changed, reloading.
+INFO 2025-03-23 12:29:11,195 autoreload 31323 8437105216 Watching for file changes with StatReloader
+ERROR 2025-03-23 12:29:40,653 auth_controller 31323 6191624192 Unexpected error during login
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py", line 47, in login
+    access_token, refresh_token = self.jwt_service.generate_tokens(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 32, in generate_tokens
+    access_token = jwt.encode(
+                   ^^^^^^^^^^
+AttributeError: module 'jwt' has no attribute 'encode'
+WARNING 2025-03-23 12:29:40,654 operation 31323 6191624192 "POST - AuthController[login] /api/auth/login" (500, "Une erreur inattendue s'est produite")
+ERROR 2025-03-23 12:29:40,655 log 31323 6191624192 Internal Server Error: /api/auth/login
+INFO 2025-03-23 12:32:06,248 autoreload 31323 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-23 12:32:06,968 autoreload 32647 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:32:13,276 autoreload 32647 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-23 12:32:13,982 autoreload 32709 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:32:18,253 autoreload 32709 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-23 12:32:18,730 autoreload 32744 8437105216 Watching for file changes with StatReloader
+ERROR 2025-03-23 12:34:13,299 auth_controller 32744 6127366144 Unexpected error during login
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/auth_controller.py", line 47, in login
+    access_token, refresh_token = self.jwt_service.generate_tokens(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 32, in generate_tokens
+    access_token = pyjwt.encode(
+                   ^^^^^^^^^^^^
+AttributeError: module 'jwt' has no attribute 'encode'
+WARNING 2025-03-23 12:34:13,302 operation 32744 6127366144 "POST - AuthController[login] /api/auth/login" (500, "Une erreur inattendue s'est produite")
+ERROR 2025-03-23 12:34:13,302 log 32744 6127366144 Internal Server Error: /api/auth/login
+INFO 2025-03-23 12:37:16,502 autoreload 35104 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-23 12:37:35,872 operation 35104 6137999360 "POST - AuthController[login] /api/auth/login" 0.31348490715026855
+INFO 2025-03-23 12:38:24,475 operation 35104 6137999360 "GET - AuthController[get_current_user] /api/auth/me" 0.015774965286254883

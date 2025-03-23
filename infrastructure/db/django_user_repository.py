@@ -1,8 +1,8 @@
 from typing import Optional
 from uuid import UUID
 
-from apps.users.models import Client, User
-from core.domain.entities.user import ClientEntity, UserEntity
+from apps.users.models import User
+from core.domain.entities.user import UserEntity
 from core.interfaces.user_repository import UserRepository
 
 
@@ -11,26 +11,10 @@ class DjangoUserRepository(UserRepository):
     def create_user(self, user: UserEntity) -> UserEntity:
         django_user = User(
             email=user.email,
-            username=user.username,
         )
         django_user.set_password(user.password)
         django_user.save()
         return self._to_entity(django_user)
-
-    def create_client(self, client: ClientEntity) -> ClientEntity:
-        django_user = User(
-            email=client.email,
-            username=client.username,
-        )
-        django_user.set_password(client.password)
-        django_user.save()
-
-        Client.objects.create(
-            user=django_user,
-            client_type=client.client_type,
-        )
-
-        return self._to_client_entity(django_user)
 
     def get_user_by_email(self, email: str) -> Optional[UserEntity]:
         try:
@@ -68,36 +52,9 @@ class DjangoUserRepository(UserRepository):
         return UserEntity(
             id=django_user.id,
             email=django_user.email,
-            username=django_user.username,
             password="",  # We don't return the password
             active=django_user.active,
-            email_verified=django_user.email_verified,
-            is_two_factor_enabled=django_user.is_two_factor_enabled,
-            image=django_user.image,
-            created_by=(
-                django_user.created_by.id if django_user.created_by else django_user.id
-            ),
             updated_by=django_user.updated_by,
             created_at=django_user.created_at,
             updated_at=django_user.updated_at,
-        )
-
-    def _to_client_entity(self, django_user: User) -> ClientEntity:
-        client = Client.objects.get(user=django_user)
-        return ClientEntity(
-            id=django_user.id,
-            email=django_user.email,
-            username=django_user.username,
-            password="",
-            active=django_user.active,
-            email_verified=django_user.email_verified,
-            is_two_factor_enabled=django_user.is_two_factor_enabled,
-            image=django_user.image,
-            created_by=(
-                django_user.created_by.id if django_user.created_by else django_user.id
-            ),
-            updated_by=django_user.updated_by,
-            created_at=django_user.created_at,
-            updated_at=django_user.updated_at,
-            client_type=client.client_type,
         )

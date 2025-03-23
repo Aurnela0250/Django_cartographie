@@ -1,11 +1,13 @@
+import logging
+
 from ninja.errors import HttpError
 from ninja_extra import api_controller, http_get, http_post
 
-from core.use_cases.auth_use_cases import LoginUseCase, SignUpClientUseCase
+from core.use_cases.auth_use_cases import LoginUseCase, SignUpUseCase
 from infrastructure.db.django_user_repository import DjangoUserRepository
 from infrastructure.external_services.jwt_service import JWTService
 from presentation.api.auth_utils import jwt_auth
-from presentation.exceptions import AuthenticationError, ValidationError
+from presentation.exceptions import AuthenticationError, ConflictError, ValidationError
 from presentation.schemas.auth_schems import Login, Token
 from presentation.schemas.user_schemas import UserCreate, UserOut
 
@@ -15,24 +17,25 @@ class AuthController:
     def __init__(self):
         self.user_repository = DjangoUserRepository()
         self.jwt_service = JWTService()
+        self.logger = logging.getLogger(__name__)
 
-    @http_post("/signin", response={201: UserOut, 400: dict})
+    @http_post("/signin", response={201: UserOut, 400: dict, 409: dict, 422: dict})
     def sign_up_client(self, user_data: UserCreate):
         try:
-            use_case = SignUpClientUseCase(
-                self.user_repository,
-            )
-            client = use_case.execute(
-                user_data.email,
-                user_data.username,
-                user_data.password,
-                "NURSERY",
-            )
+            use_case = SignUpUseCase(self.user_repository)
+            client = use_case.execute(user_data.email, user_data.password)
             return 201, UserOut.from_orm(client)
         except ValidationError as e:
-            return 400, {"message": str(e)}
+            self.logger.warning("Validation error during sign up")
+            return 422, e.detail
+        except ConflictError as e:
+            self.logger.warning("User already exists during sign up")
+            return 409, {"message": e.detail}
         except Exception:
-            # Vous pouvez logger l'exception ici si nécessaire
+            self.logger.error(
+                "Unexpected error during sign up",
+                exc_info=True,
+            )
             raise HttpError(500, "Une erreur inattendue s'est produite")
 
     @http_post("/login", response={200: Token, 401: dict})
@@ -51,13 +54,16 @@ class AuthController:
                 )
             raise AuthenticationError("Invalid credentials")
         except AuthenticationError as e:
+            self.logger.warning("Authentication failed during login")
             return 401, {"message": str(e)}
         except Exception:
-            # Vous pouvez logger l'exception ici si nécessaire
+            self.logger.error(
+                "Unexpected error during login",
+                exc_info=True,
+            )
             raise HttpError(500, "Une erreur inattendue s'est produite")
 
     @http_post("/refresh", response={200: Token, 401: dict}, auth=jwt_auth)
-    # @jwt_auth
     def refresh_token(self, refresh_token: str):
         try:
             payload = self.jwt_service.decode_token(refresh_token)
@@ -71,9 +77,13 @@ class AuthController:
                     refresh_token=new_refresh_token,
                     token_type="bearer",
                 )
+            self.logger.warning("Invalid refresh token attempt")
             return 401, {"message": "Invalid refresh token"}
         except Exception:
-            # Vous pouvez logger l'exception ici si nécessaire
+            self.logger.error(
+                "Unexpected error during token refresh",
+                exc_info=True,
+            )
             raise HttpError(500, "Une erreur inattendue s'est produite")
 
     @http_get("/me", response=UserOut, auth=jwt_auth)
@@ -83,7 +93,11 @@ class AuthController:
             user = self.user_repository.get_user_by_id(user_id)
             return UserOut.from_orm(user)
         except ValidationError as e:
+            self.logger.warning("Validation error during fetching current user")
             return 400, {"message": str(e)}
         except Exception:
-            # Vous pouvez logger l'exception ici si nécessaire
+            self.logger.error(
+                "Unexpected error during fetching current user",
+                exc_info=True,
+            )
             raise HttpError(500, "Une erreur inattendue s'est produite")

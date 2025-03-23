@@ -1,36 +1,34 @@
-from core.domain.entities.user import ClientEntity, UserEntity
+import logging
+
+from core.domain.entities.user import UserEntity
 from core.interfaces.user_repository import UserRepository
-from presentation.exceptions import AuthenticationError, ValidationError
+from presentation.exceptions import AuthenticationError, ConflictError
 
 
-class SignUpClientUseCase:
+class SignUpUseCase:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
+        self.logger = logging.getLogger(__name__)
 
-    def execute(
-        self, email: str, username: str, password: str, client_type: str
-    ) -> ClientEntity:
+    def execute(self, email: str, password: str) -> UserEntity:
 
         # Check if email or username already exists
         if self.user_repository.get_user_by_email(email):
-            raise ValidationError("Email already exists")
-        if self.user_repository.get_user_by_username(username):
-            raise ValidationError("Username already exists")
+            # Log without revealing the exact email in production logs
+            self.logger.info("Signup attempt with existing account")
+            raise ConflictError(detail="Un compte existe déjà")
 
-        client = ClientEntity(
+        user = UserEntity(
             id=None,
             email=email,
-            username=username,
             password=password,
-            client_type=client_type,
-            created_by=None,
             created_at=None,
             updated_at=None,
         )
 
-        client_created = self.user_repository.create_client(client)
+        user_created = self.user_repository.create_user(user)
 
-        return client_created
+        return user_created
 
 
 class LoginUseCase:
