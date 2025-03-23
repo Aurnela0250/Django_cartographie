@@ -60,6 +60,18 @@ help:
 	@echo "        Starts Sonarqube container."	
 	@echo "    stop-sonarqube"
 	@echo "        Stops Sonarqube container."
+	@echo "    test"
+	@echo "        Run all tests."
+	@echo "    test-unit"
+	@echo "        Run unit tests."
+	@echo "    test-integration"
+	@echo "        Run integration tests."
+	@echo "    test-services"
+	@echo "        Run service tests."
+	@echo "    test-controllers"
+	@echo "        Run controller tests."
+	@echo "    test-coverage"
+	@echo "        Run tests with coverage report."
 
 install:
 	cd backend/app && \
@@ -149,3 +161,24 @@ run-test:
 
 pytest:
 	docker compose -f docker-compose-test.yml exec fastapi_server pytest
+
+test:
+	pytest
+
+test-unit:
+	pytest -m unit
+
+test-integration:
+	pytest -m integration
+
+test-api:
+	pytest -m api
+
+test-e2e:
+	pytest -m e2e
+
+test-coverage:
+	pytest --cov=. --cov-report=html
+
+test-report:
+	pytest --junitxml=test-reports/junit.xml

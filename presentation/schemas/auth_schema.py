@@ -5,7 +5,7 @@ from ninja import Schema
 
 class Token(Schema):
     access_token: str
-    refresh_token: str
+    refresh_token: Optional[str] = None
     token_type: str
 
 
@@ -23,3 +23,7 @@ class TokenData(Schema):
 class Login(Schema):
     email: str
     password: str
+
+
+class RefreshToken(Schema):
+    refresh_token: str

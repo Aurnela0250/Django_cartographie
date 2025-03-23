@@ -1,6 +1,6 @@
 import logging
 
-from core.domain.entities.user import UserEntity
+from core.domain.entities.user_entity import UserEntity
 from core.interfaces.user_repository import UserRepository
 from presentation.exceptions import AuthenticationError, ConflictError
 

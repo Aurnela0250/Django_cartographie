@@ -1,175 +1,220 @@
-# Guide GitHub Flow pour notre projet Django
+# GitHub Flow Guide for our Django Project
 
 ## Introduction
 
-Ce document décrit notre stratégie de branches Git basée sur GitHub Flow, une approche légère et efficace adaptée à notre projet Django. GitHub Flow permet un développement continu avec des déploiements fréquents, tout en maintenant un code stable et de qualité.
+This document describes our Git branch strategy based on GitHub Flow, a lightweight and efficient approach adapted to our Django project. GitHub Flow allows continuous development with frequent deployments, while maintaining stable and quality code.
 
-## Structure des branches
+## Branch Structure
 
-GitHub Flow utilise une structure minimaliste avec seulement deux types de branches:
+GitHub Flow uses a minimalist structure with only two types of branches:
 
-1. **`main`** - La branche principale
+1. **`main`** - The main branch
 
-   - Toujours déployable en production
-   - Contient le code stable et validé
-   - Protégée contre les commits directs
+   - Always deployable to production
+   - Contains stable and validated code
+   - Protected against direct commits
 
-2. **Branches de fonctionnalités** - Créées à partir de `main`
-   - Nommées de façon descriptive (ex: `feature/auth-system`, `fix/login-error`)
-   - Courte durée de vie
-   - Une branche = une fonctionnalité ou correction
+2. **Feature branches** - Created from `main`
+   - Named descriptively (e.g., `feature/auth-system`, `fix/login-error`)
+   - Short lifetime
+   - One branch = one feature or fix
 
-## Conventions de nommage des branches
+## Branch Naming Conventions
 
-Pour maintenir une organisation claire, nous utiliserons les préfixes suivants pour nos branches:
+To maintain clear organization, we will use the following prefixes for our branches:
 
-- `feature/` - Pour les nouvelles fonctionnalités
+- `feature/` - For new features
 
-  - Exemple: `feature/user-authentication`
-  - Exemple: `feature/payment-integration`
+  - Example: `feature/user-authentication`
+  - Example: `feature/payment-integration`
 
-- `fix/` - Pour les corrections de bugs
+- `fix/` - For bug fixes
 
-  - Exemple: `fix/login-error`
-  - Exemple: `fix/api-response-format`
+  - Example: `fix/login-error`
+  - Example: `fix/api-response-format`
 
-- `refactor/` - Pour les refactorisations de code
+- `refactor/` - For code refactoring
 
-  - Exemple: `refactor/clean-architecture-implementation`
-  - Exemple: `refactor/performance-optimization`
+  - Example: `refactor/clean-architecture-implementation`
+  - Example: `refactor/performance-optimization`
 
-- `docs/` - Pour les mises à jour de documentation
-  - Exemple: `docs/api-documentation`
-  - Exemple: `docs/setup-instructions`
+- `docs/` - For documentation updates
+  - Example: `docs/api-documentation`
+  - Example: `docs/setup-instructions`
 
-## Workflow GitHub Flow
+## Commit Message Structure
 
-### 1. Création d'une branche
+Follow this format:
 
-Toujours partir de la branche `main` à jour:
+```
+<type>(<scope>): <short description>
+
+<detailed description>
+
+<references>
+```
+
+For example:
+
+1. For a simple feature:
+
+```bash
+git commit -m "feat(auth): add password reset functionality"
+```
+
+2. For a fix with a detailed description:
+
+```bash
+git commit -m "fix(api): correct user data response format
+
+- Ensure consistent date format across all endpoints
+- Add missing user profile fields
+
+Fixes #123"
+```
+
+The main commit types are:
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation change
+- `style`: Formatting (no code change)
+- `refactor`: Code refactoring
+- `test`: Adding or fixing tests
+- `chore`: Maintenance tasks
+
+The scope (in parentheses) is optional and indicates the concerned module (auth, api, models, etc.).
+
+This convention makes the history more readable and facilitates automatic changelog generation.
+
+## GitHub Flow Workflow
+
+### 1. Branch Creation
+
+Always start from an up-to-date `main` branch:
 
 ```bash
 git checkout main
 git pull
-git checkout -b feature/ma-nouvelle-fonctionnalite
+git checkout -b feature/my-new-feature
 ```
 
-### 2. Développement
+### 2. Development
 
-Travaillez sur votre branche en effectuant des commits réguliers:
+Work on your branch by making regular commits:
 
 ```bash
-# Après avoir fait des modifications
+# After making changes
 git add .
-git commit -m "Description claire des modifications"
+git commit -m "Clear description of changes"
 ```
 
-Conseils pour les messages de commit:
+Commit message tips:
 
-- Utilisez l'impératif présent: "Add feature" au lieu de "Added feature"
-- Soyez précis mais concis (< 50 caractères)
-- Si nécessaire, ajoutez des détails après une ligne vide
+- Use the present imperative: "Add feature" instead of "Added feature"
+- Be precise but concise (< 50 characters)
+- If necessary, add details after a blank line
 
-### 3. Synchronisation régulière
+### 3. Regular Synchronization
 
-Poussez régulièrement votre branche vers le dépôt distant:
+Push your branch to the remote repository regularly:
 
 ```bash
-git push -u origin feature/ma-nouvelle-fonctionnalite
+git push -u origin feature/my-new-feature
 ```
 
-Si `main` a évolué, synchronisez votre branche:
+If `main` has evolved, synchronize your branch:
 
 ```bash
 git checkout main
 git pull
-git checkout feature/ma-nouvelle-fonctionnalite
+git checkout feature/my-new-feature
 git merge main
-# Résolvez les conflits si nécessaire
+# Resolve conflicts if necessary
 ```
 
 ### 4. Pull Request (PR)
 
-Lorsque votre fonctionnalité est prête:
+When your feature is ready:
 
-1. Créez une Pull Request sur GitHub
-2. Ajoutez une description détaillée
-3. Associez la PR aux issues concernées
-4. Demandez une revue à au moins un membre de l'équipe
+1. Create a Pull Request on GitHub
+2. Add a detailed description
+3. Associate the PR with relevant issues
+4. Request a review from at least one team member
 
-### 5. Revue de code
+### 5. Code Review
 
-Le processus de revue comprend:
+The review process includes:
 
-- Vérification du respect des normes de code
-- Tests fonctionnels
-- Validation des exigences
+- Checking compliance with code standards
+- Functional testing
+- Requirements validation
 
-### 6. Déploiement en test
+### 6. Test Deployment
 
-Notre workflow GitHub Actions déploie automatiquement en environnement de test lors de la création d'une PR pour valider les changements.
+Our GitHub Actions workflow automatically deploys to the test environment when a PR is created to validate changes.
 
-### 7. Fusion
+### 7. Merging
 
-Une fois approuvée et testée, la PR peut être fusionnée dans `main`:
+Once approved and tested, the PR can be merged into `main`:
 
-- Utilisez "Squash and merge" pour garder l'historique propre
-- Assurez-vous que le message de commit résume bien les changements
+- Use "Squash and merge" to keep the history clean
+- Ensure the commit message properly summarizes the changes
 
-### 8. Déploiement en production
+### 8. Production Deployment
 
-Après fusion dans `main`, notre workflow GitHub Actions déploie automatiquement en production.
+After merging into `main`, our GitHub Actions workflow automatically deploys to production.
 
-### 9. Suppression de la branche
+### 9. Branch Deletion
 
-Une fois fusionnée, supprimez la branche de fonctionnalité:
+Once merged, delete the feature branch:
 
 ```bash
 git checkout main
 git pull
-git branch -d feature/ma-nouvelle-fonctionnalite
-git push origin --delete feature/ma-nouvelle-fonctionnalite
+git branch -d feature/my-new-feature
+git push origin --delete feature/my-new-feature
 ```
 
-## Gestion des environnements
+## Environment Management
 
-Nous utilisons GitHub Environments pour gérer nos différents environnements:
+We use GitHub Environments to manage our different environments:
 
-1. **Environnement de test**
+1. **Test Environment**
 
-   - Déploiement automatique lors de la création d'une PR
-   - URL: `https://test.notre-projet.com`
+   - Automatic deployment when a PR is created
+   - URL: `https://test.our-project.com`
 
-2. **Environnement de production**
-   - Déploiement automatique après fusion dans `main`
-   - URL: `https://notre-projet.com`
+2. **Production Environment**
+   - Automatic deployment after merging into `main`
+   - URL: `https://our-project.com`
 
-## Situation d'urgence (hotfix)
+## Emergency Situation (hotfix)
 
-En cas de bug critique en production:
+In case of a critical bug in production:
 
-1. Créez une branche `fix/` à partir de `main`
-2. Développez et testez le correctif
-3. Créez une PR avec l'étiquette "Urgent"
-4. Après revue accélérée, fusionnez dans `main`
+1. Create a `fix/` branch from `main`
+2. Develop and test the fix
+3. Create a PR with the "Urgent" label
+4. After expedited review, merge into `main`
 
 ## FAQ
 
-### Comment gérer une fonctionnalité complexe qui prendra plusieurs semaines?
+### How to handle a complex feature that will take several weeks?
 
-Divisez-la en sous-fonctionnalités plus petites qui peuvent être développées et fusionnées séparément.
+Break it down into smaller sub-features that can be developed and merged separately.
 
-### Comment annuler un changement déjà fusionné?
+### How to undo a change that has already been merged?
 
-Créez une nouvelle branche `fix/` qui annule le changement problématique et suivez le processus normal.
+Create a new `fix/` branch that reverts the problematic change and follow the normal process.
 
-### Dois-je mettre à jour ma branche de fonctionnalité si `main` a changé?
+### Should I update my feature branch if `main` has changed?
 
-Oui, il est recommandé de synchroniser régulièrement votre branche avec `main` pour éviter des conflits majeurs lors de la fusion.
+Yes, it is recommended to regularly synchronize your branch with `main` to avoid major conflicts when merging.
 
 ---
 
-Document créé le: 23/03/2025  
-Dernière mise à jour: 23/03/2025
+Document created on: 03/23/2025  
+Last updated: 03/23/2025
 
 ---

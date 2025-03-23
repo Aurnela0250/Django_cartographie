@@ -80,3 +80,16 @@ ERROR 2025-03-23 12:34:13,302 log 32744 6127366144 Internal Server Error: /api/a
 INFO 2025-03-23 12:37:16,502 autoreload 35104 8437105216 Watching for file changes with StatReloader
 INFO 2025-03-23 12:37:35,872 operation 35104 6137999360 "POST - AuthController[login] /api/auth/login" 0.31348490715026855
 INFO 2025-03-23 12:38:24,475 operation 35104 6137999360 "GET - AuthController[get_current_user] /api/auth/me" 0.015774965286254883
+INFO 2025-03-23 15:44:34,417 auth_use_cases 9133 8437105216 Signup attempt with existing account
+INFO 2025-03-23 15:49:01,026 auth_use_cases 10998 8437105216 Signup attempt with existing account
+INFO 2025-03-23 16:02:55,190 operation 16813 8437105216 "POST - AuthController[login] /login" 0.3028388023376465
+INFO 2025-03-23 16:02:55,196 operation 16813 8437105216 "GET - AuthController[get_current_user] /me" 0.005188941955566406
+WARNING 2025-03-23 16:02:55,803 auth_controller 16813 8437105216 Authentication failed during login
+INFO 2025-03-23 16:02:55,803 operation 16813 8437105216 "POST - AuthController[login] /login" 0.30095911026000977
+INFO 2025-03-23 16:02:56,408 operation 16813 8437105216 "POST - AuthController[login] /login" 0.30196499824523926
+INFO 2025-03-23 16:02:57,010 operation 16813 8437105216 "POST - AuthController[login] /login" 0.3001289367675781
+INFO 2025-03-23 16:02:57,011 operation 16813 8437105216 "POST - AuthController[refresh_token] /refresh" 0.0005309581756591797
+INFO 2025-03-23 16:02:57,315 auth_use_cases 16813 8437105216 Signup attempt with existing account
+WARNING 2025-03-23 16:02:57,316 auth_controller 16813 8437105216 User already exists during sign up
+INFO 2025-03-23 16:02:57,316 operation 16813 8437105216 "POST - AuthController[sign_up_client] /signin" 0.002156972885131836
+INFO 2025-03-23 16:02:57,920 operation 16813 8437105216 "POST - AuthController[sign_up_client] /signin" 0.300152063369751

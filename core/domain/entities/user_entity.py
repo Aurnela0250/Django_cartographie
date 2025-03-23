@@ -3,6 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from ninja import Schema
+from pydantic import ConfigDict
 
 
 class UserEntity(Schema):
@@ -14,5 +15,4 @@ class UserEntity(Schema):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

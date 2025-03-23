@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from apps.users.models import User
-from core.domain.entities.user import UserEntity
+from core.domain.entities.user_entity import UserEntity
 from core.interfaces.user_repository import UserRepository
 
 
@@ -24,11 +24,9 @@ class DjangoUserRepository(UserRepository):
             return None
 
     def get_user_by_username(self, username: str) -> Optional[UserEntity]:
-        try:
-            user = User.objects.get(username=username)
-            return self._to_entity(user)
-        except User.DoesNotExist:
-            return None
+        # Since our User model uses email as the username field,
+        # we'll just call get_user_by_email
+        return self.get_user_by_email(username)
 
     def get_user_by_id(self, user_id: UUID) -> Optional[UserEntity]:
         try:
@@ -38,13 +36,10 @@ class DjangoUserRepository(UserRepository):
             return None
 
     def authenticate_user(self, login: str, password: str) -> Optional[UserEntity]:
-        # Vérifier d'abord si le login correspond à un email
+        # In this implementation, we only use email as login
         user = User.objects.filter(email=login).first()
-        if user is None:
-            # Si ce n'est pas un email, vérifier si c'est un nom d'utilisateur
-            user = User.objects.filter(username=login).first()
         if user and user.check_password(password):
-            # Si l'utilisateur existe et le mot de passe est correct
+            # If the user exists and the password is correct
             return self._to_entity(user)
         return None
 

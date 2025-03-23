@@ -8,7 +8,7 @@ from infrastructure.db.django_user_repository import DjangoUserRepository
 from infrastructure.external_services.jwt_service import JWTService
 from presentation.api.auth_utils import jwt_auth
 from presentation.exceptions import AuthenticationError, ConflictError, ValidationError
-from presentation.schemas.auth_schems import Login, Token
+from presentation.schemas.auth_schema import Login, RefreshToken, Token
 from presentation.schemas.user_schemas import UserCreate, UserOut
 
 
@@ -64,9 +64,9 @@ class AuthController:
             raise HttpError(500, "Une erreur inattendue s'est produite")
 
     @http_post("/refresh", response={200: Token, 401: dict}, auth=jwt_auth)
-    def refresh_token(self, refresh_token: str):
+    def refresh_token(self, refresh_data: RefreshToken):
         try:
-            payload = self.jwt_service.decode_token(refresh_token)
+            payload = self.jwt_service.decode_token(refresh_data.refresh_token)
             if payload and payload["token_type"] == "refresh":
                 user_id = payload["user_id"]
                 access_token, new_refresh_token = self.jwt_service.generate_tokens(

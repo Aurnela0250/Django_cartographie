@@ -230,7 +230,7 @@ class UserEntity(BaseModel):
 from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID
-from core.domain.entities.user import UserEntity
+from core.domain.entities.user_entity import UserEntity
 
 class UserRepository(ABC):
     @abstractmethod
