@@ -8,11 +8,11 @@ from infrastructure.db.django_user_repository import DjangoUserRepository
 from infrastructure.external_services.jwt_service import JWTService
 from presentation.api.auth_utils import jwt_auth
 from presentation.exceptions import AuthenticationError, ConflictError, ValidationError
-from presentation.schemas.auth_schema import Login, RefreshToken, Token
+from presentation.schemas.auth_schema import AccessToken, Login, RefreshToken, Token
 from presentation.schemas.user_schemas import UserCreate, UserOut
 
 
-@api_controller("/auth", tags=["Authentication"])
+@api_controller("", tags=["Authentication"])
 class AuthController:
     def __init__(self):
         self.user_repository = DjangoUserRepository()
@@ -38,19 +38,32 @@ class AuthController:
             )
             raise HttpError(500, "Une erreur inattendue s'est produite")
 
-    @http_post("/login", response={200: Token, 401: dict})
+    @http_post(
+        "/login", response={200: Token, 401: dict[str, str], 500: dict[str, str]}
+    )
     def login(self, login_data: Login):
         try:
             use_case = LoginUseCase(self.user_repository)
             user = use_case.execute(login_data.email, login_data.password)
             if user:
-                access_token, refresh_token = self.jwt_service.generate_tokens(
-                    str(user.id)
-                )
+                (
+                    access_token,
+                    refresh_token,
+                    access_expire_in,
+                    refresh_expire_in,
+                    current_time,
+                ) = self.jwt_service.generate_tokens(str(user.id))
                 return 200, Token(
-                    access_token=access_token,
-                    refresh_token=refresh_token,
+                    access_token=AccessToken(
+                        access_token=access_token,
+                        expires_in=access_expire_in,
+                    ),
+                    refresh_token=RefreshToken(
+                        refresh_token=refresh_token,
+                        expires_in=refresh_expire_in,
+                    ),
                     token_type="bearer",
+                    iat=current_time,
                 )
             raise AuthenticationError("Invalid credentials")
         except AuthenticationError as e:
@@ -63,19 +76,36 @@ class AuthController:
             )
             raise HttpError(500, "Une erreur inattendue s'est produite")
 
-    @http_post("/refresh", response={200: Token, 401: dict}, auth=jwt_auth)
+    @http_post(
+        "/refresh",
+        response={200: Token, 401: dict[str, str], 500: dict[str, str]},
+        auth=jwt_auth,
+    )
     def refresh_token(self, refresh_data: RefreshToken):
         try:
             payload = self.jwt_service.decode_token(refresh_data.refresh_token)
             if payload and payload["token_type"] == "refresh":
                 user_id = payload["user_id"]
-                access_token, new_refresh_token = self.jwt_service.generate_tokens(
-                    user_id
-                )
+
+                (
+                    access_token,
+                    refresh_token,
+                    access_expire_in,
+                    refresh_expire_in,
+                    current_time,
+                ) = self.jwt_service.generate_tokens(user_id)
+
                 return 200, Token(
-                    access_token=access_token,
-                    refresh_token=new_refresh_token,
+                    access_token=AccessToken(
+                        access_token=access_token,
+                        expires_in=access_expire_in,
+                    ),
+                    refresh_token=RefreshToken(
+                        refresh_token=refresh_token,
+                        expires_in=refresh_expire_in,
+                    ),
                     token_type="bearer",
+                    iat=current_time,
                 )
             self.logger.warning("Invalid refresh token attempt")
             return 401, {"message": "Invalid refresh token"}
@@ -86,7 +116,11 @@ class AuthController:
             )
             raise HttpError(500, "Une erreur inattendue s'est produite")
 
-    @http_get("/me", response=UserOut, auth=jwt_auth)
+    @http_get(
+        "/me",
+        response={200: UserOut, 400: dict[str, str], 500: dict[str, str]},
+        auth=jwt_auth,
+    )
     def get_current_user(self, request):
         try:
             user_id = request.auth["user_id"]

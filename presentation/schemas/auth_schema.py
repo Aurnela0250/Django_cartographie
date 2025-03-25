@@ -1,12 +1,24 @@
+from datetime import datetime
 from typing import Optional
 
 from ninja import Schema
 
 
-class Token(Schema):
+class AccessToken(Schema):
     access_token: str
-    refresh_token: Optional[str] = None
+    expires_in: int
+
+
+class RefreshToken(Schema):
+    refresh_token: str
+    expires_in: Optional[int] = None
+
+
+class Token(Schema):
+    access_token: AccessToken
+    refresh_token: Optional[RefreshToken] = None
     token_type: str
+    iat: datetime
 
 
 class TokenPayload(Schema):
@@ -23,7 +35,3 @@ class TokenData(Schema):
 class Login(Schema):
     email: str
     password: str
-
-
-class RefreshToken(Schema):
-    refresh_token: str

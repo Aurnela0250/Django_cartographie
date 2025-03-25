@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import jwt  # Import simple de jwt
 from django.conf import settings
@@ -6,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from ninja.errors import HttpError
 from ninja.security import HttpBearer
-from zoneinfo import ZoneInfo
 
 User = get_user_model()
 
@@ -15,16 +15,23 @@ class JWTService:
     @staticmethod
     def generate_tokens(user_id: str):
         current_time = datetime.now(ZoneInfo("UTC"))
+        access_expire_time = current_time + timedelta(minutes=60)
+        refresh_expire_time = current_time + timedelta(days=7)
+
+        # Calculer la durée d'expiration en secondes
+        access_expire_in = int((access_expire_time - current_time).total_seconds())
+        refresh_expire_in = int((refresh_expire_time - current_time).total_seconds())
+
         access_token_payload = {
             "user_id": str(user_id),
-            "exp": current_time + timedelta(minutes=60),
+            "exp": access_expire_time,
             "iat": current_time,
             "token_type": "access",
         }
 
         refresh_token_payload = {
             "user_id": str(user_id),
-            "exp": current_time + timedelta(days=7),
+            "exp": refresh_expire_time,
             "iat": current_time,
             "token_type": "refresh",
         }
@@ -36,7 +43,13 @@ class JWTService:
             refresh_token_payload, settings.SECRET_KEY, algorithm="HS256"
         )
 
-        return access_token, refresh_token
+        return (
+            access_token,
+            refresh_token,
+            access_expire_in,
+            refresh_expire_in,
+            current_time,
+        )
 
     @staticmethod
     def decode_token(token: str):

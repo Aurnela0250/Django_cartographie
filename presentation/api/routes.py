@@ -1,9 +1,8 @@
-from ninja_extra import NinjaExtraAPI
+from django.urls import path
 
-from presentation.api.exception_handlers import global_exception_handler
-from presentation.api.v1.auth_controller import AuthController
+# Importer les contrôleurs par version
+from presentation.api.v1.router import api as api_v1
 
-api = NinjaExtraAPI()
-
-api.register_controllers(AuthController)
-api.add_exception_handler(Exception, global_exception_handler)
+routes = [
+    path("v1/", api_v1.urls),
+]

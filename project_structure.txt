@@ -47,7 +47,10 @@
 │   │   ├── routes.py
 │   │   └── v1
 │   │       ├── __init__.py
-│   │       └── auth_controller.py
+│   │       ├── endpoints/
+│   │       │   ├── __init__.py
+│   │       │   └── **_controller.py
+│   │       └── route.py
 │   ├── exceptions.py
 │   └── schemas
 │       ├── __init__..py

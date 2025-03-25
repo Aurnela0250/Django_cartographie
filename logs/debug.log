@@ -93,3 +93,544 @@ INFO 2025-03-23 16:02:57,315 auth_use_cases 16813 8437105216 Signup attempt with
 WARNING 2025-03-23 16:02:57,316 auth_controller 16813 8437105216 User already exists during sign up
 INFO 2025-03-23 16:02:57,316 operation 16813 8437105216 "POST - AuthController[sign_up_client] /signin" 0.002156972885131836
 INFO 2025-03-23 16:02:57,920 operation 16813 8437105216 "POST - AuthController[sign_up_client] /signin" 0.300152063369751
+INFO 2025-03-24 01:44:22,452 autoreload 79285 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 01:44:35,408 auth_use_cases 79285 6121680896 Signup attempt with existing account
+WARNING 2025-03-24 01:44:35,408 auth_controller 79285 6121680896 User already exists during sign up
+INFO 2025-03-24 01:44:35,409 operation 79285 6121680896 "POST - AuthController[sign_up_client] /api/auth/signin" 0.016198158264160156
+WARNING 2025-03-24 01:44:35,410 log 79285 6121680896 Conflict: /api/auth/signin
+INFO 2025-03-24 01:50:16,836 autoreload 79285 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 01:50:17,425 autoreload 83886 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 01:51:10,452 autoreload 83886 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 01:51:10,918 autoreload 84577 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 01:51:39,522 autoreload 84577 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 01:51:40,005 autoreload 85015 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 01:52:40,125 autoreload 85015 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 01:52:40,601 autoreload 85814 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 01:53:05,031 log 85814 6158790656 Not Found: /api/docs
+WARNING 2025-03-24 01:54:06,485 log 85814 6158790656 Not Found: /api/
+WARNING 2025-03-24 01:54:38,781 log 85814 6158790656 Not Found: /api/v1/
+WARNING 2025-03-24 01:54:45,503 log 85814 6158790656 Not Found: /api/v1/docs
+INFO 2025-03-24 01:57:40,801 autoreload 85814 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 01:57:41,431 autoreload 89744 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 01:57:46,320 log 89744 6202880000 Not Found: /api/v1/docs
+WARNING 2025-03-24 01:57:47,790 log 89744 6202880000 Not Found: /api/v1/docs
+INFO 2025-03-24 02:00:43,405 autoreload 89744 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 02:00:43,994 autoreload 92107 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:00:57,323 autoreload 92107 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 02:00:57,796 autoreload 92293 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 02:01:14,252 log 92293 6189527040 Not Found: /api/v1/docs
+INFO 2025-03-24 02:05:25,257 autoreload 92293 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 02:05:27,986 autoreload 95728 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:06:16,354 autoreload 95728 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 02:06:16,989 autoreload 96401 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:26:32,455 autoreload 8957 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:27:28,719 autoreload 8957 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 02:27:29,614 autoreload 9360 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:27:51,170 autoreload 9360 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 02:27:51,663 autoreload 9552 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:28:15,328 autoreload 9552 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 02:28:15,906 autoreload 9742 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 02:28:30,266 log 9742 6200307712 Not Found: /api/v1/
+INFO 2025-03-24 02:29:03,161 autoreload 9742 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:29:03,713 autoreload 10104 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 02:29:04,433 log 10104 6163984384 Not Found: /api/v1/
+INFO 2025-03-24 02:29:57,939 autoreload 10104 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:29:58,405 autoreload 10490 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:30:40,369 autoreload 10490 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 02:30:40,988 autoreload 10789 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:31:16,145 auth_use_cases 10789 6169178112 Signup attempt with existing account
+WARNING 2025-03-24 02:31:16,145 auth_controller 10789 6169178112 User already exists during sign up
+INFO 2025-03-24 02:31:16,146 operation 10789 6169178112 "POST - AuthController[sign_up_client] /api/auth/signin" 0.01711583137512207
+WARNING 2025-03-24 02:31:16,147 log 10789 6169178112 Conflict: /api/auth/signin
+INFO 2025-03-24 02:31:58,846 autoreload 10789 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:31:59,469 autoreload 11366 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:32:14,925 autoreload 11366 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:32:15,486 autoreload 11502 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:44:02,564 autoreload 11502 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:44:03,228 autoreload 16202 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:45:54,099 autoreload 16202 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:45:54,697 autoreload 17175 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:46:24,364 autoreload 17175 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:46:24,967 autoreload 17418 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:47:09,843 autoreload 17418 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:47:10,409 autoreload 17759 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:52:59,431 autoreload 17759 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:53:00,217 autoreload 20138 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:54:03,463 autoreload 20138 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:54:04,554 autoreload 20582 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 02:59:39,172 autoreload 20582 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 02:59:39,822 autoreload 22868 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:00:07,471 autoreload 22868 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:00:08,023 autoreload 23091 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:01:20,253 autoreload 23091 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:01:20,817 autoreload 23597 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:06:59,847 autoreload 23597 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:07:00,328 autoreload 25912 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:07:09,258 auth_use_cases 25912 6171389952 Signup attempt with existing account
+WARNING 2025-03-24 03:07:09,258 auth_controller 25912 6171389952 User already exists during sign up
+INFO 2025-03-24 03:07:09,259 operation 25912 6171389952 "POST - AuthController[sign_up_client] /api/auth/signin" 0.018375873565673828
+WARNING 2025-03-24 03:07:09,259 log 25912 6171389952 Conflict: /api/auth/signin
+INFO 2025-03-24 03:07:27,192 autoreload 25912 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:07:28,578 autoreload 26128 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:11:55,709 autoreload 26128 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:11:56,426 autoreload 27939 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:12:04,757 autoreload 27939 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:12:05,456 autoreload 28035 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:12:34,334 autoreload 28035 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:12:34,960 autoreload 28256 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:13:18,822 autoreload 28256 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/routes.py changed, reloading.
+INFO 2025-03-24 03:13:19,304 autoreload 28609 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:25:12,495 autoreload 28609 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 03:25:13,340 autoreload 33707 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:25:35,866 autoreload 33707 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/router.py changed, reloading.
+INFO 2025-03-24 03:25:36,356 autoreload 33878 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:26:48,988 autoreload 33878 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 03:26:49,679 autoreload 34432 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:27:03,426 autoreload 34432 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 03:27:04,055 autoreload 34588 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:28:09,214 autoreload 34588 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:28:09,759 autoreload 35071 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:28:12,325 autoreload 35071 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:28:13,050 autoreload 35113 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:28:14,378 autoreload 35113 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:28:14,864 autoreload 35144 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 03:28:46,505 log 35144 6135001088 Not Found: /api/
+INFO 2025-03-24 03:28:57,845 auth_use_cases 35144 6135001088 Signup attempt with existing account
+WARNING 2025-03-24 03:28:57,846 auth_controller 35144 6135001088 User already exists during sign up
+INFO 2025-03-24 03:28:57,847 operation 35144 6135001088 "POST - AuthController[sign_up_client] /api/auth/signin" 0.01884603500366211
+WARNING 2025-03-24 03:28:57,847 log 35144 6135001088 Conflict: /api/auth/signin
+INFO 2025-03-24 03:34:16,154 autoreload 35144 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:34:16,911 autoreload 37606 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:36:38,879 autoreload 37606 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:36:39,533 autoreload 38580 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:36:52,614 autoreload 38706 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:37:04,789 auth_use_cases 38706 6122778624 Signup attempt with existing account
+WARNING 2025-03-24 03:37:04,790 auth_controller 38706 6122778624 User already exists during sign up
+INFO 2025-03-24 03:37:04,790 operation 38706 6122778624 "POST - AuthController[sign_up_client] /api/auth/signin" 0.013273239135742188
+WARNING 2025-03-24 03:37:04,790 log 38706 6122778624 Conflict: /api/auth/signin
+INFO 2025-03-24 03:38:29,619 autoreload 38706 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 03:38:30,097 autoreload 39380 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:38:44,571 autoreload 39380 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 03:38:45,214 autoreload 39517 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:38:53,627 autoreload 39517 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 03:38:54,103 autoreload 39603 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:39:02,436 autoreload 39603 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:39:02,937 autoreload 39689 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:39:23,627 autoreload 39689 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:39:24,236 autoreload 39857 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:40:09,325 autoreload 39857 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:40:09,943 autoreload 40195 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:43:23,444 autoreload 40195 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:43:24,058 autoreload 41487 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:43:34,450 autoreload 41487 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:43:35,825 autoreload 41569 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:46:05,617 autoreload 41569 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:46:06,324 autoreload 42602 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:46:16,706 autoreload 42602 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:46:18,527 autoreload 42691 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:46:18,624 api_factory 42691 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:46:18,624 api_factory 42691 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:46:18,624 api_factory 42691 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:46:18,624 api_factory 42691 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:46:18,624 api_factory 42691 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:46:18,624 api_factory 42691 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:46:37,010 autoreload 42691 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:46:38,320 autoreload 42841 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:46:38,476 api_factory 42841 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:46:38,476 api_factory 42841 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:46:38,476 api_factory 42841 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:46:38,477 api_factory 42841 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:46:38,477 api_factory 42841 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:46:38,478 api_factory 42841 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:46:38,478 api_factory 42841 8437105216 Préfixage du contrôleur: AuthController
+WARNING 2025-03-24 03:46:38,478 api_factory 42841 8437105216 Aucune métadonnée trouvée pour AuthController, contrôleur ignoré
+INFO 2025-03-24 03:46:51,888 autoreload 42841 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:46:52,452 autoreload 42954 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:46:52,532 api_factory 42954 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Préfixage du contrôleur: AuthController
+WARNING 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Aucune métadonnée trouvée pour AuthController, contrôleur ignoré
+INFO 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Enregistrement de 1 contrôleurs préfixés
+INFO 2025-03-24 03:46:52,533 api_factory 42954 8437105216 Ajout du gestionnaire d'exceptions global
+INFO 2025-03-24 03:46:52,533 api_factory 42954 8437105216 API versionnée v1 créée avec succès
+INFO 2025-03-24 03:50:48,446 autoreload 42954 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:50:49,130 autoreload 44558 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:50:49,217 api_factory 44558 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:50:49,217 api_factory 44558 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:50:49,217 api_factory 44558 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:50:49,217 api_factory 44558 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Préfixage du contrôleur: AuthController
+WARNING 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Aucune métadonnée trouvée pour AuthController, contrôleur ignoré
+INFO 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Enregistrement de 1 contrôleurs préfixés
+INFO 2025-03-24 03:50:49,218 api_factory 44558 8437105216 Ajout du gestionnaire d'exceptions global
+INFO 2025-03-24 03:50:49,218 api_factory 44558 8437105216 API versionnée v1 créée avec succès
+INFO 2025-03-24 03:51:08,635 autoreload 44718 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Préfixage du contrôleur: AuthController
+WARNING 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Aucune métadonnée trouvée pour AuthController, contrôleur ignoré
+INFO 2025-03-24 03:51:08,714 api_factory 44718 8437105216 Enregistrement de 1 contrôleurs préfixés
+INFO 2025-03-24 03:51:08,715 api_factory 44718 8437105216 Ajout du gestionnaire d'exceptions global
+INFO 2025-03-24 03:51:08,715 api_factory 44718 8437105216 API versionnée v1 créée avec succès
+INFO 2025-03-24 03:53:03,884 autoreload 44718 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:53:04,492 autoreload 45496 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:53:04,577 api_factory 45496 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:53:04,577 api_factory 45496 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:53:04,577 api_factory 45496 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:53:04,577 api_factory 45496 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:53:04,577 api_factory 45496 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:53:04,577 api_factory 45496 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:53:04,577 api_factory 45496 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:53:04,578 api_factory 45496 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:53:04,578 api_factory 45496 8437105216 Préfixage du contrôleur: AuthController
+ERROR 2025-03-24 03:53:04,584 api_factory 45496 8437105216 Erreur lors de l'analyse du code source: could not find class definition
+INFO 2025-03-24 03:53:04,584 api_factory 45496 8437105216 Application d'un décorateur par défaut pour AuthController
+INFO 2025-03-24 03:53:04,585 api_factory 45496 6148124672 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:53:04,585 api_factory 45496 6148124672 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:53:04,585 api_factory 45496 6148124672 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:53:04,586 api_factory 45496 6148124672 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:53:04,586 api_factory 45496 6148124672 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:53:04,587 api_factory 45496 6148124672 Préfixe de version défini: /v1
+INFO 2025-03-24 03:53:04,587 api_factory 45496 6148124672 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:53:04,587 api_factory 45496 6148124672 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:53:04,587 api_factory 45496 6148124672 Préfixage du contrôleur: AuthController
+ERROR 2025-03-24 03:53:04,594 api_factory 45496 6148124672 Erreur lors de l'analyse du code source: could not find class definition
+INFO 2025-03-24 03:53:04,594 api_factory 45496 6148124672 Application d'un décorateur par défaut pour AuthController
+INFO 2025-03-24 03:53:57,982 autoreload 45496 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:53:58,797 autoreload 45865 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:53:58,885 api_factory 45865 8437105216 Préfixage du contrôleur: AuthController
+ERROR 2025-03-24 03:53:58,891 api_factory 45865 8437105216 Erreur lors de l'analyse du code source: could not find class definition
+INFO 2025-03-24 03:53:58,891 api_factory 45865 8437105216 Application d'un décorateur par défaut pour AuthController
+INFO 2025-03-24 03:53:58,892 api_factory 45865 6179942400 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:53:58,892 api_factory 45865 6179942400 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:53:58,892 api_factory 45865 6179942400 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:53:58,892 api_factory 45865 6179942400 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:53:58,893 api_factory 45865 6179942400 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:53:58,893 api_factory 45865 6179942400 Préfixe de version défini: /v1
+INFO 2025-03-24 03:53:58,893 api_factory 45865 6179942400 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:53:58,893 api_factory 45865 6179942400 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:53:58,893 api_factory 45865 6179942400 Préfixage du contrôleur: AuthController
+ERROR 2025-03-24 03:53:58,898 api_factory 45865 6179942400 Erreur lors de l'analyse du code source: could not find class definition
+INFO 2025-03-24 03:53:58,899 api_factory 45865 6179942400 Application d'un décorateur par défaut pour AuthController
+INFO 2025-03-24 03:54:35,521 autoreload 45865 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:54:37,207 autoreload 46140 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:54:37,474 api_factory 46140 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:54:37,475 api_factory 46140 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:54:37,475 api_factory 46140 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:54:37,475 api_factory 46140 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:54:37,476 api_factory 46140 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:54:37,476 api_factory 46140 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:54:37,476 api_factory 46140 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:54:37,476 api_factory 46140 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:54:37,476 api_factory 46140 8437105216 Préfixage du contrôleur: AuthController
+ERROR 2025-03-24 03:54:37,486 controller_utils 46140 8437105216 Erreur lors de l'analyse du code source: could not find class definition
+WARNING 2025-03-24 03:54:37,487 controller_utils 46140 8437105216 Aucune métadonnée trouvée pour AuthController
+WARNING 2025-03-24 03:54:37,487 api_factory 46140 8437105216 Aucune métadonnée trouvée pour AuthController, application d'un décorateur par défaut
+INFO 2025-03-24 03:54:37,489 api_factory 46140 6117289984 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:54:37,489 api_factory 46140 6117289984 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:54:37,489 api_factory 46140 6117289984 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:54:37,489 api_factory 46140 6117289984 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:54:37,490 api_factory 46140 6117289984 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:54:37,490 api_factory 46140 6117289984 Préfixe de version défini: /v1
+INFO 2025-03-24 03:54:37,490 api_factory 46140 6117289984 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:54:37,490 api_factory 46140 6117289984 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:54:37,490 api_factory 46140 6117289984 Préfixage du contrôleur: AuthController
+ERROR 2025-03-24 03:54:37,499 controller_utils 46140 6117289984 Erreur lors de l'analyse du code source: could not find class definition
+WARNING 2025-03-24 03:54:37,499 controller_utils 46140 6117289984 Aucune métadonnée trouvée pour AuthController
+WARNING 2025-03-24 03:54:37,499 api_factory 46140 6117289984 Aucune métadonnée trouvée pour AuthController, application d'un décorateur par défaut
+INFO 2025-03-24 03:55:35,602 autoreload 46140 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:55:36,153 autoreload 46567 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Préfixage du contrôleur: AuthController
+WARNING 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Aucune métadonnée trouvée pour AuthController, contrôleur ignoré
+INFO 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Enregistrement de 1 contrôleurs préfixés
+INFO 2025-03-24 03:55:36,234 api_factory 46567 8437105216 Ajout du gestionnaire d'exceptions global
+INFO 2025-03-24 03:55:36,234 api_factory 46567 8437105216 API versionnée v1 créée avec succès
+INFO 2025-03-24 03:55:52,573 autoreload 46567 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:55:53,170 autoreload 46711 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Préfixage du contrôleur: AuthController
+WARNING 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Aucune métadonnée trouvée pour AuthController, contrôleur ignoré
+INFO 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Enregistrement de 1 contrôleurs préfixés
+INFO 2025-03-24 03:55:53,260 api_factory 46711 8437105216 Ajout du gestionnaire d'exceptions global
+INFO 2025-03-24 03:55:53,260 api_factory 46711 8437105216 API versionnée v1 créée avec succès
+INFO 2025-03-24 03:56:37,161 autoreload 46711 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:56:37,756 autoreload 47030 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:56:37,840 api_factory 47030 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:56:37,840 api_factory 47030 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:56:37,840 api_factory 47030 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:56:37,840 api_factory 47030 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:56:37,840 api_factory 47030 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:56:37,840 api_factory 47030 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:56:37,840 api_factory 47030 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:56:37,841 api_factory 47030 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:56:37,841 api_factory 47030 8437105216 Préfixage du contrôleur: AuthController
+WARNING 2025-03-24 03:56:37,841 api_factory 47030 8437105216 Aucune métadonnée trouvée pour AuthController, contrôleur ignoré
+INFO 2025-03-24 03:56:37,841 api_factory 47030 8437105216 Enregistrement de 1 contrôleurs préfixés
+INFO 2025-03-24 03:56:37,841 api_factory 47030 8437105216 Ajout du gestionnaire d'exceptions global
+INFO 2025-03-24 03:56:37,841 api_factory 47030 8437105216 API versionnée v1 créée avec succès
+INFO 2025-03-24 03:57:24,733 autoreload 47030 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:57:26,145 autoreload 47353 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:57:40,477 autoreload 47353 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:57:42,200 autoreload 47484 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:58:26,928 autoreload 47484 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:58:27,742 autoreload 47802 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:59:35,834 autoreload 47802 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:59:36,478 autoreload 48279 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:59:41,625 autoreload 48279 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 03:59:42,069 autoreload 48350 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 03:59:42,140 api_factory 48350 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:59:42,140 api_factory 48350 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:59:42,140 api_factory 48350 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:59:42,141 api_factory 48350 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:59:42,141 api_factory 48350 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:59:42,141 api_factory 48350 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 03:59:42,141 api_factory 48350 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:59:42,141 api_factory 48350 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:59:42,141 api_factory 48350 8437105216 Préfixage du contrôleur: AuthController
+DEBUG 2025-03-24 03:59:42,141 api_factory 48350 8437105216 Est une sous-classe de ControllerBase: True
+INFO 2025-03-24 03:59:42,141 api_factory 48350 6147371008 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Préfixe de version défini: /v1
+INFO 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Traitement du contrôleur: AuthController
+INFO 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Préfixage du contrôleur: AuthController
+DEBUG 2025-03-24 03:59:42,142 api_factory 48350 6147371008 Est une sous-classe de ControllerBase: True
+INFO 2025-03-24 04:00:44,037 autoreload 48350 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 04:00:45,236 autoreload 48805 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:00:45,719 api_factory 48805 8437105216 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 04:00:45,719 api_factory 48805 8437105216 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 04:00:45,720 api_factory 48805 8437105216 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 04:00:45,720 api_factory 48805 8437105216 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 04:00:45,723 api_factory 48805 8437105216 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 04:00:45,730 api_factory 48805 8437105216 Préfixe de version défini: /v1
+INFO 2025-03-24 04:00:45,730 api_factory 48805 8437105216 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 04:00:45,730 api_factory 48805 8437105216 Traitement du contrôleur: AuthController
+INFO 2025-03-24 04:00:45,731 api_factory 48805 8437105216 Préfixage du contrôleur: AuthController
+DEBUG 2025-03-24 04:00:45,731 api_factory 48805 8437105216 Est une sous-classe de ControllerBase: True
+INFO 2025-03-24 04:00:45,736 api_factory 48805 6147682304 Création d'une API versionnée: version=v1
+DEBUG 2025-03-24 04:00:45,739 api_factory 48805 6147682304 Nombre de contrôleurs à enregistrer: 1
+DEBUG 2025-03-24 04:00:45,739 api_factory 48805 6147682304 Fusion avec la configuration personnalisée: {'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+DEBUG 2025-03-24 04:00:45,742 api_factory 48805 6147682304 Configuration finale de l'API: {'title': 'API Cartographie', 'version': 'v1.0.0', 'docs_url': '/v1/docs', 'urls_namespace': 'api-v1', 'description': "\n        API pour la gestion de la cartographie des données.\n        \n        Cette API permet de gérer les données cartographiques, les utilisateurs et leurs autorisations.\n        Elle fournit des endpoints pour l'authentification, la gestion des profils utilisateurs,\n        et la manipulation des données cartographiques.\n        \n        Le versionnement de l'API est géré via des préfixes d'URL (/api/v1/, /api/v2/, etc.).\n        \n        ## Versions disponibles\n        - **v1** : Version initiale de l'API (actuelle)\n        - **v2** : Version future avec fonctionnalités améliorées (en développement)\n        "}
+INFO 2025-03-24 04:00:45,743 api_factory 48805 6147682304 Initialisation de l'API NinjaExtraAPI
+DEBUG 2025-03-24 04:00:45,743 api_factory 48805 6147682304 Préfixe de version défini: /v1
+INFO 2025-03-24 04:00:45,743 api_factory 48805 6147682304 Préfixage de 1 contrôleurs
+DEBUG 2025-03-24 04:00:45,743 api_factory 48805 6147682304 Traitement du contrôleur: AuthController
+INFO 2025-03-24 04:00:45,743 api_factory 48805 6147682304 Préfixage du contrôleur: AuthController
+DEBUG 2025-03-24 04:00:45,744 api_factory 48805 6147682304 Est une sous-classe de ControllerBase: True
+INFO 2025-03-24 04:01:14,758 autoreload 48805 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 04:01:15,333 autoreload 49056 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:06:54,819 autoreload 49056 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/api_factory.py changed, reloading.
+INFO 2025-03-24 04:06:56,227 autoreload 51432 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:09:50,523 autoreload 51432 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/router.py changed, reloading.
+INFO 2025-03-24 04:09:51,124 autoreload 52677 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:10:55,319 autoreload 52677 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 04:10:56,115 autoreload 53123 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:12:28,829 autoreload 53123 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 04:12:29,445 autoreload 53793 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:12:31,656 autoreload 53793 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 04:12:32,123 autoreload 53833 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:13:02,760 autoreload 53833 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 04:13:03,355 autoreload 54101 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:13:10,714 autoreload 54101 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/routes.py changed, reloading.
+INFO 2025-03-24 04:13:11,203 autoreload 54183 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:13:26,649 autoreload 54183 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/urls.py changed, reloading.
+INFO 2025-03-24 04:13:27,231 autoreload 54303 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:13:53,891 autoreload 54528 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:16:49,666 autoreload 55805 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:17:36,138 autoreload 56153 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 04:18:28,491 autoreload 56540 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 04:19:01,793 log 56540 6160986112 Not Found: /api/
+WARNING 2025-03-24 04:19:49,427 auth_controller 56540 6160986112 Authentication failed during login
+INFO 2025-03-24 04:19:49,429 operation 56540 6160986112 "POST - AuthController[login] /api/v1/auth/login" 0.012560129165649414
+WARNING 2025-03-24 04:19:49,430 log 56540 6160986112 Unauthorized: /api/v1/auth/login
+INFO 2025-03-24 04:22:09,841 autoreload 56540 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 04:22:11,688 autoreload 58077 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 04:26:05,641 auth_controller 58077 6163722240 Authentication failed during login
+INFO 2025-03-24 04:26:05,644 operation 58077 6163722240 "POST - AuthController[login] /api/v1/login" 0.32125425338745117
+WARNING 2025-03-24 04:26:05,644 log 58077 6163722240 Unauthorized: /api/v1/login
+INFO 2025-03-24 04:26:14,271 operation 58077 6163722240 "POST - AuthController[login] /api/v1/login" 0.3134770393371582
+INFO 2025-03-24 05:02:59,979 autoreload 58077 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:03:00,804 autoreload 75421 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:04:49,296 autoreload 75421 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-24 05:04:49,944 autoreload 76188 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:06:16,720 autoreload 76188 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:06:17,490 autoreload 76805 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:06:26,194 autoreload 76805 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:06:26,725 autoreload 76891 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:07:06,608 autoreload 76891 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:07:08,153 autoreload 77186 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:07:57,071 autoreload 77186 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-24 05:07:57,657 autoreload 77553 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:08:18,156 autoreload 77553 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-24 05:08:18,650 autoreload 77714 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:09:05,191 autoreload 77714 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:09:05,752 autoreload 78059 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:09:21,158 autoreload 78059 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:09:21,961 autoreload 78185 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:09:28,303 autoreload 78185 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:09:28,807 autoreload 78280 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:09:31,025 autoreload 78280 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:09:31,493 autoreload 78318 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:10:05,141 autoreload 78318 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:10:07,609 autoreload 78571 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:10:08,856 autoreload 78571 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:10:09,361 autoreload 78601 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:10:38,446 autoreload 78601 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:10:39,299 autoreload 78819 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:11:10,106 autoreload 78819 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:11:10,746 autoreload 79063 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:12:16,096 autoreload 79063 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-24 05:12:17,841 autoreload 79526 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:12:21,119 autoreload 79526 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-24 05:12:21,593 autoreload 79571 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:12:25,835 autoreload 79571 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-24 05:12:26,318 autoreload 79606 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:17:15,429 autoreload 79606 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:17:16,083 autoreload 82053 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:17:19,334 autoreload 82053 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:17:19,773 autoreload 82105 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:17:51,472 autoreload 82105 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:17:52,082 autoreload 82331 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:17:54,320 autoreload 82331 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:17:54,767 autoreload 82387 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:18:00,028 autoreload 82387 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:18:00,599 autoreload 82450 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:18:11,242 operation 82450 6133313536 "POST - AuthController[login] /api/v1/login" 0.32059407234191895
+INFO 2025-03-24 05:32:22,342 operation 82450 6133313536 "POST - AuthController[refresh_token] /api/v1/refresh" 0.002420186996459961
+WARNING 2025-03-24 05:32:22,343 log 82450 6133313536 Unauthorized: /api/v1/refresh
+WARNING 2025-03-24 05:34:02,300 operation 82450 6133313536 "POST - AuthController[refresh_token] /api/v1/refresh" ([{'type': 'missing', 'loc': ('body', 'refresh_data', 'expires_in'), 'msg': 'Field required'}],)
+WARNING 2025-03-24 05:34:02,301 log 82450 6133313536 Unprocessable Entity: /api/v1/refresh
+INFO 2025-03-24 05:34:26,505 autoreload 82450 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:34:27,174 autoreload 89239 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 05:34:34,561 operation 89239 6163427328 "POST - AuthController[refresh_token] /api/v1/refresh" ([{'type': 'missing', 'loc': ('body', 'refresh_data', 'expires_in'), 'msg': 'Field required'}],)
+WARNING 2025-03-24 05:34:34,562 log 89239 6163427328 Unprocessable Entity: /api/v1/refresh
+WARNING 2025-03-24 05:34:36,888 operation 89239 6163427328 "POST - AuthController[refresh_token] /api/v1/refresh" ([{'type': 'missing', 'loc': ('body', 'refresh_data', 'expires_in'), 'msg': 'Field required'}],)
+WARNING 2025-03-24 05:34:36,888 log 89239 6163427328 Unprocessable Entity: /api/v1/refresh
+INFO 2025-03-24 05:34:48,758 autoreload 89239 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:34:49,334 autoreload 89423 8437105216 Watching for file changes with StatReloader
+WARNING 2025-03-24 05:35:20,222 operation 89423 6194458624 "POST - AuthController[refresh_token] /api/v1/refresh" ([{'type': 'missing', 'loc': ('body', 'refresh_data', 'expires_in'), 'msg': 'Field required'}],)
+WARNING 2025-03-24 05:35:20,223 log 89423 6194458624 Unprocessable Entity: /api/v1/refresh
+INFO 2025-03-24 05:36:23,137 autoreload 89423 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:36:23,616 autoreload 90114 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:36:32,957 autoreload 90114 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:36:33,657 autoreload 90198 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:36:35,812 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0040929317474365234
+INFO 2025-03-24 05:36:56,650 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.004019975662231445
+INFO 2025-03-24 05:36:57,419 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.009119033813476562
+INFO 2025-03-24 05:36:58,004 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0016360282897949219
+INFO 2025-03-24 05:36:58,768 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0010619163513183594
+INFO 2025-03-24 05:36:59,464 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0015230178833007812
+INFO 2025-03-24 05:37:00,120 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0027098655700683594
+INFO 2025-03-24 05:37:00,760 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.001138925552368164
+INFO 2025-03-24 05:37:01,323 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0017309188842773438
+INFO 2025-03-24 05:37:01,929 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0008940696716308594
+INFO 2025-03-24 05:37:02,561 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0009438991546630859
+INFO 2025-03-24 05:37:03,353 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0013000965118408203
+INFO 2025-03-24 05:37:03,996 operation 90198 6159167488 "POST - AuthController[refresh_token] /api/v1/refresh" 0.000993967056274414
+INFO 2025-03-24 05:37:34,956 autoreload 90198 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py changed, reloading.
+INFO 2025-03-24 05:37:35,496 autoreload 90652 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:37:55,991 autoreload 90652 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 05:37:56,598 autoreload 90825 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:38:25,236 autoreload 90825 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:38:25,841 autoreload 91055 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:38:50,394 autoreload 91055 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:38:50,910 autoreload 91250 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:39:54,462 autoreload 91793 8437105216 Watching for file changes with StatReloader
+ERROR 2025-03-24 05:39:59,133 auth_controller 91793 6131363840 Unexpected error during token refresh
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py", line 92, in refresh_token
+    return 200, Token(
+                ^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/pydantic/main.py", line 193, in __init__
+    self.__pydantic_validator__.validate_python(data, self_instance=self)
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Token
+iat
+  Datetimes provided to dates should have zero time - e.g. be exact dates [type=date_from_datetime_inexact, input_value=datetime.datetime(2025, 3...nfo.ZoneInfo(key='UTC')), input_type=datetime]
+    For further information visit https://errors.pydantic.dev/2.8/v/date_from_datetime_inexact
+WARNING 2025-03-24 05:39:59,136 operation 91793 6131363840 "POST - AuthController[refresh_token] /api/v1/refresh" (500, "Une erreur inattendue s'est produite")
+ERROR 2025-03-24 05:39:59,136 log 91793 6131363840 Internal Server Error: /api/v1/refresh
+INFO 2025-03-24 05:43:55,767 autoreload 91793 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 05:43:56,572 autoreload 93456 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 05:44:03,455 operation 93456 6130069504 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0036759376525878906
+INFO 2025-03-24 08:12:20,753 operation 93456 6130069504 "POST - AuthController[refresh_token] /api/v1/refresh" 0.01081991195678711
+WARNING 2025-03-24 08:12:20,756 log 93456 6130069504 Unauthorized: /api/v1/refresh
+INFO 2025-03-24 08:27:20,529 autoreload 93456 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:27:21,156 autoreload 62618 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:27:40,535 autoreload 62618 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:27:41,135 autoreload 62779 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:28:20,732 autoreload 62779 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:28:21,461 autoreload 63089 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:28:59,866 autoreload 63089 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:29:02,151 autoreload 63474 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:52:55,649 autoreload 63474 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 08:52:58,869 autoreload 73548 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:53:49,217 operation 73548 6137098240 "POST - AuthController[login] /api/v1/login" 0.31077098846435547
+INFO 2025-03-24 08:54:09,861 operation 73548 6137098240 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0005609989166259766
+WARNING 2025-03-24 08:54:09,861 log 73548 6137098240 Unauthorized: /api/v1/refresh
+INFO 2025-03-24 08:54:53,604 autoreload 73548 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/auth_schema.py changed, reloading.
+INFO 2025-03-24 08:54:54,255 autoreload 74413 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:55:02,705 autoreload 74413 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:55:03,240 autoreload 74516 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:55:08,474 autoreload 74516 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:55:09,055 autoreload 74571 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:55:20,352 autoreload 74571 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:55:20,831 autoreload 74676 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:55:39,192 autoreload 74676 8437105216 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-03-24 08:55:39,887 autoreload 74834 8437105216 Watching for file changes with StatReloader
+INFO 2025-03-24 08:56:18,139 operation 74834 6192279552 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0003139972686767578
+WARNING 2025-03-24 08:56:18,140 log 74834 6192279552 Unauthorized: /api/v1/refresh
+INFO 2025-03-24 08:56:27,006 operation 74834 6192279552 "POST - AuthController[refresh_token] /api/v1/refresh" 0.0005130767822265625
+WARNING 2025-03-24 08:56:27,007 log 74834 6192279552 Unauthorized: /api/v1/refresh
+WARNING 2025-03-24 08:57:26,212 auth_controller 74834 6192279552 Authentication failed during login
+INFO 2025-03-24 08:57:26,214 operation 74834 6192279552 "POST - AuthController[login] /api/v1/login" 0.009016275405883789
+WARNING 2025-03-24 08:57:26,214 log 74834 6192279552 Unauthorized: /api/v1/login
+WARNING 2025-03-24 08:57:43,158 auth_controller 74834 6192279552 Authentication failed during login
+INFO 2025-03-24 08:57:43,158 operation 74834 6192279552 "POST - AuthController[login] /api/v1/login" 0.0037870407104492188
+WARNING 2025-03-24 08:57:43,158 log 74834 6192279552 Unauthorized: /api/v1/login
+INFO 2025-03-24 08:58:20,107 operation 74834 6192279552 "POST - AuthController[login] /api/v1/login" 0.3176891803741455
+WARNING 2025-03-24 08:58:35,163 auth_controller 74834 6192279552 Authentication failed during login
+INFO 2025-03-24 08:58:35,164 operation 74834 6192279552 "POST - AuthController[login] /api/v1/login" 0.007848024368286133
+WARNING 2025-03-24 08:58:35,164 log 74834 6192279552 Unauthorized: /api/v1/login
+INFO 2025-03-24 09:30:35,141 operation 74834 6192279552 "POST - AuthController[login] /api/v1/login" 0.340911865234375
