@@ -9,15 +9,6 @@ from pydantic import ValidationError as PydanticValidationError
 ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
-class SkyPulseApiError(Exception):
-    """Base exception class for SkyPulse API"""
-
-    def __init__(self, message: str = "Service is unavailable", name: str = "SkyPulse"):
-        self.message = message
-        self.name = name
-        super().__init__(self.message)
-
-
 class HTTPError(HttpError):
     """Base HTTP exception with customizable status code and detail"""
 
