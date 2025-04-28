@@ -1,24 +1,18 @@
-from datetime import datetime
 from typing import Optional
 
 from ninja import Schema
 
+from presentation.schemas.base_schema import BaseSchema
+from presentation.schemas.user_schema import UserAuthSchema
 
-class AccessToken(Schema):
+
+class TokenSchema(BaseSchema):
     access_token: str
-    expires_in: int
-
-
-class RefreshToken(Schema):
     refresh_token: str
-    expires_in: Optional[int] = None
-
-
-class Token(Schema):
-    access_token: AccessToken
-    refresh_token: Optional[RefreshToken] = None
-    token_type: str
-    iat: datetime
+    token_type: str = "bearer"
+    exp: int
+    iat: int
+    user: UserAuthSchema
 
 
 class TokenPayload(Schema):

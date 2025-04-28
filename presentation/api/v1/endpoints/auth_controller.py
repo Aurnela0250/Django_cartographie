@@ -1,137 +1,152 @@
 import logging
 
-from ninja.errors import HttpError
-from ninja_extra import api_controller, http_get, http_post
+from ninja_extra import api_controller, http_get, http_post, route
+from pydantic import ValidationError as PydanticValidationError
 
-from core.use_cases.auth_use_cases import LoginUseCase, SignUpUseCase
-from infrastructure.db.django_user_repository import DjangoUserRepository
-from infrastructure.external_services.jwt_service import JWTService
-from presentation.api.auth_utils import jwt_auth
-from presentation.exceptions import AuthenticationError, ConflictError, ValidationError
-from presentation.schemas.auth_schema import AccessToken, Login, RefreshToken, Token
-from presentation.schemas.user_schemas import UserCreate, UserOut
+from core.use_cases.auth_use_case import AuthUseCase
+from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
+from infrastructure.external_services.jwt_service import JWTService, jwt_auth
+from presentation.exceptions import (
+    AuthenticationError,
+    ConflictError,
+    InternalServerError,
+    InvalidTokenError,
+    ValidationError,
+)
+from presentation.schemas.auth_schema import Login, TokenSchema
+from presentation.schemas.error_schema import ErrorResponseSchema
+from presentation.schemas.user_schema import UserAuthSchema, UserSignUp
 
 
-@api_controller("", tags=["Authentication"])
+@api_controller("/auth", tags=["Authentication"])
 class AuthController:
     def __init__(self):
-        self.user_repository = DjangoUserRepository()
+        self.unit_of_work = DjangoUnitOfWork()
         self.jwt_service = JWTService()
+        self.auth_use_case = AuthUseCase(
+            self.unit_of_work,
+            self.jwt_service,
+        )
         self.logger = logging.getLogger(__name__)
 
-    @http_post("/signin", response={201: UserOut, 400: dict, 409: dict, 422: dict})
-    def sign_up_client(self, user_data: UserCreate):
+    @route.post(
+        "/signup",
+        response={
+            201: UserAuthSchema,
+            422: ErrorResponseSchema,
+            409: ErrorResponseSchema,
+            500: ErrorResponseSchema,
+        },
+    )
+    def sign_up(self, user_data: UserSignUp):
         try:
-            use_case = SignUpUseCase(self.user_repository)
-            client = use_case.execute(user_data.email, user_data.password)
-            return 201, UserOut.from_orm(client)
-        except ValidationError as e:
+            user_found = self.auth_use_case.signup(
+                user_data.email,
+                user_data.password,
+            )
+            return 201, UserAuthSchema.from_orm(user_found)
+        except PydanticValidationError as e:
             self.logger.warning("Validation error during sign up")
-            return 422, e.detail
+            raise ValidationError(e)
         except ConflictError as e:
             self.logger.warning("User already exists during sign up")
-            return 409, {"message": e.detail}
+            raise e
         except Exception:
             self.logger.error(
                 "Unexpected error during sign up",
                 exc_info=True,
             )
-            raise HttpError(500, "Une erreur inattendue s'est produite")
+            raise InternalServerError()
 
-    @http_post(
-        "/login", response={200: Token, 401: dict[str, str], 500: dict[str, str]}
+    @route.post(
+        "/login",
+        response={
+            200: TokenSchema,
+            401: ErrorResponseSchema,
+            422: ErrorResponseSchema,
+            500: ErrorResponseSchema,
+        },
     )
-    def login(self, login_data: Login):
+    def login(self, data: Login):
         try:
-            use_case = LoginUseCase(self.user_repository)
-            user = use_case.execute(login_data.email, login_data.password)
-            if user:
-                (
-                    access_token,
-                    refresh_token,
-                    access_expire_in,
-                    refresh_expire_in,
-                    current_time,
-                ) = self.jwt_service.generate_tokens(str(user.id))
-                return 200, Token(
-                    access_token=AccessToken(
-                        access_token=access_token,
-                        expires_in=access_expire_in,
-                    ),
-                    refresh_token=RefreshToken(
-                        refresh_token=refresh_token,
-                        expires_in=refresh_expire_in,
-                    ),
-                    token_type="bearer",
-                    iat=current_time,
-                )
-            raise AuthenticationError("Invalid credentials")
-        except AuthenticationError as e:
-            self.logger.warning("Authentication failed during login")
-            return 401, {"message": str(e)}
-        except Exception:
+            use_case = self.auth_use_case
+            token = use_case.login(data.email, data.password)
+
+            response = TokenSchema.from_orm(token)
+
+            return 200, response
+        except PydanticValidationError as e:
+            self.logger.warning("Validation error during login")
+            raise ValidationError(e)
+        except AuthenticationError:
+            self.logger.warning("Authentication error during login")
+            raise AuthenticationError()
+        except Exception as e:
             self.logger.error(
-                "Unexpected error during login",
+                f"Unexpected error during login {e}",
                 exc_info=True,
             )
-            raise HttpError(500, "Une erreur inattendue s'est produite")
+            print(f"Unexpected error during login {e}")
+            raise InternalServerError()
 
-    @http_post(
+    @route.post(
         "/refresh",
-        response={200: Token, 401: dict[str, str], 500: dict[str, str]},
-        auth=jwt_auth,
+        response={
+            200: TokenSchema,
+            401: ErrorResponseSchema,
+            500: ErrorResponseSchema,
+        },
     )
-    def refresh_token(self, refresh_data: RefreshToken):
+    def refresh_token(self, refresh_token: str):
+        self.logger.info("Refreshing token")
         try:
-            payload = self.jwt_service.decode_token(refresh_data.refresh_token)
-            if payload and payload["token_type"] == "refresh":
-                user_id = payload["user_id"]
+            new_token = self.auth_use_case.refresh_token(refresh_token)
+            token = TokenSchema.from_orm(new_token)
 
-                (
-                    access_token,
-                    refresh_token,
-                    access_expire_in,
-                    refresh_expire_in,
-                    current_time,
-                ) = self.jwt_service.generate_tokens(user_id)
-
-                return 200, Token(
-                    access_token=AccessToken(
-                        access_token=access_token,
-                        expires_in=access_expire_in,
-                    ),
-                    refresh_token=RefreshToken(
-                        refresh_token=refresh_token,
-                        expires_in=refresh_expire_in,
-                    ),
-                    token_type="bearer",
-                    iat=current_time,
-                )
-            self.logger.warning("Invalid refresh token attempt")
-            return 401, {"message": "Invalid refresh token"}
-        except Exception:
-            self.logger.error(
-                "Unexpected error during token refresh",
-                exc_info=True,
+            return (
+                200,
+                token,
             )
-            raise HttpError(500, "Une erreur inattendue s'est produite")
+        except InvalidTokenError as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Error refreshing token: {str(e)}", exc_info=True)
+            raise InternalServerError()
 
-    @http_get(
-        "/me",
-        response={200: UserOut, 400: dict[str, str], 500: dict[str, str]},
-        auth=jwt_auth,
-    )
+    @http_get("/me", response=UserAuthSchema, auth=jwt_auth)
     def get_current_user(self, request):
         try:
             user_id = request.auth["user_id"]
-            user = self.user_repository.get_user_by_id(user_id)
-            return UserOut.from_orm(user)
-        except ValidationError as e:
-            self.logger.warning("Validation error during fetching current user")
-            return 400, {"message": str(e)}
-        except Exception:
-            self.logger.error(
-                "Unexpected error during fetching current user",
-                exc_info=True,
+            user = self.auth_use_case.get_current_user(user_id)
+            return UserAuthSchema.from_orm(user)
+        except InvalidTokenError as e:
+            raise e
+        except Exception as e:
+            print(f"Error getting current user: {e}")
+            raise InternalServerError()
+
+    @http_post(
+        "/logout",
+        response={
+            200: dict,
+            401: ErrorResponseSchema,
+            500: ErrorResponseSchema,
+        },
+        auth=jwt_auth,
+    )
+    def logout(self, request, refresh_token: str):
+        try:
+            access_token = request.auth
+
+            self.auth_use_case.logout(
+                access_token,
+                refresh_token,
             )
-            raise HttpError(500, "Une erreur inattendue s'est produite")
+
+            return {"message": "Successfully logged out"}
+        except InvalidTokenError as e:
+            raise e
+        except Exception as e:
+            print(f"Unexpected error during logout {e}")
+            self.logger.error("Error during logout", exc_info=True)
+            raise InternalServerError()

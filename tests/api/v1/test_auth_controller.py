@@ -1,6 +1,6 @@
+import pytest
 from django.test import TestCase
 from ninja_extra.testing import TestClient
-import pytest
 
 from apps.users.models import User
 from presentation.api.v1.endpoints.auth_controller import AuthController

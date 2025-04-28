@@ -24,9 +24,14 @@ class DjangoBaseRepository(Generic[T, M, ID]):
             "created_by": db_obj.created_by.id if db_obj.created_by else None,  # type: ignore
             "updated_by": db_obj.updated_by.id if db_obj.updated_by else None,  # type: ignore
         }
+
+        # Traiter tous les autres champs sauf ceux déjà définis
+        exclude_fields = {"id", "created_at", "updated_at", "created_by", "updated_by"}
+
         for field in self.entity.__annotations__:
-            if hasattr(db_obj, field):
+            if hasattr(db_obj, field) and field not in exclude_fields:
                 obj_dict[field] = getattr(db_obj, field)
+
         return self.entity(**obj_dict)
 
     def _to_entity_list(self, db_objs: List[M]) -> List[T]:
@@ -36,7 +41,9 @@ class DjangoBaseRepository(Generic[T, M, ID]):
         created_by_id = obj.created_by  # type: ignore
         updated_by_id = obj.updated_by  # type: ignore
 
-        obj_dict = obj.model_dump(exclude={"id", "created_by", "updated_by"})
+        obj_dict = obj.model_dump(
+            exclude={"id", "created_by", "updated_by", "created_at", "updated_at"}
+        )
 
         db_obj = self.model(**obj_dict)
 

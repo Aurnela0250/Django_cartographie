@@ -4,7 +4,7 @@ from uuid import UUID
 import pytest
 
 from core.domain.entities.user_entity import UserEntity
-from core.use_cases.auth_use_cases import LoginUseCase, SignUpUseCase
+from core.use_cases.auth_use_case import LoginUseCase, SignUpUseCase
 from presentation.exceptions import AuthenticationError, ConflictError
 
 

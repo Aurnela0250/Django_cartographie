@@ -125,7 +125,7 @@ def my_function(param1: str, param2: int) -> bool:
     return result
 
 class MyEntity:
-    id: Optional[UUID]
+    id: Optional[int]
     name: str
     created_at: datetime
 
@@ -209,11 +209,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 ```python
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
 from pydantic import BaseModel
 
 class UserEntity(BaseModel):
-    id: Optional[UUID] = None
+    id: Optional[int] = None
     email: str
     password: str
     active: bool = True

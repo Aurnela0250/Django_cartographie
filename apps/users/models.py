@@ -1,7 +1,5 @@
 from typing import Optional
 
-import uuid6
-
 # Create your models here.
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -35,11 +33,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid6.uuid7,
-        editable=False,
-    )
+    id = models.BigAutoField(primary_key=True)
     email = models.EmailField(unique=True)
     active = models.BooleanField(default=True)
     email_verified = models.BooleanField(default=False)

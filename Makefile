@@ -7,6 +7,25 @@ TEST_PATH = tests/
 COV_PATH = htmlcov/
 PYTEST_OPTS = -v -s --ds=config.settings --cov=core --cov=presentation --cov-report term-missing
 
+# Docker commands
+docker-check:
+	@echo "Vérification du conteneur Redis..."
+	@if ! docker ps | grep -q redis_cartographie; then \
+		echo "Le conteneur Redis n'est pas en cours d'exécution. Démarrage..."; \
+		docker-compose up -d; \
+	else \
+		echo "Le conteneur Redis est déjà en cours d'exécution."; \
+	fi
+
+docker-start:
+	docker-compose up -d
+
+docker-stop:
+	docker-compose down
+
+docker-restart:
+	docker-compose restart
+
 # Commandes principales
 install:
 	pip install -r requirements.txt
@@ -17,7 +36,8 @@ freeze:
 migrate:
 	$(MANAGE) migrate
 
-run:
+# Modifié pour vérifier et démarrer Redis automatiquement
+run: docker-check
 	$(MANAGE) runserver
 
 test:
@@ -62,7 +82,18 @@ clean:
 	find . -type d -name "__pycache__" -delete
 
 # Déploiement local (ex: avec Gunicorn)
-start:
+start: docker-check
 	gunicorn $(PYTHON_MODULE).wsgi:application --bind 0.0.0.0:8000
 
-.PHONY: install migrate run test lint format makemigrations clean start
+# Création d'une application
+createapp:
+	@APP_NAME=$(word 2, $(MAKECMDGOALS)) && \
+	if [ -z "$$APP_NAME" ]; then \
+		echo "Usage: make createapp <app_name>"; \
+		exit 1; \
+	fi; \
+	mkdir -p apps/$$APP_NAME && \
+	$(MANAGE) startapp $$APP_NAME apps/$$APP_NAME
+	@:
+
+.PHONY: install migrate run test lint format makemigrations clean start createapp docker-check docker-start docker-stop docker-restart

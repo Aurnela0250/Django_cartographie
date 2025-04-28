@@ -634,3 +634,341 @@ WARNING 2025-03-24 08:58:35,163 auth_controller 74834 6192279552 Authentication 
 INFO 2025-03-24 08:58:35,164 operation 74834 6192279552 "POST - AuthController[login] /api/v1/login" 0.007848024368286133
 WARNING 2025-03-24 08:58:35,164 log 74834 6192279552 Unauthorized: /api/v1/login
 INFO 2025-03-24 09:30:35,141 operation 74834 6192279552 "POST - AuthController[login] /api/v1/login" 0.340911865234375
+INFO 2025-04-03 10:39:06,759 autoreload 58621 8252195392 Watching for file changes with StatReloader
+INFO 2025-04-03 10:39:20,621 autoreload 58688 8252195392 Watching for file changes with StatReloader
+WARNING 2025-04-03 10:39:32,463 log 58688 6204370944 Not Found: /api/v1/member/4/fetch_events/
+INFO 2025-04-28 15:41:45,145 autoreload 98136 8486322752 Watching for file changes with StatReloader
+ERROR 2025-04-28 15:42:21,997 auth_controller 98136 6204338176 Unexpected error during sign up
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py", line 43, in sign_up
+    user_found = self.auth_use_case.signup(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 27, in signup
+    user_repository = self.unit_of_work.get_repository(DjangoUserRepository)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_unit_of_work.py", line 42, in get_repository
+    self._repositories[repository_class] = repository_class()
+                                           ^^^^^^^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class DjangoUserRepository without an implementation for abstract methods 'create', 'delete', 'filter', 'get', 'get_all', 'update'
+WARNING 2025-04-28 15:42:22,000 operation 98136 6204338176 "POST - AuthController[sign_up] /api/v1/auth/signup" (500, 'Internal server error')
+ERROR 2025-04-28 15:42:22,001 log 98136 6204338176 Internal Server Error: /api/v1/auth/signup
+INFO 2025-04-28 15:43:24,702 autoreload 98136 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-04-28 15:43:25,263 autoreload 1026 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:43:48,702 autoreload 1026 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-04-28 15:43:49,340 autoreload 1645 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:43:56,592 autoreload 1645 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/interfaces/user_repository.py changed, reloading.
+INFO 2025-04-28 15:43:57,367 autoreload 1906 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:44:20,695 autoreload 1906 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-04-28 15:44:21,311 autoreload 2555 8486322752 Watching for file changes with StatReloader
+WARNING 2025-04-28 15:44:25,167 auth_controller 2555 6204944384 Validation error during sign up
+WARNING 2025-04-28 15:44:25,168 operation 2555 6204944384 "POST - AuthController[sign_up] /api/v1/auth/signup" (422, {'message': 'Erreur de validation', 'errors': 2 validation errors for UserAuthSchema
+id
+  UUID input should be a string, bytes or UUID object [type=uuid_type, input_value=1, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.8/v/uuid_type
+username
+  Field required [type=missing, input_value=<DjangoGetter: UserEntity...datetime.timezone.utc))>, input_type=DjangoGetter]
+    For further information visit https://errors.pydantic.dev/2.8/v/missing})
+INFO 2025-04-28 15:45:08,055 auth_use_case 2555 6204370944 Signup attempt with existing account
+WARNING 2025-04-28 15:45:08,056 auth_controller 2555 6204370944 User already exists during sign up
+WARNING 2025-04-28 15:45:08,056 operation 2555 6204370944 "POST - AuthController[sign_up] /api/v1/auth/signup" (409, 'Un compte existe déjà')
+WARNING 2025-04-28 15:45:08,056 log 2555 6204370944 Conflict: /api/v1/auth/signup
+WARNING 2025-04-28 15:45:31,914 auth_controller 2555 6204370944 Validation error during sign up
+WARNING 2025-04-28 15:45:31,915 operation 2555 6204370944 "POST - AuthController[sign_up] /api/v1/auth/signup" (422, {'message': 'Erreur de validation', 'errors': 2 validation errors for UserAuthSchema
+id
+  UUID input should be a string, bytes or UUID object [type=uuid_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.8/v/uuid_type
+username
+  Field required [type=missing, input_value=<DjangoGetter: UserEntity...datetime.timezone.utc))>, input_type=DjangoGetter]
+    For further information visit https://errors.pydantic.dev/2.8/v/missing})
+INFO 2025-04-28 15:46:25,725 autoreload 2555 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-04-28 15:46:26,383 autoreload 5837 8486322752 Watching for file changes with StatReloader
+WARNING 2025-04-28 15:47:41,475 auth_controller 5837 6158151680 Validation error during sign up
+WARNING 2025-04-28 15:47:41,475 operation 5837 6158151680 "POST - AuthController[sign_up] /api/v1/auth/signup" (422, {'message': 'Erreur de validation', 'errors': 1 validation error for UserAuthSchema
+username
+  Field required [type=missing, input_value=<DjangoGetter: UserEntity...datetime.timezone.utc))>, input_type=DjangoGetter]
+    For further information visit https://errors.pydantic.dev/2.8/v/missing})
+INFO 2025-04-28 15:50:16,790 autoreload 5837 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-04-28 15:50:17,575 autoreload 11927 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:51:51,323 autoreload 11927 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-04-28 15:51:51,822 autoreload 14460 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:51:56,155 autoreload 14460 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-04-28 15:51:56,673 autoreload 14599 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:52:05,033 autoreload 14599 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-04-28 15:52:05,544 autoreload 14884 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:52:51,686 autoreload 16123 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:53:07,505 operation 16123 6133133312 "POST - AuthController[sign_up] /api/v1/auth/signup" 0.3868069648742676
+INFO 2025-04-28 15:53:57,074 operation 16123 6133133312 "POST - AuthController[login] /api/v1/auth/login" 0.5998959541320801
+INFO 2025-04-28 15:54:28,419 auth_controller 16123 6133133312 Refreshing token
+ERROR 2025-04-28 15:54:28,465 auth_controller 16123 6133133312 Error refreshing token: Internal server error
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 357, in connect
+    sock = self.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/retry.py", line 62, in call_with_retry
+    return do()
+           ^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 358, in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 730, in _connect
+    raise err
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 718, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 61] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 125, in decode_refresh_token
+    if JWTService.is_token_revoked(payload.get("jti")):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 148, in is_token_revoked
+    return RedisService.exists(f"revoked_token:{jti}")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/redis_service.py", line 53, in exists
+    return bool(cls.get_client().exists(key))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/commands/core.py", line 1729, in exists
+    return self.execute_command("EXISTS", *names, keys=names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/client.py", line 559, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/client.py", line 565, in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 1422, in get_connection
+    connection.connect()
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 363, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 61 connecting to localhost:6378. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 80, in refresh_token
+    payload = self.jwt_service.decode_refresh_token(token)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 138, in decode_refresh_token
+    raise InternalServerError()
+presentation.exceptions.InternalServerError: Internal server error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py", line 103, in refresh_token
+    new_token = self.auth_use_case.refresh_token(refresh_token)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 114, in refresh_token
+    raise InternalServerError()
+presentation.exceptions.InternalServerError: Internal server error
+WARNING 2025-04-28 15:54:28,472 operation 16123 6133133312 "POST - AuthController[refresh_token] /api/v1/auth/refresh" (500, 'Internal server error')
+ERROR 2025-04-28 15:54:28,472 log 16123 6133133312 Internal Server Error: /api/v1/auth/refresh
+INFO 2025-04-28 15:55:45,234 autoreload 20752 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:56:48,346 autoreload 22554 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 15:56:56,615 auth_controller 22554 6123597824 Refreshing token
+ERROR 2025-04-28 15:56:56,670 auth_controller 22554 6123597824 Error refreshing token: Internal server error
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 125, in decode_refresh_token
+    if JWTService.is_token_revoked(payload.get("jti")):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 148, in is_token_revoked
+    return RedisService.exists(f"revoked_token:{jti}")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/redis_service.py", line 53, in exists
+    return bool(cls.get_client().exists(key))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/commands/core.py", line 1729, in exists
+    return self.execute_command("EXISTS", *names, keys=names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/client.py", line 559, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/client.py", line 565, in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 1422, in get_connection
+    connection.connect()
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 369, in connect
+    self.on_connect()
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 471, in on_connect
+    self.read_response()
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/connection.py", line 592, in read_response
+    response = self._parser.read_response(disable_decoding=disable_decoding)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 15, in read_response
+    result = self._read_response(disable_decoding=disable_decoding)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 25, in _read_response
+    raw = self._buffer.readline()
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/_parsers/socket.py", line 115, in readline
+    self._read_from_socket()
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/redis/_parsers/socket.py", line 68, in _read_from_socket
+    raise ConnectionError(SERVER_CLOSED_CONNECTION_ERROR)
+redis.exceptions.ConnectionError: Connection closed by server.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 80, in refresh_token
+    payload = self.jwt_service.decode_refresh_token(token)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/external_services/jwt_service.py", line 138, in decode_refresh_token
+    raise InternalServerError()
+presentation.exceptions.InternalServerError: Internal server error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py", line 103, in refresh_token
+    new_token = self.auth_use_case.refresh_token(refresh_token)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 114, in refresh_token
+    raise InternalServerError()
+presentation.exceptions.InternalServerError: Internal server error
+WARNING 2025-04-28 15:56:56,676 operation 22554 6123597824 "POST - AuthController[refresh_token] /api/v1/auth/refresh" (500, 'Internal server error')
+ERROR 2025-04-28 15:56:56,677 log 22554 6123597824 Internal Server Error: /api/v1/auth/refresh
+INFO 2025-04-28 16:02:16,051 autoreload 31384 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:02:22,573 operation 31384 6197473280 "POST - AuthController[login] /api/v1/auth/login" 0.6233251094818115
+INFO 2025-04-28 16:02:34,316 auth_controller 31384 6197473280 Refreshing token
+INFO 2025-04-28 16:02:34,613 operation 31384 6197473280 "POST - AuthController[refresh_token] /api/v1/auth/refresh" 0.30279111862182617
+WARNING 2025-04-28 16:03:30,968 operation 31384 6197473280 "GET - AuthController[get_current_user] /api/v1/auth/me" (500, 'Internal server error')
+ERROR 2025-04-28 16:03:30,970 log 31384 6197473280 Internal Server Error: /api/v1/auth/me
+INFO 2025-04-28 16:04:58,280 autoreload 31384 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-04-28 16:04:58,834 autoreload 35631 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:05:24,439 autoreload 35631 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-04-28 16:05:25,051 autoreload 36323 8486322752 Watching for file changes with StatReloader
+WARNING 2025-04-28 16:05:28,316 operation 36323 6172405760 "GET - AuthController[get_current_user] /api/v1/auth/me" ()
+WARNING 2025-04-28 16:05:28,320 log 36323 6172405760 Unprocessable Entity: /api/v1/auth/me
+INFO 2025-04-28 16:05:50,893 autoreload 36323 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py changed, reloading.
+INFO 2025-04-28 16:05:51,399 autoreload 37047 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:05:55,060 operation 37047 6170783744 "GET - AuthController[get_current_user] /api/v1/auth/me" 0.10154581069946289
+INFO 2025-04-28 16:06:20,431 operation 37047 6170210304 "POST - AuthController[logout] /api/v1/auth/logout" 0.05165696144104004
+INFO 2025-04-28 16:06:27,916 operation 37047 6170210304 "GET - AuthController[get_current_user] /api/v1/auth/me" 0.008875846862792969
+WARNING 2025-04-28 16:06:27,917 log 37047 6170210304 Unauthorized: /api/v1/auth/me
+INFO 2025-04-28 16:10:17,362 autoreload 37047 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/config/settings.py changed, reloading.
+INFO 2025-04-28 16:10:17,847 autoreload 43955 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:10:47,528 autoreload 43955 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/region/apps.py changed, reloading.
+INFO 2025-04-28 16:10:48,032 autoreload 44761 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:29:09,275 autoreload 44761 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/region/models.py changed, reloading.
+INFO 2025-04-28 16:29:09,906 autoreload 66771 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:29:14,453 autoreload 66771 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/router.py changed, reloading.
+INFO 2025-04-28 16:29:15,004 autoreload 66944 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:29:33,502 autoreload 66944 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/users/models.py changed, reloading.
+INFO 2025-04-28 16:29:34,081 autoreload 67496 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:29:39,330 autoreload 67496 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/users/models.py changed, reloading.
+INFO 2025-04-28 16:29:40,010 autoreload 67677 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:29:46,330 autoreload 67677 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/users/models.py changed, reloading.
+INFO 2025-04-28 16:29:46,874 autoreload 67845 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:29:57,212 autoreload 67845 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/region/models.py changed, reloading.
+INFO 2025-04-28 16:29:57,807 autoreload 68194 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:30:05,147 autoreload 68194 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/region/models.py changed, reloading.
+INFO 2025-04-28 16:30:05,679 autoreload 68433 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:30:10,900 autoreload 68433 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/region/models.py changed, reloading.
+INFO 2025-04-28 16:30:11,384 autoreload 68562 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:30:24,724 autoreload 68562 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/router.py changed, reloading.
+INFO 2025-04-28 16:30:25,384 autoreload 68949 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:36:34,401 autoreload 68949 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 16:36:35,047 autoreload 80891 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:37:09,644 autoreload 80891 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 16:37:10,153 autoreload 81852 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:41:06,038 autoreload 81852 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 16:41:06,637 autoreload 88278 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:43:36,925 autoreload 88278 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 16:43:37,523 autoreload 92320 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:43:44,899 autoreload 92320 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 16:43:46,868 autoreload 92546 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:45:48,423 autoreload 96168 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:46:00,806 autoreload 96168 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 16:46:03,241 autoreload 96508 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:46:37,138 autoreload 96508 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/__init__.py changed, reloading.
+INFO 2025-04-28 16:46:37,828 autoreload 97703 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:46:42,131 autoreload 97703 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/router.py changed, reloading.
+INFO 2025-04-28 16:46:42,626 autoreload 97868 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:46:55,025 autoreload 97868 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/__init__.py changed, reloading.
+INFO 2025-04-28 16:46:55,556 autoreload 98215 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:48:31,227 autoreload 2375 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:48:58,019 autoreload 2375 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/router.py changed, reloading.
+INFO 2025-04-28 16:48:58,641 autoreload 3098 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:54:43,564 autoreload 3098 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/router.py changed, reloading.
+INFO 2025-04-28 16:54:44,498 autoreload 12915 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:58:31,836 autoreload 12915 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/__init__.py changed, reloading.
+INFO 2025-04-28 16:58:32,353 autoreload 19246 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 16:58:35,628 autoreload 19246 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 16:58:36,108 autoreload 19370 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 17:00:04,849 operation 19370 6203256832 "POST - AuthController[login] /api/v1/auth/login" 0.6640851497650146
+INFO 2025-04-28 17:00:22,769 operation 19370 6203256832 "GET - RegionController[get_all_regions] /api/v1/regions" 0.14354491233825684
+ERROR 2025-04-28 17:00:31,862 region_controller 19370 6203256832 Error creating region: null value in column "created_at" of relation "region_region" violates not-null constraint
+DETAIL:  Failing row contains (1, string, string, null, 2025-04-28 17:00:31.858461+00, null, null).
+
+WARNING 2025-04-28 17:00:31,864 operation 19370 6203256832 "POST - RegionController[create_region] /api/v1/regions" (500, 'Error creating region: null value in column "created_at" of relation "region_region" violates not-null constraint\nDETAIL:  Failing row contains (1, string, string, null, 2025-04-28 17:00:31.858461+00, null, null).\n')
+ERROR 2025-04-28 17:00:31,865 log 19370 6203256832 Internal Server Error: /api/v1/regions
+INFO 2025-04-28 17:03:42,785 autoreload 19370 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 17:03:43,482 autoreload 27435 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 17:05:08,082 autoreload 27435 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 17:05:08,809 autoreload 29733 8486322752 Watching for file changes with StatReloader
+ERROR 2025-04-28 17:06:01,932 region_controller 29733 6202322944 Error creating region: null value in column "created_at" of relation "region_region" violates not-null constraint
+DETAIL:  Failing row contains (2, string, string, null, 2025-04-28 17:06:01.930267+00, 4, null).
+
+WARNING 2025-04-28 17:06:01,933 operation 29733 6202322944 "POST - RegionController[create_region] /api/v1/regions" (500, 'Error creating region: null value in column "created_at" of relation "region_region" violates not-null constraint\nDETAIL:  Failing row contains (2, string, string, null, 2025-04-28 17:06:01.930267+00, 4, null).\n')
+ERROR 2025-04-28 17:06:01,933 log 29733 6202322944 Internal Server Error: /api/v1/regions
+INFO 2025-04-28 17:06:53,891 autoreload 29733 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-04-28 17:06:54,512 autoreload 32495 8486322752 Watching for file changes with StatReloader
+WARNING 2025-04-28 17:06:57,895 region_controller 32495 6193754112 Validation error during region creation: 1 validation error for RegionEntity
+created_by
+  Input should be a valid integer [type=int_type, input_value=<User: ninot@example.com>, input_type=User]
+    For further information visit https://errors.pydantic.dev/2.8/v/int_type
+WARNING 2025-04-28 17:06:57,895 operation 32495 6193754112 "POST - RegionController[create_region] /api/v1/regions" (422, {'message': 'Erreur de validation', 'errors': 1 validation error for RegionEntity
+created_by
+  Input should be a valid integer [type=int_type, input_value=<User: ninot@example.com>, input_type=User]
+    For further information visit https://errors.pydantic.dev/2.8/v/int_type})
+INFO 2025-04-28 17:21:02,312 autoreload 32495 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-04-28 17:21:02,918 autoreload 54468 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 17:21:13,741 operation 54468 6170800128 "POST - RegionController[create_region] /api/v1/regions" 0.03697705268859863
+WARNING 2025-04-28 17:21:13,742 log 54468 6170800128 Unauthorized: /api/v1/regions
+INFO 2025-04-28 17:21:23,209 operation 54468 6170800128 "POST - AuthController[login] /api/v1/auth/login" 0.5976591110229492
+INFO 2025-04-28 17:21:36,792 operation 54468 6170800128 "POST - RegionController[create_region] /api/v1/regions" 0.0547337532043457
+INFO 2025-04-28 17:21:47,355 operation 54468 6170800128 "GET - RegionController[get_all_regions] /api/v1/regions" 0.054705142974853516
+INFO 2025-04-28 17:21:55,477 operation 54468 6170800128 "GET - RegionController[get_region] /api/v1/regions/4" 0.04261589050292969
+INFO 2025-04-28 17:22:09,338 operation 54468 6170800128 "PUT - RegionController[update_region] /api/v1/regions/4" 0.04886198043823242
+INFO 2025-04-28 17:22:15,082 operation 54468 6170800128 "GET - RegionController[get_all_regions] /api/v1/regions" 0.04261302947998047
+INFO 2025-04-28 17:22:25,226 operation 54468 6170800128 "DELETE - RegionController[delete_region] /api/v1/regions/4" 0.03735685348510742
+INFO 2025-04-28 17:24:50,292 operation 54468 6170800128 "POST - RegionController[create_region] /api/v1/regions" 0.05271196365356445
+WARNING 2025-04-28 17:24:53,869 region_use_case 54468 6170800128 Region with name 'Region 1' already exists
+WARNING 2025-04-28 17:24:53,870 region_controller 54468 6170800128 Conflict error during region creation
+WARNING 2025-04-28 17:24:53,871 operation 54468 6170800128 "POST - RegionController[create_region] /api/v1/regions" (409, 'This resource already exists')
+WARNING 2025-04-28 17:24:53,871 log 54468 6170800128 Conflict: /api/v1/regions
+INFO 2025-04-28 17:25:44,070 operation 54468 6170800128 "PUT - RegionController[update_region] /api/v1/regions/5" 0.06102800369262695
+INFO 2025-04-28 17:25:51,921 operation 54468 6170800128 "PUT - RegionController[update_region] /api/v1/regions/5" 0.04616498947143555
+INFO 2025-04-28 17:26:59,238 autoreload 54468 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-04-28 17:26:59,966 autoreload 63722 8486322752 Watching for file changes with StatReloader
+INFO 2025-04-28 17:27:06,892 operation 63722 6161510400 "PUT - RegionController[update_region] /api/v1/regions/5" 0.10200667381286621
+ERROR 2025-04-28 17:27:16,628 region_controller 63722 6161510400 Error deleting region 4: Region matching query does not exist.
+WARNING 2025-04-28 17:27:16,629 operation 63722 6161510400 "DELETE - RegionController[delete_region] /api/v1/regions/4" (500, 'Error deleting region: Region matching query does not exist.')
+ERROR 2025-04-28 17:27:16,629 log 63722 6161510400 Internal Server Error: /api/v1/regions/4
+INFO 2025-04-28 17:27:22,930 operation 63722 6161510400 "DELETE - RegionController[delete_region] /api/v1/regions/5" 0.05180978775024414
+ERROR 2025-04-28 17:28:33,152 region_controller 63722 6161510400 Error deleting region 5: Region matching query does not exist.
+WARNING 2025-04-28 17:28:33,153 operation 63722 6161510400 "DELETE - RegionController[delete_region] /api/v1/regions/5" (500, 'Error deleting region: Region matching query does not exist.')
+ERROR 2025-04-28 17:28:33,155 log 63722 6161510400 Internal Server Error: /api/v1/regions/5
+INFO 2025-04-28 17:29:09,656 autoreload 63722 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/region_use_case.py changed, reloading.
+INFO 2025-04-28 17:29:10,298 autoreload 67125 8486322752 Watching for file changes with StatReloader
+ERROR 2025-04-28 17:29:12,635 region_controller 67125 6172749824 Error deleting region 5: Region matching query does not exist.
+WARNING 2025-04-28 17:29:12,635 operation 67125 6172749824 "DELETE - RegionController[delete_region] /api/v1/regions/5" (500, 'Error deleting region: Region matching query does not exist.')
+ERROR 2025-04-28 17:29:12,635 log 67125 6172749824 Internal Server Error: /api/v1/regions/5
+ERROR 2025-04-28 17:29:14,538 region_controller 67125 6172749824 Error deleting region 5: Region matching query does not exist.
+WARNING 2025-04-28 17:29:14,538 operation 67125 6172749824 "DELETE - RegionController[delete_region] /api/v1/regions/5" (500, 'Error deleting region: Region matching query does not exist.')
+ERROR 2025-04-28 17:29:14,539 log 67125 6172749824 Internal Server Error: /api/v1/regions/5
+INFO 2025-04-28 17:29:20,821 autoreload 67125 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/region_use_case.py changed, reloading.
+INFO 2025-04-28 17:29:21,352 autoreload 67488 8486322752 Watching for file changes with StatReloader
+ERROR 2025-04-28 17:29:24,669 region_controller 67488 6163869696 Error deleting region 5: Region matching query does not exist.
+WARNING 2025-04-28 17:29:24,669 operation 67488 6163869696 "DELETE - RegionController[delete_region] /api/v1/regions/5" (500, 'Error deleting region: Region matching query does not exist.')
+ERROR 2025-04-28 17:29:24,669 log 67488 6163869696 Internal Server Error: /api/v1/regions/5
+ERROR 2025-04-28 17:29:25,800 region_controller 67488 6163869696 Error deleting region 5: Region matching query does not exist.
+WARNING 2025-04-28 17:29:25,800 operation 67488 6163869696 "DELETE - RegionController[delete_region] /api/v1/regions/5" (500, 'Error deleting region: Region matching query does not exist.')
+ERROR 2025-04-28 17:29:25,800 log 67488 6163869696 Internal Server Error: /api/v1/regions/5
+ERROR 2025-04-28 17:29:26,084 region_controller 67488 6163869696 Error deleting region 5: Region matching query does not exist.
+WARNING 2025-04-28 17:29:26,085 operation 67488 6163869696 "DELETE - RegionController[delete_region] /api/v1/regions/5" (500, 'Error deleting region: Region matching query does not exist.')
+ERROR 2025-04-28 17:29:26,086 log 67488 6163869696 Internal Server Error: /api/v1/regions/5
+INFO 2025-04-28 17:29:40,002 autoreload 67488 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/region_use_case.py changed, reloading.
+INFO 2025-04-28 17:29:40,571 autoreload 67996 8486322752 Watching for file changes with StatReloader

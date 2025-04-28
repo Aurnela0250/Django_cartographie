@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, List, Optional
 from uuid import UUID
 
 from apps.users.models import User
@@ -28,7 +28,7 @@ class DjangoUserRepository(UserRepository):
         # we'll just call get_user_by_email
         return self.get_user_by_email(username)
 
-    def get_user_by_id(self, user_id: UUID) -> Optional[UserEntity]:
+    def get_user_by_id(self, user_id: int) -> Optional[UserEntity]:
         try:
             user = User.objects.get(id=user_id)
             return self._to_entity(user)
@@ -36,10 +36,13 @@ class DjangoUserRepository(UserRepository):
             return None
 
     def authenticate_user(self, login: str, password: str) -> Optional[UserEntity]:
-        # In this implementation, we only use email as login
+        # Vérifier d'abord si le login correspond à un email
         user = User.objects.filter(email=login).first()
+        if user is None:
+            # Si ce n'est pas un email, vérifier si c'est un nom d'utilisateur
+            user = User.objects.filter(username=login).first()
         if user and user.check_password(password):
-            # If the user exists and the password is correct
+            # Si l'utilisateur existe et le mot de passe est correct
             return self._to_entity(user)
         return None
 
@@ -53,3 +56,21 @@ class DjangoUserRepository(UserRepository):
             created_at=django_user.created_at,
             updated_at=django_user.updated_at,
         )
+
+    def create(self, data: Any) -> Any:
+        raise NotImplementedError
+
+    def get(self, id: UUID | int) -> Any | None:
+        raise NotImplementedError
+
+    def get_all(self) -> List[Any]:
+        raise NotImplementedError
+
+    def update(self, id: UUID | int, data: Any) -> Any | None:
+        raise NotImplementedError
+
+    def delete(self, id: UUID | int) -> bool:
+        raise NotImplementedError
+
+    def filter(self, **kwargs) -> List[Any]:
+        raise NotImplementedError

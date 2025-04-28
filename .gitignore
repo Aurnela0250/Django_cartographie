@@ -2,3 +2,9 @@
 .env
 **.log
 **/__pycache__
+.baserock
+*.log
+*.pem
+*.b64
+keys
+logs
