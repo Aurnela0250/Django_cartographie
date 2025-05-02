@@ -972,3 +972,242 @@ WARNING 2025-04-28 17:29:26,085 operation 67488 6163869696 "DELETE - RegionContr
 ERROR 2025-04-28 17:29:26,086 log 67488 6163869696 Internal Server Error: /api/v1/regions/5
 INFO 2025-04-28 17:29:40,002 autoreload 67488 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/region_use_case.py changed, reloading.
 INFO 2025-04-28 17:29:40,571 autoreload 67996 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:23:36,808 autoreload 33971 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:23:46,503 operation 33971 6206943232 "GET - LevelController[get_all_levels] /api/v1/levels" 0.0013549327850341797
+WARNING 2025-05-01 09:23:46,504 log 33971 6206943232 Unauthorized: /api/v1/levels
+ERROR 2025-05-01 09:24:02,615 auth_controller 33971 6206943232 Unexpected error during login Internal server error
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 50, in login
+    user = user_repository.authenticate_user(login, password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py", line 43, in authenticate_user
+    user = User.objects.filter(username=login).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1609, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1641, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1491, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1303, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1768, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'username' into field. Choices are: active, created_at, created_levels, created_regions, email, email_verified, groups, id, is_superuser, last_login, logentry, password, updated_at, updated_by, updated_by_id, updated_levels, updated_regions, updated_users, user_permissions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py", line 73, in login
+    token = use_case.login(data.email, data.password)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 74, in login
+    raise InternalServerError()
+presentation.exceptions.InternalServerError: Internal server error
+WARNING 2025-05-01 09:24:02,631 operation 33971 6206943232 "POST - AuthController[login] /api/v1/auth/login" (500, 'Internal server error')
+ERROR 2025-05-01 09:24:02,631 log 33971 6206943232 Internal Server Error: /api/v1/auth/login
+INFO 2025-05-01 09:27:39,657 autoreload 33971 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-05-01 09:27:40,153 autoreload 40358 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:27:50,549 autoreload 40358 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py changed, reloading.
+INFO 2025-05-01 09:27:50,895 autoreload 40659 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:27:59,246 autoreload 40659 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-05-01 09:27:59,574 autoreload 40880 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:28:19,180 autoreload 40880 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py changed, reloading.
+INFO 2025-05-01 09:28:19,532 autoreload 41441 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:28:22,776 autoreload 41441 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-05-01 09:28:23,108 autoreload 41575 8486322752 Watching for file changes with StatReloader
+ERROR 2025-05-01 09:29:14,990 auth_controller 41575 6157414400 Unexpected error during login Internal server error
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 50, in login
+    user = user_repository.authenticate_user(login, password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py", line 43, in authenticate_user
+    user = User.objects.filter(username=login).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1609, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1641, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1491, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1303, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1768, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'username' into field. Choices are: active, created_at, created_levels, created_regions, email, email_verified, groups, id, is_superuser, last_login, logentry, password, updated_at, updated_by, updated_by_id, updated_levels, updated_regions, updated_users, user_permissions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py", line 73, in login
+    token = use_case.login(data.email, data.password)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 74, in login
+    raise InternalServerError()
+presentation.exceptions.InternalServerError: Internal server error
+WARNING 2025-05-01 09:29:15,001 operation 41575 6157414400 "POST - AuthController[login] /api/v1/auth/login" (500, 'Internal server error')
+ERROR 2025-05-01 09:29:15,002 log 41575 6157414400 Internal Server Error: /api/v1/auth/login
+ERROR 2025-05-01 09:29:51,747 auth_controller 41575 6157414400 Unexpected error during login Internal server error
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 50, in login
+    user = user_repository.authenticate_user(login, password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py", line 43, in authenticate_user
+    user = User.objects.filter(username=login).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1609, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1641, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1491, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1303, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1768, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'username' into field. Choices are: active, created_at, created_levels, created_regions, email, email_verified, groups, id, is_superuser, last_login, logentry, password, updated_at, updated_by, updated_by_id, updated_levels, updated_regions, updated_users, user_permissions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/auth_controller.py", line 73, in login
+    token = use_case.login(data.email, data.password)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py", line 74, in login
+    raise InternalServerError()
+presentation.exceptions.InternalServerError: Internal server error
+WARNING 2025-05-01 09:29:51,754 operation 41575 6157414400 "POST - AuthController[login] /api/v1/auth/login" (500, 'Internal server error')
+ERROR 2025-05-01 09:29:51,755 log 41575 6157414400 Internal Server Error: /api/v1/auth/login
+INFO 2025-05-01 09:35:35,355 autoreload 41575 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/user_schema.py changed, reloading.
+INFO 2025-05-01 09:35:37,029 autoreload 52865 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:38:38,230 autoreload 52865 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/users/models.py changed, reloading.
+INFO 2025-05-01 09:38:38,585 autoreload 57548 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:38:49,948 autoreload 57548 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-05-01 09:38:50,331 autoreload 57890 8486322752 Watching for file changes with StatReloader
+WARNING 2025-05-01 09:39:18,795 auth_controller 57890 6158659584 Authentication error during login
+WARNING 2025-05-01 09:39:18,796 operation 57890 6158659584 "POST - AuthController[login] /api/v1/auth/login" (401, 'Unauthorized')
+WARNING 2025-05-01 09:39:18,797 log 57890 6158659584 Unauthorized: /api/v1/auth/login
+INFO 2025-05-01 09:40:31,370 operation 57890 6158659584 "POST - AuthController[login] /api/v1/auth/login" 0.3864889144897461
+INFO 2025-05-01 09:40:47,505 operation 57890 6158659584 "GET - LevelController[get_all_levels] /api/v1/levels" 0.08542275428771973
+INFO 2025-05-01 09:41:08,424 operation 57890 6158659584 "POST - LevelController[create_level] /api/v1/levels" 0.06470799446105957
+INFO 2025-05-01 09:41:16,988 operation 57890 6158659584 "GET - LevelController[get_all_levels] /api/v1/levels" 0.04889702796936035
+INFO 2025-05-01 09:41:37,829 operation 57890 6158659584 "GET - LevelController[get_level] /api/v1/levels/1" 0.03780722618103027
+INFO 2025-05-01 09:43:13,892 operation 57890 6158659584 "PUT - LevelController[update_level] /api/v1/levels/1" 0.06634998321533203
+INFO 2025-05-01 09:43:22,860 operation 57890 6158659584 "GET - LevelController[get_level] /api/v1/levels/1" 0.04486703872680664
+INFO 2025-05-01 09:43:29,312 operation 57890 6158659584 "DELETE - LevelController[delete_level] /api/v1/levels/1" 0.04786276817321777
+ERROR 2025-05-01 09:43:32,810 level_controller 57890 6158659584 Error retrieving level 1: Level matching query does not exist.
+WARNING 2025-05-01 09:43:32,811 operation 57890 6158659584 "GET - LevelController[get_level] /api/v1/levels/1" (500, 'Error retrieving level: Level matching query does not exist.')
+ERROR 2025-05-01 09:43:32,811 log 57890 6158659584 Internal Server Error: /api/v1/levels/1
+INFO 2025-05-01 09:48:48,445 autoreload 81140 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:51:26,445 autoreload 81140 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/domain/entities/level_entity.py changed, reloading.
+INFO 2025-05-01 09:51:26,938 autoreload 85188 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:51:29,208 autoreload 85188 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/level_schema.py changed, reloading.
+INFO 2025-05-01 09:51:29,634 autoreload 85310 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:51:30,863 autoreload 85310 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/interfaces/level_repository.py changed, reloading.
+INFO 2025-05-01 09:51:31,185 autoreload 85363 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:51:33,422 autoreload 85363 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_level_repository.py changed, reloading.
+INFO 2025-05-01 09:51:33,808 autoreload 85463 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:51:43,099 autoreload 85463 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/level_use_case.py changed, reloading.
+INFO 2025-05-01 09:51:43,423 autoreload 85759 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:51:52,757 autoreload 85759 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/level_use_case.py changed, reloading.
+INFO 2025-05-01 09:51:53,167 autoreload 86000 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:52:06,564 autoreload 86000 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/level_controller.py changed, reloading.
+INFO 2025-05-01 09:52:06,921 autoreload 86386 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:52:40,734 autoreload 86386 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/domain/entities/level_entity.py changed, reloading.
+INFO 2025-05-01 09:52:41,192 autoreload 87295 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:52:47,491 autoreload 87295 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/interfaces/level_repository.py changed, reloading.
+INFO 2025-05-01 09:52:47,808 autoreload 87477 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:52:55,107 autoreload 87477 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/level_use_case.py changed, reloading.
+INFO 2025-05-01 09:52:55,461 autoreload 87710 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:52:58,701 autoreload 87710 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_level_repository.py changed, reloading.
+INFO 2025-05-01 09:52:59,014 autoreload 87838 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:53:04,298 autoreload 87838 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/level_schema.py changed, reloading.
+INFO 2025-05-01 09:53:04,663 autoreload 88022 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 09:53:17,763 operation 88022 6191476736 "POST - LevelController[create_level] /api/v1/levels" 0.10567307472229004
+INFO 2025-05-01 09:53:31,214 operation 88022 6191476736 "POST - LevelController[create_level] /api/v1/levels" 0.056835174560546875
+INFO 2025-05-01 09:54:45,085 operation 88022 6191476736 "POST - LevelController[create_level] /api/v1/levels" 0.06182599067687988
+INFO 2025-05-01 09:55:18,493 operation 88022 6191476736 "POST - LevelController[create_level] /api/v1/levels" 0.07823729515075684
+INFO 2025-05-01 09:55:45,260 operation 88022 6191476736 "POST - LevelController[create_level] /api/v1/levels" 0.0024569034576416016
+WARNING 2025-05-01 09:55:45,260 log 88022 6191476736 Unauthorized: /api/v1/levels
+INFO 2025-05-01 09:55:55,705 operation 88022 6191476736 "POST - AuthController[login] /api/v1/auth/login" 0.40528202056884766
+INFO 2025-05-01 09:56:15,073 operation 88022 6191476736 "POST - LevelController[create_level] /api/v1/levels" 0.046447038650512695
+WARNING 2025-05-01 09:56:39,981 level_use_case 88022 6191476736 Level with name 'Doctorat' already exists
+WARNING 2025-05-01 09:56:39,982 level_controller 88022 6191476736 Conflict error during level creation
+WARNING 2025-05-01 09:56:39,983 operation 88022 6191476736 "POST - LevelController[create_level] /api/v1/levels" (409, 'This resource already exists')
+WARNING 2025-05-01 09:56:39,983 log 88022 6191476736 Conflict: /api/v1/levels
+INFO 2025-05-01 09:57:41,484 operation 88022 6191476736 "GET - LevelController[get_all_levels] /api/v1/levels" 0.0623471736907959
+INFO 2025-05-01 10:01:25,699 autoreload 88022 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/exceptions.py changed, reloading.
+INFO 2025-05-01 10:01:26,217 autoreload 1240 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:05:53,824 autoreload 1240 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/level_use_case.py changed, reloading.
+INFO 2025-05-01 10:05:54,250 autoreload 8236 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:05:57,455 autoreload 8236 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/region_use_case.py changed, reloading.
+INFO 2025-05-01 10:05:57,900 autoreload 8353 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:06:06,242 autoreload 8353 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/region_use_case.py changed, reloading.
+INFO 2025-05-01 10:06:06,576 autoreload 8607 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:09:53,962 autoreload 8607 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/region_use_case.py changed, reloading.
+INFO 2025-05-01 10:09:54,336 autoreload 14585 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:10:00,627 autoreload 14585 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/level_use_case.py changed, reloading.
+INFO 2025-05-01 10:10:00,944 autoreload 14772 8486322752 Watching for file changes with StatReloader
+WARNING 2025-05-01 10:10:12,104 level_use_case 14772 6158643200 Level with name 'Doctorat' already exists
+WARNING 2025-05-01 10:10:12,105 level_controller 14772 6158643200 Conflict error during level creation
+WARNING 2025-05-01 10:10:12,105 operation 14772 6158643200 "POST - LevelController[create_level] /api/v1/levels" 409
+WARNING 2025-05-01 10:10:12,105 log 14772 6158643200 Conflict: /api/v1/levels
+INFO 2025-05-01 10:13:56,047 autoreload 14772 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/users/models.py changed, reloading.
+INFO 2025-05-01 10:13:56,395 autoreload 20955 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:14:11,764 autoreload 20955 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-05-01 10:14:12,228 autoreload 21405 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:15:08,162 autoreload 21405 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-05-01 10:15:08,687 autoreload 22878 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:15:10,930 autoreload 22878 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/apps/users/models.py changed, reloading.
+INFO 2025-05-01 10:15:11,239 autoreload 22983 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:15:31,661 autoreload 22983 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_user_repository.py changed, reloading.
+INFO 2025-05-01 10:15:32,092 autoreload 23520 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:15:43,505 autoreload 23520 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/core/use_cases/auth_use_case.py changed, reloading.
+INFO 2025-05-01 10:15:44,019 autoreload 23880 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:16:06,537 autoreload 23880 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_region_repository.py changed, reloading.
+INFO 2025-05-01 10:16:06,880 autoreload 24533 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-01 10:20:42,550 autoreload 24533 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
+INFO 2025-05-01 10:20:43,151 autoreload 31707 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 04:47:54,544 autoreload 97098 8486322752 Watching for file changes with StatReloader

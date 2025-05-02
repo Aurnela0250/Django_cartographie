@@ -1,10 +1,10 @@
 import logging
-from typing import List, Optional
+from typing import List
 
 from core.domain.entities.region_entity import RegionEntity
 from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_region_repository import DjangoRegionRepository
-from presentation.exceptions import ConflictError, NotFoundError, EntityError
+from presentation.exceptions import ConflictError, NotFoundError
 
 
 class RegionUseCase:
@@ -25,7 +25,7 @@ class RegionUseCase:
                 self.logger.warning(
                     f"Region with name '{region_data.name}' already exists"
                 )
-                raise EntityError.already_exists(RegionEntity, region_data.name)
+                raise ConflictError()
 
             # Vérifier si une région avec le même code existe déjà (si un code est fourni)
             if region_data.code:
@@ -34,7 +34,7 @@ class RegionUseCase:
                     self.logger.warning(
                         f"Region with code '{region_data.code}' already exists"
                     )
-                    raise EntityError.already_exists(RegionEntity, region_data.code)
+                    raise ConflictError()
 
             # Créer la région
             created_region = region_repository.create(region_data)
@@ -47,7 +47,7 @@ class RegionUseCase:
             region_repository = self.unit_of_work.get_repository(DjangoRegionRepository)
             region = region_repository.get(region_id)
             if not region:
-                raise EntityError.not_found(RegionEntity, region_id)
+                raise NotFoundError()
             return region
 
     def update_region(self, region_id: int, region_data: RegionEntity) -> RegionEntity:
@@ -58,7 +58,7 @@ class RegionUseCase:
             # Vérifier si la région existe
             existing_region = region_repository.get(region_id)
             if not existing_region:
-                raise EntityError.not_found(RegionEntity, region_id)
+                raise NotFoundError()
 
             # Vérifier si le nouveau nom existe déjà pour une autre région
             if region_data.name != existing_region.name:
@@ -67,7 +67,7 @@ class RegionUseCase:
                     self.logger.warning(
                         f"Cannot update: Region with name '{region_data.name}' already exists"
                     )
-                    raise EntityError.already_exists(RegionEntity, region_data.name)
+                    raise ConflictError()
 
             # Vérifier si le nouveau code existe déjà pour une autre région
             if region_data.code and region_data.code != existing_region.code:
@@ -76,7 +76,7 @@ class RegionUseCase:
                     self.logger.warning(
                         f"Cannot update: Region with code '{region_data.code}' already exists"
                     )
-                    raise EntityError.already_exists(RegionEntity, region_data.code)
+                    raise ConflictError()
 
             # Mettre à jour la région
             updated_region = region_repository.update(region_id, region_data)
@@ -91,7 +91,7 @@ class RegionUseCase:
             # Vérifier si la région existe
             existing_region = region_repository.get(region_id)
             if not existing_region:
-                raise EntityError.not_found(RegionEntity, region_id)
+                raise NotFoundError()
 
             # Supprimer la région
             result = region_repository.delete(region_id)

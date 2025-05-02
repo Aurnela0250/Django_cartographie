@@ -10,7 +10,6 @@ from presentation.schemas.base_schema import BaseSchema
 
 class UserBase(Schema):
     email: EmailStr
-    username: str
 
 
 class UserCreate(Schema):

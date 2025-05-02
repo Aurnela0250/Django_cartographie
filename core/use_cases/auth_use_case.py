@@ -26,11 +26,11 @@ class AuthUseCase:
         with self.unit_of_work:
             user_repository = self.unit_of_work.get_repository(DjangoUserRepository)
 
-            # Check if email or username already exists
+            # Check if email already exists
             if user_repository.get_user_by_email(email):
                 # Log without revealing the exact email in production logs
                 self.logger.info("Signup attempt with existing account")
-                raise ConflictError(detail="Un compte existe déjà")
+                raise ConflictError()
 
             user = UserEntity(
                 id=None,

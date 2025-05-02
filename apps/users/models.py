@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -17,7 +18,7 @@ class CustomUserManager(BaseUserManager):
         **extra_fields,
     ):
         if not email:
-            raise ValueError("The Email field must be set")
+            raise ValidationError("The Email field must be set")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -53,3 +54,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+# Aucun champ username ici, rien à changer.

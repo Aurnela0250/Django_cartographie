@@ -41,7 +41,7 @@ class RegionController:
             return 200, [RegionOut.model_validate(region) for region in regions]
         except Exception as e:
             self.logger.error(f"Error retrieving all regions: {str(e)}")
-            raise InternalServerError(f"Error retrieving regions: {str(e)}")
+            raise InternalServerError()
 
     @http_get(
         "/{region_id}",
@@ -60,7 +60,7 @@ class RegionController:
             raise
         except Exception as e:
             self.logger.error(f"Error retrieving region {region_id}: {str(e)}")
-            raise InternalServerError(f"Error retrieving region: {str(e)}")
+            raise InternalServerError()
 
     @http_post(
         "",
@@ -91,7 +91,7 @@ class RegionController:
             raise
         except Exception as e:
             self.logger.error(f"Error creating region: {str(e)}")
-            raise InternalServerError(f"Error creating region: {str(e)}")
+            raise InternalServerError()
 
     @http_put(
         "/{region_id}",
@@ -143,7 +143,7 @@ class RegionController:
             raise
         except Exception as e:
             self.logger.error(f"Error updating region {region_id}: {str(e)}")
-            raise InternalServerError(f"Error updating region: {str(e)}")
+            raise InternalServerError()
 
     @http_delete(
         "/{region_id}",
@@ -162,4 +162,4 @@ class RegionController:
             raise
         except Exception as e:
             self.logger.error(f"Error deleting region {region_id}: {str(e)}")
-            raise InternalServerError(f"Error deleting region: {str(e)}")
+            raise InternalServerError()

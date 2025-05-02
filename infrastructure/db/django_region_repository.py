@@ -1,9 +1,8 @@
-from typing import List, Optional, Union
-from uuid import UUID
+from typing import Optional
 
+from apps.region.models import Region
 from core.domain.entities.region_entity import RegionEntity
 from core.interfaces.region_repository import RegionRepository
-from apps.region.models import Region
 from infrastructure.db.django_base_repository import DjangoBaseRepository
 
 

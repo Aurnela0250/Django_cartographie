@@ -4,9 +4,10 @@ from presentation.api.exception_handlers import global_exception_handler
 
 # Importer les contrôleurs par version
 from .endpoints.auth_controller import AuthController
+from .endpoints.level_controller import LevelController
 from .endpoints.region_controller import RegionController
 
-controllers = [AuthController, RegionController]
+controllers = [AuthController, RegionController, LevelController]
 
 # Création de l'API
 api = NinjaExtraAPI(

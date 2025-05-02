@@ -24,9 +24,9 @@ class DjangoUserRepository(UserRepository):
             return None
 
     def get_user_by_username(self, username: str) -> Optional[UserEntity]:
-        # Since our User model uses email as the username field,
-        # we'll just call get_user_by_email
-        return self.get_user_by_email(username)
+        # Cette méthode n'est plus utile, vous pouvez la supprimer complètement.
+        # return self.get_user_by_email(username)
+        pass
 
     def get_user_by_id(self, user_id: int) -> Optional[UserEntity]:
         try:
@@ -36,13 +36,9 @@ class DjangoUserRepository(UserRepository):
             return None
 
     def authenticate_user(self, login: str, password: str) -> Optional[UserEntity]:
-        # Vérifier d'abord si le login correspond à un email
+        # Vérifier uniquement par email
         user = User.objects.filter(email=login).first()
-        if user is None:
-            # Si ce n'est pas un email, vérifier si c'est un nom d'utilisateur
-            user = User.objects.filter(username=login).first()
         if user and user.check_password(password):
-            # Si l'utilisateur existe et le mot de passe est correct
             return self._to_entity(user)
         return None
 
