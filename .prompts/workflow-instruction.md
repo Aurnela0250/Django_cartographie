@@ -6,3 +6,4 @@
 4. créer les schemas pour le controller dans `presentation/schema/`
 5. Implementer le use case dans `core/use_case/`
 6. implementer le controller dans `presentation/api/v1/endpoints/`
+7. Ajouter le controller dans la list des controller `presentation/api/v1/router.ts`

@@ -41,7 +41,7 @@ class LevelController:
             return 200, [LevelOut.model_validate(level) for level in levels]
         except Exception as e:
             self.logger.error(f"Error retrieving all levels: {str(e)}")
-            raise InternalServerError(f"Error retrieving levels: {str(e)}")
+            raise InternalServerError()
 
     @http_get(
         "/{level_id}",
@@ -60,7 +60,7 @@ class LevelController:
             raise
         except Exception as e:
             self.logger.error(f"Error retrieving level {level_id}: {str(e)}")
-            raise InternalServerError(f"Error retrieving level: {str(e)}")
+            raise InternalServerError()
 
     @http_post(
         "",
@@ -91,7 +91,7 @@ class LevelController:
             raise
         except Exception as e:
             self.logger.error(f"Error creating level: {str(e)}")
-            raise InternalServerError(f"Error creating level: {str(e)}")
+            raise InternalServerError()
 
     @http_put(
         "/{level_id}",
@@ -143,7 +143,7 @@ class LevelController:
             raise
         except Exception as e:
             self.logger.error(f"Error updating level {level_id}: {str(e)}")
-            raise InternalServerError(f"Error updating level: {str(e)}")
+            raise InternalServerError()
 
     @http_delete(
         "/{level_id}",
@@ -162,4 +162,4 @@ class LevelController:
             raise
         except Exception as e:
             self.logger.error(f"Error deleting level {level_id}: {str(e)}")
-            raise InternalServerError(f"Error deleting level: {str(e)}")
+            raise InternalServerError()

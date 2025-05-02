@@ -1,10 +1,14 @@
+import logging  # Added import for logging
 from typing import Generic, List, Optional, Type, TypeVar
 
-from django.db import models
+from django.db import IntegrityError, models
 from django.db.models import Q
 from pydantic import BaseModel
 
 from apps.users.models import User
+from presentation.exceptions import ConflictError, DatabaseError, NotFoundError
+
+logger = logging.getLogger(__name__)  # Added logger instance
 
 T = TypeVar("T", bound=BaseModel)
 M = TypeVar("M", bound=models.Model)
@@ -56,35 +60,71 @@ class DjangoBaseRepository(Generic[T, M, ID]):
         return self._to_entity(db_obj)
 
     def get(self, id: ID) -> Optional[T]:
-        obj = self.model.objects.get(id=id)
-        return self._to_entity(obj)
+        try:
+            obj = self.model.objects.get(id=id)
+            return self._to_entity(obj)
+        except self.model.DoesNotExist:
+            logger.warning(f"{self.model.__name__} with id {id} not found.")
+            raise NotFoundError()  # Call exception without arguments
+        except Exception as e:
+            logger.error(
+                f"Database error retrieving {self.model.__name__} with id {id}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseError()  # Call exception without arguments
 
     def get_all(self) -> List[T]:
         objs = self.model.objects.all()
         return self._to_entity_list(list(objs))
 
     def update(self, id: ID, obj: T) -> T:
-        created_by_id = obj.created_by  # type: ignore
-        updated_by_id = obj.updated_by  # type: ignore
+        try:
+            updated_by_id = obj.updated_by  # type: ignore
 
-        db_obj = self.model.objects.get(id=id)
-        for key, value in obj.model_dump(
-            exclude={"id", "created_by", "updated_by"}
-        ).items():
-            setattr(db_obj, key, value)
+            db_obj = self.model.objects.get(id=id)
+            for key, value in obj.model_dump(
+                exclude={"id", "created_by", "updated_by", "created_at", "updated_at"}
+            ).items():
+                setattr(db_obj, key, value)
 
-        if created_by_id:
-            db_obj.created_by = User.objects.get(id=created_by_id)  # type: ignore
-        if updated_by_id:
-            db_obj.updated_by = User.objects.get(id=updated_by_id)  # type: ignore
+            if updated_by_id:
+                db_obj.updated_by = User.objects.get(id=updated_by_id)  # type: ignore
 
-        db_obj.save()
-        return self._to_entity(db_obj)
+            db_obj.save()
+            return self._to_entity(db_obj)
+        except self.model.DoesNotExist:
+            logger.warning(f"{self.model.__name__} with id {id} not found for update.")
+            raise NotFoundError()  # Call exception without arguments
+        except IntegrityError as e:
+            logger.error(
+                f"Database integrity error updating {self.model.__name__} with id {id}: {e}",
+                exc_info=True,
+            )
+            # Using ConflictError for unique constraints, adjust if needed for other IntegrityErrors
+            raise ConflictError()  # Call exception without arguments
+        except Exception as e:
+            logger.error(
+                f"Database error updating {self.model.__name__} with id {id}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseError()  # Call exception without arguments
 
     def delete(self, id: ID) -> bool:
-        obj = self.model.objects.get(id=id)
-        obj.delete()
-        return True
+        try:
+            obj = self.model.objects.get(id=id)
+            obj.delete()
+            return True
+        except self.model.DoesNotExist:
+            logger.warning(
+                f"{self.model.__name__} with id {id} not found for deletion."
+            )
+            raise NotFoundError()  # Call exception without arguments
+        except Exception as e:
+            logger.error(
+                f"Database error deleting {self.model.__name__} with id {id}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseError()  # Call exception without arguments
 
     def filter(self, **kwargs) -> List[T]:
         query = Q()

@@ -1211,3 +1211,87 @@ INFO 2025-05-01 10:16:06,880 autoreload 24533 8486322752 Watching for file chang
 INFO 2025-05-01 10:20:42,550 autoreload 24533 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/region_controller.py changed, reloading.
 INFO 2025-05-01 10:20:43,151 autoreload 31707 8486322752 Watching for file changes with StatReloader
 INFO 2025-05-02 04:47:54,544 autoreload 97098 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:13:38,927 autoreload 52456 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:13:58,354 operation 52456 6201421824 "POST - AuthController[login] /api/v1/auth/login" 0.40508198738098145
+INFO 2025-05-02 05:14:23,683 operation 52456 6201421824 "GET - AuthController[get_current_user] /api/v1/auth/me" 0.10874009132385254
+INFO 2025-05-02 05:14:36,548 operation 52456 6201421824 "GET - DomainController[get_all_domains] /api/v1/domains" 0.04663562774658203
+WARNING 2025-05-02 05:15:11,941 domain_controller 52456 6201421824 Validation error during domain creation: 1 validation error for DomainOut
+  Input should be a valid dictionary or instance of DomainOut [type=model_type, input_value=DomainEntity(id=1, name='...d_by=4, updated_by=None), input_type=DomainEntity]
+    For further information visit https://errors.pydantic.dev/2.8/v/model_type
+WARNING 2025-05-02 05:15:11,946 operation 52456 6201421824 "POST - DomainController[create_domain] /api/v1/domains" 422
+WARNING 2025-05-02 05:15:11,946 log 52456 6201421824 Unprocessable Entity: /api/v1/domains
+INFO 2025-05-02 05:16:29,116 autoreload 52456 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/__init__.py changed, reloading.
+INFO 2025-05-02 05:16:29,464 autoreload 56889 8486322752 Watching for file changes with StatReloader
+WARNING 2025-05-02 05:16:50,579 domain_use_case 56889 6136016896 Domain with name 'Sciences de la Société' already exists
+WARNING 2025-05-02 05:16:50,580 domain_controller 56889 6136016896 Conflict error during domain creation
+WARNING 2025-05-02 05:16:50,580 operation 56889 6136016896 "POST - DomainController[create_domain] /api/v1/domains" 409
+WARNING 2025-05-02 05:16:50,580 log 56889 6136016896 Conflict: /api/v1/domains
+WARNING 2025-05-02 05:17:09,459 domain_controller 56889 6136016896 Validation error during domain creation: 1 validation error for DomainOut
+  Input should be a valid dictionary or instance of DomainOut [type=model_type, input_value=DomainEntity(id=2, name='...d_by=4, updated_by=None), input_type=DomainEntity]
+    For further information visit https://errors.pydantic.dev/2.8/v/model_type
+WARNING 2025-05-02 05:17:09,460 operation 56889 6136016896 "POST - DomainController[create_domain] /api/v1/domains" 422
+WARNING 2025-05-02 05:17:09,461 log 56889 6136016896 Unprocessable Entity: /api/v1/domains
+INFO 2025-05-02 05:18:56,293 autoreload 56889 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/level_controller.py changed, reloading.
+INFO 2025-05-02 05:18:56,684 autoreload 60747 8486322752 Watching for file changes with StatReloader
+WARNING 2025-05-02 05:20:00,747 domain_controller 60747 6196064256 Validation error during domain creation: 1 validation error for DomainOut
+  Input should be a valid dictionary or instance of DomainOut [type=model_type, input_value=DomainEntity(id=3, name='...d_by=4, updated_by=None), input_type=DomainEntity]
+    For further information visit https://errors.pydantic.dev/2.8/v/model_type
+WARNING 2025-05-02 05:20:00,748 operation 60747 6196064256 "POST - DomainController[create_domain] /api/v1/domains" 422
+WARNING 2025-05-02 05:20:00,749 log 60747 6196064256 Unprocessable Entity: /api/v1/domains
+INFO 2025-05-02 05:23:55,259 autoreload 60747 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/domain_schema.py changed, reloading.
+INFO 2025-05-02 05:23:55,631 autoreload 68463 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:25:36,686 autoreload 68463 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/domain_schema.py changed, reloading.
+INFO 2025-05-02 05:25:37,048 autoreload 71048 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:26:55,992 operation 71048 6195539968 "POST - DomainController[create_domain] /api/v1/domains" 0.09534287452697754
+INFO 2025-05-02 05:27:01,246 operation 71048 6195539968 "GET - DomainController[get_all_domains] /api/v1/domains" 0.03885626792907715
+INFO 2025-05-02 05:27:07,974 autoreload 71048 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-05-02 05:27:08,491 autoreload 73413 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:27:39,210 autoreload 73413 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-05-02 05:27:39,672 autoreload 74295 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:27:55,259 autoreload 74295 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-05-02 05:27:55,812 autoreload 74737 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:28:41,846 autoreload 74737 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-05-02 05:28:42,487 autoreload 75959 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:30:00,263 autoreload 75959 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-05-02 05:30:00,907 autoreload 78037 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:30:25,652 autoreload 78037 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/schemas/domain_schema.py changed, reloading.
+INFO 2025-05-02 05:30:26,214 autoreload 78746 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:39:08,915 autoreload 78746 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/infrastructure/db/django_base_repository.py changed, reloading.
+INFO 2025-05-02 05:39:09,603 autoreload 90715 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:41:09,306 operation 90715 6194147328 "POST - DomainController[create_domain] /api/v1/domains" 0.038561105728149414
+WARNING 2025-05-02 05:41:09,306 log 90715 6194147328 Unauthorized: /api/v1/domains
+INFO 2025-05-02 05:41:16,564 operation 90715 6194147328 "POST - AuthController[login] /api/v1/auth/login" 0.5773742198944092
+ERROR 2025-05-02 05:41:32,232 domain_controller 90715 6194147328 Error creating domain: core.domain.entities.domain_entity.DomainEntity() got multiple values for keyword argument 'created_by'
+WARNING 2025-05-02 05:41:32,233 operation 90715 6194147328 "POST - DomainController[create_domain] /api/v1/domains" 500
+ERROR 2025-05-02 05:41:32,234 log 90715 6194147328 Internal Server Error: /api/v1/domains
+INFO 2025-05-02 05:43:53,936 autoreload 90715 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/domain_controller.py changed, reloading.
+INFO 2025-05-02 05:43:54,702 autoreload 98079 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:44:42,872 autoreload 98079 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/domain_controller.py changed, reloading.
+INFO 2025-05-02 05:44:43,421 autoreload 99363 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:44:55,922 autoreload 99363 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/domain_controller.py changed, reloading.
+INFO 2025-05-02 05:44:56,480 autoreload 99758 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:45:01,372 operation 99758 6198161408 "POST - DomainController[create_domain] /api/v1/domains" 0.08269596099853516
+WARNING 2025-05-02 05:45:05,135 domain_use_case 99758 6197587968 Domain with name 'Sciences de l’Education' already exists
+WARNING 2025-05-02 05:45:05,136 domain_controller 99758 6197587968 Conflict error during domain creation
+WARNING 2025-05-02 05:45:05,136 operation 99758 6197587968 "POST - DomainController[create_domain] /api/v1/domains" 409
+WARNING 2025-05-02 05:45:05,137 log 99758 6197587968 Conflict: /api/v1/domains
+INFO 2025-05-02 05:45:17,911 operation 99758 6197587968 "POST - DomainController[create_domain] /api/v1/domains" 0.06693100929260254
+INFO 2025-05-02 05:46:23,721 operation 99758 6197587968 "GET - DomainController[get_all_domains] /api/v1/domains" 0.05057883262634277
+INFO 2025-05-02 05:46:33,976 operation 99758 6197587968 "GET - DomainController[get_domain] /api/v1/domains/6" 0.04080009460449219
+INFO 2025-05-02 05:46:49,632 operation 99758 6197587968 "PUT - DomainController[update_domain] /api/v1/domains/6" 0.057784080505371094
+INFO 2025-05-02 05:46:57,844 operation 99758 6197587968 "GET - DomainController[get_all_domains] /api/v1/domains" 0.05436897277832031
+INFO 2025-05-02 05:47:11,220 operation 99758 6197587968 "DELETE - DomainController[delete_domain] /api/v1/domains/6" 0.05880904197692871
+INFO 2025-05-02 05:47:22,325 operation 99758 6197587968 "GET - DomainController[get_all_domains] /api/v1/domains" 0.055411338806152344
+WARNING 2025-05-02 05:47:29,046 django_base_repository 99758 6197587968 Domain with id 6 not found.
+WARNING 2025-05-02 05:47:29,048 domain_controller 99758 6197587968 Domain with ID 6 not found
+WARNING 2025-05-02 05:47:29,048 operation 99758 6197587968 "GET - DomainController[get_domain] /api/v1/domains/6" 404
+WARNING 2025-05-02 05:47:29,049 log 99758 6197587968 Not Found: /api/v1/domains/6
+INFO 2025-05-02 05:48:39,811 autoreload 99758 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/domain_controller.py changed, reloading.
+INFO 2025-05-02 05:48:40,354 autoreload 5906 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-02 05:48:48,807 autoreload 5906 8486322752 /Users/ninotwilrich/Documents/au_projet/Django_cartographie/presentation/api/v1/endpoints/domain_controller.py changed, reloading.
+INFO 2025-05-02 05:48:49,339 autoreload 6145 8486322752 Watching for file changes with StatReloader
+WARNING 2025-05-02 05:48:49,758 django_base_repository 6145 6130364416 Domain with id 6 not found.
+WARNING 2025-05-02 05:48:49,758 domain_controller 6145 6130364416 Domain with ID 6 not found
+WARNING 2025-05-02 05:48:49,758 operation 6145 6130364416 "GET - DomainController[get_domain] /api/v1/domains/6" 404
+WARNING 2025-05-02 05:48:49,759 log 6145 6130364416 Not Found: /api/v1/domains/6
+INFO 2025-05-02 05:49:34,682 operation 6145 6129790976 "POST - DomainController[create_domain] /api/v1/domains" 0.06071281433105469
