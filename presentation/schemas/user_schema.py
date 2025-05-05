@@ -31,10 +31,6 @@ class UserInDB(UserBase):
     email_verified: bool
 
 
-class Config:
-    model_config = ConfigDict(from_attributes=True)
-
-
 class UserOut(UserInDB):
     pass
 

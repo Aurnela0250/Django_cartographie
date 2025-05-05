@@ -168,7 +168,8 @@ class Config:
 
 
 class UserOut(UserInDB):
-    pass
+    model_config = ConfigDict(from_attributes=True)
+
 
 
 class UserAuthSchema(BaseSchema):
@@ -183,4 +184,6 @@ class UserAuthSchema(BaseSchema):
     updated_by: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
 ```

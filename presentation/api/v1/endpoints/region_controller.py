@@ -78,7 +78,7 @@ class RegionController:
         """Crée une nouvelle région"""
         try:
             region_entity = RegionEntity(
-                **region_data.dict(),
+                **region_data.model_dump(),
                 created_by=request.user.id,
             )
             created_region = self.region_use_case.create_region(region_entity)

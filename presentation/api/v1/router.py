@@ -5,6 +5,7 @@ from presentation.api.exception_handlers import global_exception_handler
 # Importer les contrôleurs par version
 from .endpoints.auth_controller import AuthController
 from .endpoints.domain_controller import DomainController
+from .endpoints.establishment_type_controller import EstablishmentTypeController
 from .endpoints.level_controller import LevelController
 from .endpoints.mention_controller import MentionController
 from .endpoints.region_controller import RegionController
@@ -15,6 +16,7 @@ controllers = [
     LevelController,
     DomainController,
     MentionController,
+    EstablishmentTypeController,
 ]
 
 # Création de l'API
