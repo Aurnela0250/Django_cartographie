@@ -25,7 +25,7 @@ class MyEntity(BaseModel):
 ## Instructions
 
 - Convention name class `I`+`Name`+`Repository` => `INameRepository(ABC)`
-- Conventions des noms des fichiers doivient terminer par `name`+`_repository_interface.py` => `name_repository_interface.py`
+- Conventions des noms des fichiers doivient terminer par `name`+`_repository.py` => `name_repository.py`
 
 ## Code example
 

@@ -1295,3 +1295,21 @@ WARNING 2025-05-02 05:48:49,758 domain_controller 6145 6130364416 Domain with ID
 WARNING 2025-05-02 05:48:49,758 operation 6145 6130364416 "GET - DomainController[get_domain] /api/v1/domains/6" 404
 WARNING 2025-05-02 05:48:49,759 log 6145 6130364416 Not Found: /api/v1/domains/6
 INFO 2025-05-02 05:49:34,682 operation 6145 6129790976 "POST - DomainController[create_domain] /api/v1/domains" 0.06071281433105469
+INFO 2025-05-03 02:10:45,698 autoreload 9231 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-03 02:11:20,741 operation 9231 6127071232 "POST - AuthController[login] /api/v1/auth/login" 0.634563684463501
+INFO 2025-05-03 02:11:40,748 operation 9231 6127071232 "GET - AuthController[get_current_user] /api/v1/auth/me" 0.10101103782653809
+INFO 2025-05-03 02:11:56,637 operation 9231 6127071232 "GET - MentionController[get_all_mentions] /api/v1/mentions/" 0.06114506721496582
+INFO 2025-05-03 02:12:05,051 operation 9231 6127071232 "GET - DomainController[get_all_domains] /api/v1/domains" 0.05293583869934082
+INFO 2025-05-03 02:12:25,437 operation 9231 6127071232 "POST - MentionController[create_mention] /api/v1/mentions/" 0.06656908988952637
+WARNING 2025-05-03 02:12:34,567 operation 9231 6127071232 "POST - MentionController[create_mention] /api/v1/mentions/" 404
+WARNING 2025-05-03 02:12:34,568 log 9231 6127071232 Not Found: /api/v1/mentions/
+INFO 2025-05-03 04:47:34,266 operation 9231 6127071232 "GET - MentionController[get_all_mentions] /api/v1/mentions/" 0.014914989471435547
+WARNING 2025-05-03 04:47:34,267 log 9231 6127071232 Unauthorized: /api/v1/mentions/
+INFO 2025-05-05 03:43:24,207 autoreload 6197 8486322752 Watching for file changes with StatReloader
+INFO 2025-05-05 03:43:39,464 operation 6197 6202732544 "GET - MentionController[get_all_mentions] /api/v1/mentions/" 0.0009479522705078125
+WARNING 2025-05-05 03:43:39,465 log 6197 6202732544 Unauthorized: /api/v1/mentions/
+INFO 2025-05-05 03:43:58,292 operation 6197 6202732544 "POST - AuthController[login] /api/v1/auth/login" 0.6523890495300293
+INFO 2025-05-05 03:44:12,938 operation 6197 6202732544 "GET - MentionController[get_all_mentions] /api/v1/mentions/" 0.11228513717651367
+INFO 2025-05-05 03:44:37,787 operation 6197 6202732544 "GET - MentionController[get_mention] /api/v1/mentions/1" 0.052681922912597656
+INFO 2025-05-05 03:46:06,277 operation 6197 6202732544 "GET - RegionController[get_all_regions] /api/v1/regions" 0.11320877075195312
+INFO 2025-05-05 03:46:30,078 operation 6197 6202732544 "POST - RegionController[create_region] /api/v1/regions" 0.06407403945922852

@@ -6,9 +6,16 @@ from presentation.api.exception_handlers import global_exception_handler
 from .endpoints.auth_controller import AuthController
 from .endpoints.domain_controller import DomainController
 from .endpoints.level_controller import LevelController
+from .endpoints.mention_controller import MentionController
 from .endpoints.region_controller import RegionController
 
-controllers = [AuthController, RegionController, LevelController, DomainController]
+controllers = [
+    AuthController,
+    RegionController,
+    LevelController,
+    DomainController,
+    MentionController,
+]
 
 # Création de l'API
 api = NinjaExtraAPI(

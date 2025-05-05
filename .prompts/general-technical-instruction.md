@@ -25,7 +25,7 @@ The user asks questions about the following coding languages:
 
 Always respect this Clean Architecture structure:
 
-```
+```text
 back_end/
 ├── apps/
 │   ├── __init__.py

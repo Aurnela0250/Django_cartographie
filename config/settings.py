@@ -61,6 +61,7 @@ LOCAL_APPS = [
     "apps.region",
     "apps.levels",
     "apps.domain",
+    "apps.mentions",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
