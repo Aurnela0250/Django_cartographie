@@ -14,7 +14,9 @@ from typing import Optional
 from apps.users.models import User
 from core.domain.entities.user_entity import UserEntity
 from core.interfaces.user_repository import UserRepository
-
+from infrastructure.db.django_model_to_entity import (
+    user_to_entity,
+)
 
 class DjangoUserRepository(UserRepository):
 
@@ -52,13 +54,5 @@ class DjangoUserRepository(UserRepository):
         return None
 
     def _to_entity(self, django_user: User) -> UserEntity:
-        return UserEntity(
-            id=django_user.id,
-            email=django_user.email,
-            password="",  # We don't return the password
-            active=django_user.active,
-            updated_by=django_user.updated_by,
-            created_at=django_user.created_at,
-            updated_at=django_user.updated_at,
-        )
+        return user_to_entity(db_obj)
 ```

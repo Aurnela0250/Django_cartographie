@@ -3,8 +3,23 @@ from typing import Optional
 from pydantic import BaseModel
 
 from apps.establishment.models import Establishment, EstablishmentType
+from apps.sector.models import Sector
+from core.domain.entities.sector_entity import SectorEntity
 from core.interfaces.establishment_repository import EstablishmentEntity
 from core.interfaces.establishment_type_repository import EstablishmentTypeEntity
+
+
+def sector_to_entity(sector: Sector) -> SectorEntity:
+    """Convertit un objet Sector Django en SectorEntity"""
+    return SectorEntity(
+        id=sector.pk,
+        name=sector.name,
+        region_id=sector.region.pk,
+        created_at=sector.created_at,
+        updated_at=sector.updated_at,
+        created_by=sector.created_by.id if sector.created_by else None,
+        updated_by=sector.updated_by.id if sector.updated_by else None,
+    )
 
 
 class EstablishmentToEntityMetadata(BaseModel):

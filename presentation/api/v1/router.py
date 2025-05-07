@@ -10,6 +10,7 @@ from .endpoints.establishment_type_controller import EstablishmentTypeController
 from .endpoints.level_controller import LevelController
 from .endpoints.mention_controller import MentionController
 from .endpoints.region_controller import RegionController
+from .endpoints.sector_controller import SectorController
 
 controllers = [
     AuthController,
@@ -19,6 +20,7 @@ controllers = [
     MentionController,
     EstablishmentTypeController,
     EstablishmentController,
+    SectorController,
 ]
 
 # Création de l'API
