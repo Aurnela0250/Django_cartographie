@@ -1,7 +1,7 @@
 import logging
-from typing import List
 
 from core.domain.entities.domain_entity import DomainEntity
+from core.domain.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_domain_repository import DjangoDomainRepository
 from presentation.exceptions import ConflictError, NotFoundError
@@ -62,12 +62,21 @@ class DomainUseCase:
             self.unit_of_work.commit()
             return result
 
-    def get_all_domains(self) -> List[DomainEntity]:
+    def get_all_domains(
+        self,
+        pagination_params: PaginationParams,
+    ) -> PaginatedResult[DomainEntity]:
         with self.unit_of_work:
             domain_repository = self.unit_of_work.get_repository(DjangoDomainRepository)
-            return domain_repository.get_all()
+            return domain_repository.get_all(pagination_params=pagination_params)
 
-    def filter_domains(self, **kwargs) -> List[DomainEntity]:
+    def filter_domains(
+        self,
+        pagination_params: PaginationParams,
+        **kwargs,
+    ) -> PaginatedResult[DomainEntity]:
         with self.unit_of_work:
             domain_repository = self.unit_of_work.get_repository(DjangoDomainRepository)
-            return domain_repository.filter(**kwargs)
+            return domain_repository.filter(
+                pagination_params=pagination_params, **kwargs
+            )

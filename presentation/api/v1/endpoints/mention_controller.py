@@ -1,8 +1,8 @@
-from typing import List
-
+from ninja import Query
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from ninja_extra.permissions import IsAuthenticated
 
+from core.domain.entities.pagination import PaginationParams
 from core.use_cases.mention_use_case import MentionUseCase
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
@@ -11,6 +11,10 @@ from presentation.schemas.mention_schema import (
     CreateMentionSchema,
     MentionSchema,
     UpdateMentionSchema,
+)
+from presentation.schemas.pagination_schema import (
+    PaginatedResultSchema,
+    PaginationParamsSchema,
 )
 
 
@@ -56,12 +60,31 @@ class MentionController:
         except Exception as e:
             raise e
 
-    @http_get("/", response={200: List[MentionSchema], 500: ErrorResponseSchema})
-    def get_all_mentions(self, request):
+    @http_get(
+        "/",
+        response={
+            200: PaginatedResultSchema[MentionSchema],
+            500: ErrorResponseSchema,
+        },
+    )
+    def get_all_mentions(
+        self,
+        request,
+        pagination: Query[PaginationParamsSchema],
+    ):
         """Retrieves all mentions."""
         try:
-            mentions = self.mention_use_case.get_all()
-            return [MentionSchema.from_orm(mention) for mention in mentions]
+            pagination_params = PaginationParams(
+                page=pagination.page, per_page=pagination.per_page
+            )
+
+            mentions = self.mention_use_case.get_all(pagination_params)
+
+            return 200, PaginatedResultSchema.from_domain_result(
+                mentions,
+                MentionSchema,
+                MentionSchema.model_validate,
+            )
         except Exception as e:
             raise e
 

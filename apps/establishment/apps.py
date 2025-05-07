@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class EstablishmentConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'establishment'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.establishment"

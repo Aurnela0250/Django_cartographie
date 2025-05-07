@@ -11,6 +11,6 @@ class LevelRepository(BaseRepository[LevelEntity]):
         """Retrieves a level by its name"""
         pass
 
-    def get_by_acronyme(self, acronyme: Optional[str]) -> Optional[LevelEntity]:
+    def get_by_acronyme(self, acronym: Optional[str]) -> Optional[LevelEntity]:
         """Retrieves a level by its acronym (can be None)"""
         pass

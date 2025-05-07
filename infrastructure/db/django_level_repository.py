@@ -22,10 +22,10 @@ class DjangoLevelRepository(
         except self.model.DoesNotExist:
             return None
 
-    def get_by_acronyme(self, acronyme: Optional[str]) -> Optional[LevelEntity]:
+    def get_by_acronyme(self, acronym: Optional[str]) -> Optional[LevelEntity]:
         """Retrieves a level by its acronym (can be None)"""
         try:
-            level = self.model.objects.get(acronyme=acronyme)
+            level = self.model.objects.get(acronyme=acronym)
             return self._to_entity(level)
         except self.model.DoesNotExist:
             return None

@@ -1,6 +1,6 @@
 import logging
-from typing import List
 
+from core.domain.entities.pagination import PaginatedResult, PaginationParams
 from core.domain.entities.region_entity import RegionEntity
 from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_region_repository import DjangoRegionRepository
@@ -98,14 +98,25 @@ class RegionUseCase:
             self.unit_of_work.commit()
             return result
 
-    def get_all_regions(self) -> List[RegionEntity]:
-        """Récupère toutes les régions"""
+    def get_all_regions(
+        self,
+        pagination_params: PaginationParams,
+    ) -> PaginatedResult[RegionEntity]:
+        """Récupère toutes les régions, avec pagination optionnelle"""
         with self.unit_of_work:
             region_repository = self.unit_of_work.get_repository(DjangoRegionRepository)
-            return region_repository.get_all()
+            result = region_repository.get_all(pagination_params)
 
-    def filter_regions(self, **kwargs) -> List[RegionEntity]:
-        """Filtre les régions selon les critères fournis"""
+            return result
+
+    def filter_regions(
+        self,
+        pagination_params: PaginationParams,
+        **kwargs,
+    ) -> PaginatedResult[RegionEntity]:
+        """Filtre les régions selon les critères fournis, avec pagination optionnelle"""
         with self.unit_of_work:
             region_repository = self.unit_of_work.get_repository(DjangoRegionRepository)
-            return region_repository.filter(**kwargs)
+            result = region_repository.filter(pagination_params, **kwargs)
+
+            return result

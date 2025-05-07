@@ -1,8 +1,8 @@
-from typing import List
-
+from ninja import Query
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 
 from core.domain.entities.establishment_type_entity import EstablishmentTypeEntity
+from core.domain.entities.pagination import PaginationParams
 from core.use_cases.establishment_type_use_case import EstablishmentTypeUseCase
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
@@ -17,6 +17,10 @@ from presentation.schemas.establishment_type_schema import (
     CreateEstablishmentTypeSchema,
     EstablishmentTypeSchema,
     UpdateEstablishmentTypeSchema,
+)
+from presentation.schemas.pagination_schema import (
+    PaginatedResultSchema,
+    PaginationParamsSchema,
 )
 
 
@@ -120,13 +124,29 @@ class EstablishmentTypeController:
         except Exception:
             raise InternalServerError()
 
-    @http_get("/", response=List[EstablishmentTypeSchema])
-    def get_all_establishment_types(self):
+    @http_get("/", response=PaginatedResultSchema[EstablishmentTypeSchema])
+    def get_all_establishment_types(
+        self,
+        request,
+        pagination: Query[PaginationParamsSchema],
+    ):
         """Get all establishment types"""
         try:
-            establishment_types = (
-                self.establishment_type_use_case.get_all_establishment_types()
+            pagination_params = PaginationParams(
+                page=pagination.page, per_page=pagination.per_page
             )
-            return [EstablishmentTypeSchema.from_orm(et) for et in establishment_types]
+
+            establishment_types = (
+                self.establishment_type_use_case.get_all_establishment_types(
+                    pagination_params
+                )
+            )
+
+            return 200, PaginatedResultSchema.from_domain_result(
+                establishment_types,
+                EstablishmentTypeSchema,
+                EstablishmentTypeSchema.model_validate,
+            )
+
         except Exception:
             raise InternalServerError()

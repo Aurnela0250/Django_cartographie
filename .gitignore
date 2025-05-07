@@ -4,5 +4,6 @@
 .baserock
 *.pem
 *.b64
+*.log
 keys
 logs

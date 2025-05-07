@@ -1,12 +1,12 @@
 import logging
-from typing import List
 
 from core.domain.entities.establishment_type_entity import EstablishmentTypeEntity
+from core.domain.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_establishment_type_repository import (
     DjangoEstablishmentTypeRepository,
 )
-from presentation.exceptions import ConflictError, NotFoundError, InternalServerError
+from presentation.exceptions import ConflictError, NotFoundError
 
 
 class EstablishmentTypeUseCase:
@@ -112,18 +112,29 @@ class EstablishmentTypeUseCase:
             self.unit_of_work.commit()
             return result
 
-    def get_all_establishment_types(self) -> List[EstablishmentTypeEntity]:
-        """Retrieves all establishment types"""
+    def get_all_establishment_types(
+        self,
+        pagination_params: PaginationParams,
+    ) -> PaginatedResult[EstablishmentTypeEntity]:
+        """Retrieves all establishment types with pagination"""
         with self.unit_of_work:
             establishment_type_repository = self.unit_of_work.get_repository(
                 DjangoEstablishmentTypeRepository
             )
-            return establishment_type_repository.get_all()
+            return establishment_type_repository.get_all(
+                pagination_params=pagination_params
+            )
 
-    def filter_establishment_types(self, **kwargs) -> List[EstablishmentTypeEntity]:
-        """Filters establishment types based on provided criteria"""
+    def filter_establishment_types(
+        self,
+        pagination_params: PaginationParams,
+        **kwargs,
+    ) -> PaginatedResult[EstablishmentTypeEntity]:
+        """Filters establishment types based on provided criteria with pagination"""
         with self.unit_of_work:
             establishment_type_repository = self.unit_of_work.get_repository(
                 DjangoEstablishmentTypeRepository
             )
-            return establishment_type_repository.filter(**kwargs)
+            return establishment_type_repository.filter(
+                pagination_params=pagination_params, **kwargs
+            )

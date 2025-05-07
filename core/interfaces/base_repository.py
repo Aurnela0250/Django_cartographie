@@ -1,6 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 from uuid import UUID
+
+from core.domain.entities.pagination import (
+    PaginatedResult,
+    PaginationParams,
+)
 
 T = TypeVar("T")
 
@@ -15,7 +20,10 @@ class BaseRepository(Generic[T], ABC):
         pass
 
     @abstractmethod
-    def get_all(self) -> List[T]:
+    def get_all(
+        self,
+        pagination_params: PaginationParams,
+    ) -> PaginatedResult[T]:
         pass
 
     @abstractmethod
@@ -27,5 +35,9 @@ class BaseRepository(Generic[T], ABC):
         pass
 
     @abstractmethod
-    def filter(self, **kwargs) -> List[T]:
+    def filter(
+        self,
+        pagination_params: PaginationParams,
+        **kwargs,
+    ) -> PaginatedResult[T]:
         pass

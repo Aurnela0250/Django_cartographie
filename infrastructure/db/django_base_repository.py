@@ -6,7 +6,15 @@ from django.db.models import Q
 from pydantic import BaseModel
 
 from apps.users.models import User
-from presentation.exceptions import ConflictError, DatabaseError, NotFoundError
+from core.domain.entities.pagination import (
+    PaginatedResult,
+    PaginationParams,
+)
+from presentation.exceptions import (
+    ConflictError,
+    DatabaseError,
+    NotFoundError,
+)
 
 logger = logging.getLogger(__name__)  # Added logger instance
 
@@ -30,7 +38,13 @@ class DjangoBaseRepository(Generic[T, M, ID]):
         }
 
         # Traiter tous les autres champs sauf ceux déjà définis
-        exclude_fields = {"id", "created_at", "updated_at", "created_by", "updated_by"}
+        exclude_fields = {
+            "id",
+            "created_at",
+            "updated_at",
+            "created_by",
+            "updated_by",
+        }
 
         for field in self.entity.__annotations__:
             if hasattr(db_obj, field) and field not in exclude_fields:
@@ -41,12 +55,55 @@ class DjangoBaseRepository(Generic[T, M, ID]):
     def _to_entity_list(self, db_objs: List[M]) -> List[T]:
         return [self._to_entity(obj) for obj in db_objs]
 
+    def _to_pagination_result(
+        self, queryset: models.QuerySet, pagination_params: PaginationParams
+    ) -> PaginatedResult[T]:
+        """Crée un résultat paginé à partir d'un queryset"""
+        # Calculer le nombre total d'éléments
+        total_items = queryset.count()
+
+        # Paginer les résultats
+        paginated_queryset = queryset[
+            pagination_params.offset : pagination_params.offset
+            + pagination_params.limit
+        ]
+
+        # Calculer le nombre total de pages
+        total_pages = (
+            total_items + pagination_params.per_page - 1
+        ) // pagination_params.per_page
+
+        # Calculer la page suivante et précédente
+        next_page = (
+            pagination_params.page + 1 if pagination_params.page < total_pages else None
+        )
+        previous_page = (
+            pagination_params.page - 1 if pagination_params.page > 1 else None
+        )
+
+        # Retourner un résultat paginé
+        return PaginatedResult(
+            items=self._to_entity_list(list(paginated_queryset)),
+            total_items=total_items,
+            page=pagination_params.page,
+            per_page=pagination_params.per_page,
+            total_pages=total_pages,
+            next_page=next_page,
+            previous_page=previous_page,
+        )
+
     def create(self, obj: T) -> T:
         created_by_id = obj.created_by  # type: ignore
         updated_by_id = obj.updated_by  # type: ignore
 
         obj_dict = obj.model_dump(
-            exclude={"id", "created_by", "updated_by", "created_at", "updated_at"}
+            exclude={
+                "id",
+                "created_by",
+                "updated_by",
+                "created_at",
+                "updated_at",
+            }
         )
 
         db_obj = self.model(**obj_dict)
@@ -65,17 +122,21 @@ class DjangoBaseRepository(Generic[T, M, ID]):
             return self._to_entity(obj)
         except self.model.DoesNotExist:
             logger.warning(f"{self.model.__name__} with id {id} not found.")
-            raise NotFoundError()  # Call exception without arguments
+            raise NotFoundError()
         except Exception as e:
             logger.error(
                 f"Database error retrieving {self.model.__name__} with id {id}: {e}",
                 exc_info=True,
             )
-            raise DatabaseError()  # Call exception without arguments
+            raise DatabaseError()
 
-    def get_all(self) -> List[T]:
-        objs = self.model.objects.all()
-        return self._to_entity_list(list(objs))
+    def get_all(
+        self,
+        pagination_params: PaginationParams,
+    ) -> PaginatedResult[T]:
+        """Récupère tous les objets avec pagination"""
+        queryset = self.model.objects.all()
+        return self._to_pagination_result(queryset, pagination_params)
 
     def update(self, id: ID, obj: T) -> T:
         try:
@@ -126,9 +187,14 @@ class DjangoBaseRepository(Generic[T, M, ID]):
             )
             raise DatabaseError()  # Call exception without arguments
 
-    def filter(self, **kwargs) -> List[T]:
+    def filter(
+        self,
+        pagination_params: PaginationParams,
+        **kwargs,
+    ) -> PaginatedResult[T]:
+        """Filtre les objets avec pagination"""
         query = Q()
         for key, value in kwargs.items():
             query &= Q(**{key: value})
-        objs = self.model.objects.filter(query)
-        return self._to_entity_list(list(objs))
+        queryset = self.model.objects.filter(query)
+        return self._to_pagination_result(queryset, pagination_params)

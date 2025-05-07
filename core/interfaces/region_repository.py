@@ -1,5 +1,4 @@
-from typing import List, Optional, Union
-from uuid import UUID
+from typing import Optional
 
 from core.domain.entities.region_entity import RegionEntity
 from core.interfaces.base_repository import BaseRepository

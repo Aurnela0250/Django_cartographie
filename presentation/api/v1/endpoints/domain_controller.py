@@ -1,10 +1,11 @@
 import logging
-from typing import List
 
+from ninja import Query
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from pydantic import ValidationError as PydanticValidationError
 
 from core.domain.entities.domain_entity import DomainEntity
+from core.domain.entities.pagination import PaginationParams
 from core.use_cases.domain_use_case import DomainUseCase
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
@@ -16,6 +17,10 @@ from presentation.exceptions import (
 )
 from presentation.schemas.domain_schema import DomainCreate, DomainOut, DomainUpdate
 from presentation.schemas.error_schema import ErrorResponseSchema
+from presentation.schemas.pagination_schema import (
+    PaginatedResultSchema,
+    PaginationParamsSchema,
+)
 
 
 @api_controller("/domains", tags=["Domains"])
@@ -29,15 +34,25 @@ class DomainController:
 
     @http_get(
         "",
-        response={200: List[DomainOut], 500: ErrorResponseSchema},
+        response={200: PaginatedResultSchema[DomainOut], 500: ErrorResponseSchema},
         auth=jwt_auth,
         summary="Récupérer tous les domaines",
         description="Renvoie la liste de tous les domaines disponibles",
     )
-    def get_all_domains(self, request):
+    def get_all_domains(
+        self,
+        request,
+        pagination: Query[PaginationParamsSchema],
+    ):
         try:
-            domains = self.domain_use_case.get_all_domains()
-            return 200, [DomainOut.model_validate(domain) for domain in domains]
+            pagination_params = PaginationParams(
+                page=pagination.page, per_page=pagination.per_page
+            )
+
+            domains = self.domain_use_case.get_all_domains(pagination_params)
+            return 200, PaginatedResultSchema.from_domain_result(
+                domains, DomainOut, DomainOut.model_validate
+            )
         except Exception as e:
             self.logger.error(f"Error retrieving all domains: {str(e)}")
             raise InternalServerError()

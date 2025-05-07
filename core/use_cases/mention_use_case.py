@@ -2,6 +2,7 @@ from typing import List
 
 from core.domain.entities.mention_entity import MentionEntity
 from core.interfaces.unit_of_work import UnitOfWork
+from core.domain.entities.pagination import PaginatedResult, PaginationParams
 from infrastructure.db.django_mention_repository import DjangoMentionRepository
 from presentation.exceptions import (
     DatabaseError,
@@ -122,12 +123,15 @@ class MentionUseCase:
             self.unit_of_work.rollback()
             raise InternalServerError()
 
-    def get_all(self) -> List[MentionEntity]:
+    def get_all(
+        self,
+        pagination_params: PaginationParams,
+    ) -> PaginatedResult[MentionEntity]:
         """Retrieves all mentions."""
         try:
             with self.unit_of_work:
                 mention_repo = self.unit_of_work.get_repository(DjangoMentionRepository)
-                mentions = mention_repo.get_all()
+                mentions = mention_repo.get_all(pagination_params)
                 return mentions
         except DatabaseError as e:
             raise e

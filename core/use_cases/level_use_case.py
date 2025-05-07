@@ -1,7 +1,7 @@
 import logging
-from typing import List
 
 from core.domain.entities.level_entity import LevelEntity
+from core.domain.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_level_repository import DjangoLevelRepository
 from presentation.exceptions import ConflictError, NotFoundError
@@ -101,14 +101,21 @@ class LevelUseCase:
             self.unit_of_work.commit()
             return result
 
-    def get_all_levels(self) -> List[LevelEntity]:
-        """Retrieves all levels"""
+    def get_all_levels(
+        self,
+        pagination_params: PaginationParams,
+    ) -> PaginatedResult[LevelEntity]:
+        """Retrieves all levels with pagination"""
         with self.unit_of_work:
             level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-            return level_repository.get_all()
+            return level_repository.get_all(pagination_params)
 
-    def filter_levels(self, **kwargs) -> List[LevelEntity]:
-        """Filters levels based on provided criteria"""
+    def filter_levels(
+        self,
+        pagination_params: PaginationParams,
+        **kwargs,
+    ) -> PaginatedResult[LevelEntity]:
+        """Filters levels based on provided criteria with pagination"""
         with self.unit_of_work:
             level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-            return level_repository.filter(**kwargs)
+            return level_repository.filter(pagination_params, **kwargs)

@@ -1,10 +1,11 @@
 import logging
-from typing import List
 
+from ninja import Query
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from pydantic import ValidationError as PydanticValidationError
 
 from core.domain.entities.level_entity import LevelEntity
+from core.domain.entities.pagination import PaginationParams
 from core.use_cases.level_use_case import LevelUseCase
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
@@ -16,6 +17,10 @@ from presentation.exceptions import (
 )
 from presentation.schemas.error_schema import ErrorResponseSchema
 from presentation.schemas.level_schema import LevelCreate, LevelOut, LevelUpdate
+from presentation.schemas.pagination_schema import (
+    PaginatedResultSchema,
+    PaginationParamsSchema,
+)
 
 
 @api_controller("/levels", tags=["Levels"])
@@ -29,16 +34,32 @@ class LevelController:
 
     @http_get(
         "",
-        response={200: List[LevelOut], 500: ErrorResponseSchema},
+        response={
+            200: PaginatedResultSchema[LevelOut],
+            500: ErrorResponseSchema,
+        },
         auth=jwt_auth,
         summary="Retrieve all levels",
-        description="Returns a list of all available levels",
+        description="Returns a list of all available levels with pagination",
     )
-    def get_all_levels(self, request):
-        """Retrieves all levels"""
+    def get_all_levels(
+        self,
+        request,
+        pagination: Query[PaginationParamsSchema],
+    ):
+        """Retrieves all levels with pagination (page=1 and per_page=10 by default)"""
         try:
-            levels = self.level_use_case.get_all_levels()
-            return 200, [LevelOut.model_validate(level) for level in levels]
+            pagination_params = PaginationParams(
+                page=pagination.page, per_page=pagination.per_page
+            )
+
+            result = self.level_use_case.get_all_levels(pagination_params)
+
+            # Convertir le PaginatedResult en PaginatedResultSchema
+            return 200, PaginatedResultSchema.from_domain_result(
+                result, LevelOut, LevelOut.model_validate
+            )
+
         except Exception as e:
             self.logger.error(f"Error retrieving all levels: {str(e)}")
             raise InternalServerError()

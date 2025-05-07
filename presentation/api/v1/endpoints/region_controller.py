@@ -1,9 +1,10 @@
 import logging
-from typing import List
 
+from ninja import Query
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from pydantic import ValidationError as PydanticValidationError
 
+from core.domain.entities.pagination import PaginationParams
 from core.domain.entities.region_entity import RegionEntity
 from core.use_cases.region_use_case import RegionUseCase
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
@@ -15,6 +16,10 @@ from presentation.exceptions import (
     ValidationError,
 )
 from presentation.schemas.error_schema import ErrorResponseSchema
+from presentation.schemas.pagination_schema import (
+    PaginatedResultSchema,
+    PaginationParamsSchema,
+)
 from presentation.schemas.region_schema import RegionCreate, RegionOut, RegionUpdate
 
 
@@ -29,16 +34,34 @@ class RegionController:
 
     @http_get(
         "",
-        response={200: List[RegionOut], 500: ErrorResponseSchema},
+        response={
+            200: PaginatedResultSchema[RegionOut],
+            500: ErrorResponseSchema,
+        },
         auth=jwt_auth,
         summary="Récupérer toutes les régions",
-        description="Renvoie la liste de toutes les régions disponibles",
+        description="Renvoie la liste de toutes les régions disponibles avec pagination optionnelle",
     )
-    def get_all_regions(self):
-        """Récupère toutes les régions"""
+    def get_all_regions(
+        self,
+        request,
+        pagination: Query[PaginationParamsSchema],
+    ):
+        """Récupère toutes les régions avec pagination optionnelle"""
         try:
-            regions = self.region_use_case.get_all_regions()
-            return 200, [RegionOut.model_validate(region) for region in regions]
+
+            pagination_params = PaginationParams(
+                page=pagination.page, per_page=pagination.per_page
+            )
+
+            result = self.region_use_case.get_all_regions(pagination_params)
+
+            return 200, PaginatedResultSchema.from_domain_result(
+                result,
+                RegionOut,
+                RegionOut.model_validate,
+            )
+
         except Exception as e:
             self.logger.error(f"Error retrieving all regions: {str(e)}")
             raise InternalServerError()
