@@ -157,6 +157,10 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Assurez-vous que le dossier logs existe
+LOGS_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOGS_DIR, exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -173,7 +177,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "logs", "debug.log"),
+            "filename": os.path.join(LOGS_DIR, "debug.log"),
             "formatter": "verbose",
         },
     },

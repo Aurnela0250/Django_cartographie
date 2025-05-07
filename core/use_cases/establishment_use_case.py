@@ -6,7 +6,13 @@ from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_establishment_repository import (
     DjangoEstablishmentRepository,
 )
-from presentation.exceptions import ConflictError, InternalServerError, NotFoundError
+from presentation.exceptions import (
+    ConflictError,
+    InternalServerError,
+    NotFoundError,
+    PydanticValidationError,
+    ValidationError,
+)
 
 
 class EstablishmentUseCase:
@@ -130,7 +136,8 @@ class EstablishmentUseCase:
                 raise InternalServerError()
 
     def get_all_establishments(
-        self, pagination_params: PaginationParams
+        self,
+        pagination_params: PaginationParams,
     ) -> PaginatedResult[EstablishmentEntity]:
         """Retrieves all establishments with pagination"""
         with self.unit_of_work:
@@ -141,6 +148,10 @@ class EstablishmentUseCase:
                 return establishment_repository.get_all(
                     pagination_params=pagination_params
                 )
+
+            except PydanticValidationError as e:
+                self.logger.warning(f"Validation error occurred: {e}")
+                raise ValidationError(e)
             except Exception as e:
                 self.logger.error(f"Failed to get all establishments: {e}")
                 raise InternalServerError()

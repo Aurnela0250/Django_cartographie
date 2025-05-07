@@ -132,31 +132,39 @@ class AuthUseCase:
             print(f"Unexpected error during getting current user {e}")
             raise InternalServerError()
 
-    def logout(self, access_token: dict[str, Any], refresh_token: str) -> None:
+    def logout(
+        self,
+        access_token: dict[str, Any],
+        refresh_token: str,
+    ) -> None:
         try:
-            # Gérer l'access token (déjà présent dans la requête)
-            access_jti = str(access_token.get("jti"))
             current_time = int(datetime.now(ZoneInfo("UTC")).timestamp())
+            tokens_to_revoke = []
+
+            # Prepare access token revocation
+            access_jti = str(access_token.get("jti"))
             access_exp = access_token.get("exp", current_time)
             access_exp_time = access_exp - current_time
 
-            # Révoquer l'access token
             if access_exp_time > 0:
-                self.jwt_service.revoke_token(access_jti, access_exp_time)
+                tokens_to_revoke.append((access_jti, access_exp_time))
 
-            # Décoder et révoquer le refresh token
+            # Prepare refresh token revocation
             try:
                 payload = self.jwt_service.decode_refresh_token(refresh_token)
                 refresh_jti = payload["jti"]
                 refresh_exp_time = payload["exp"] - current_time
 
                 if refresh_exp_time > 0:
-                    self.jwt_service.revoke_token(refresh_jti, refresh_exp_time)
+                    tokens_to_revoke.append((refresh_jti, refresh_exp_time))
             except Exception as e:
-                self.logger.warning(f"Failed to revoke refresh token: {str(e)}")
-                # On continue même si la révocation du refresh token échoue
-        except InvalidTokenError as e:
-            raise e
+                self.logger.warning(f"Failed to decode refresh token: {str(e)}")
+
+            # Revoke all tokens at once
+            for jti, exp_time in tokens_to_revoke:
+                self.jwt_service.revoke_token(jti, exp_time)
+
+            return None
         except Exception as e:
-            print(f"Unexpected error during logout {e}")
+            self.logger.error(f"Unexpected error during logout {e}")
             raise InternalServerError()

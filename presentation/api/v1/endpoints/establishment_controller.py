@@ -1,3 +1,5 @@
+import logging
+
 from ninja import Query
 from ninja_extra import (
     api_controller,
@@ -35,6 +37,7 @@ class EstablishmentController:
     def __init__(self):
         self.unit_of_work = DjangoUnitOfWork()
         self.establishment_use_case = EstablishmentUseCase(self.unit_of_work)
+        self.logger = logging.getLogger(__name__)
 
     @http_post("/", response={201: EstablishmentSchema})
     def create_establishment(
@@ -46,7 +49,7 @@ class EstablishmentController:
         try:
             entity_data = EstablishmentEntity(
                 **establishment_data.model_dump(),
-                created_by=request.auth.get("user_id")
+                created_by=request.auth.get("user_id"),
             )
 
             establishment = self.establishment_use_case.create_establishment(
@@ -142,8 +145,13 @@ class EstablishmentController:
             )
 
             return 200, PaginatedResultSchema.from_domain_result(
-                establishments, EstablishmentSchema, EstablishmentSchema.model_validate
+                establishments,
+                EstablishmentSchema,
+                EstablishmentSchema.model_validate,
             )
 
+        except ValidationError as e:
+            self.logger.warning(f"Validation error occurred: {e}")
+            raise e
         except Exception:
             raise InternalServerError()

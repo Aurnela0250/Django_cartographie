@@ -8,9 +8,7 @@ User = settings.AUTH_USER_MODEL
 # Create your models here.
 class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(
-        max_length=50, null=True, blank=True, unique=True
-    )  # e.g., INSEE code
+    code = models.CharField(max_length=50, null=True, blank=True, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(

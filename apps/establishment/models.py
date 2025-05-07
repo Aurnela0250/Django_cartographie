@@ -11,12 +11,25 @@ User = settings.AUTH_USER_MODEL
 
 class Establishment(models.Model):
     name = models.CharField(max_length=255)
-    acronyme = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    acronyme = models.CharField(
+        max_length=50,
+        unique=True,
+        null=True,
+        blank=True,
+    )
     address = models.CharField(max_length=255)
     code_postal = models.IntegerField()
     ville = models.CharField(max_length=100)
-    contacts = ArrayField(models.CharField(max_length=100), blank=True, null=True)
-    site_url = models.URLField(max_length=255, blank=True, null=True)
+    contacts = ArrayField(
+        models.CharField(max_length=100),
+        blank=True,
+        null=True,
+    )
+    site_url = models.URLField(
+        max_length=255,
+        blank=True,
+        null=True,
+    )
     description = models.TextField(blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)

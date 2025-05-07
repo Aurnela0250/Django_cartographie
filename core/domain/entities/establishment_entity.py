@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from core.domain.entities.establishment_type_entity import EstablishmentTypeEntity
+
 
 class EstablishmentEntity(BaseModel):
     """Entity representing an establishment"""
@@ -19,6 +21,7 @@ class EstablishmentEntity(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     establishment_type_id: int
+    establishment_type: Optional[EstablishmentTypeEntity] = None  # Added
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None

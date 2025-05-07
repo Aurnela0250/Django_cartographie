@@ -4,6 +4,8 @@ from typing import List, Optional
 from ninja import Schema
 from pydantic.config import ConfigDict
 
+from presentation.schemas.establishment_type_schema import EstablishmentTypeSchema
+
 
 class EstablishmentBaseSchema(Schema):
     """Base schema for establishment data"""
@@ -47,6 +49,7 @@ class EstablishmentSchema(EstablishmentBaseSchema):
     """Schema for establishment responses"""
 
     id: int
+    establishment_type: Optional[EstablishmentTypeSchema] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None

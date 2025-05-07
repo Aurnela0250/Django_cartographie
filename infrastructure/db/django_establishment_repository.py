@@ -6,6 +6,10 @@ from apps.users.models import User
 from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.interfaces.establishment_repository import IEstablishmentRepository
 from infrastructure.db.django_base_repository import DjangoBaseRepository
+from infrastructure.db.django_model_to_entity import (
+    EstablishmentToEntityMetadata,
+    establishment_to_entity,
+)
 from presentation.exceptions import UnprocessableEntityError
 
 
@@ -19,15 +23,11 @@ class DjangoEstablishmentRepository(
         super().__init__(Establishment, EstablishmentEntity)
 
     def _to_entity(self, db_obj: Establishment) -> EstablishmentEntity:
-        """Converts a database object to an entity"""
-        # Get base entity data (id, created_at, etc.)
-        obj_dict = super()._to_entity(db_obj).model_dump()
-
-        # Add establishment type ID
-        if db_obj.establishment_type:
-            obj_dict["establishment_type_id"] = db_obj.establishment_type.id  # type: ignore
-
-        return EstablishmentEntity(**obj_dict)
+        """Converts a Django Establishment model to an EstablishmentEntity."""
+        return establishment_to_entity(
+            db_obj,
+            metadata=EstablishmentToEntityMetadata(establishment_type=True),
+        )
 
     def get_by_name(self, name: str) -> Optional[EstablishmentEntity]:
         """Retrieves an establishment by its name"""
@@ -57,6 +57,7 @@ class DjangoEstablishmentRepository(
                 "created_at",
                 "updated_at",
                 "establishment_type_id",
+                "establishment_type",
             }
         )
 
