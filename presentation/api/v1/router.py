@@ -1,3 +1,4 @@
+from ninja import Swagger
 from ninja_extra import NinjaExtraAPI
 
 from presentation.api.exception_handlers import global_exception_handler
@@ -7,6 +8,7 @@ from .endpoints.auth_controller import AuthController
 from .endpoints.domain_controller import DomainController
 from .endpoints.establishment_controller import EstablishmentController
 from .endpoints.establishment_type_controller import EstablishmentTypeController
+from .endpoints.formation_controller import FormationController
 from .endpoints.level_controller import LevelController
 from .endpoints.mention_controller import MentionController
 from .endpoints.region_controller import RegionController
@@ -21,6 +23,7 @@ controllers = [
     EstablishmentTypeController,
     EstablishmentController,
     SectorController,
+    FormationController,
 ]
 
 # Création de l'API
@@ -40,6 +43,7 @@ api = NinjaExtraAPI(
         - **v1** : Version initiale de l'API (actuelle)
         - **v2** : Version future avec fonctionnalités améliorées (en développement)
     """,
+    docs=Swagger(settings={"persistAuthorization": True, "filter": True}),
 )
 
 # Enregistrer les contrôleurs

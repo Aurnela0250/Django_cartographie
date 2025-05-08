@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from ninja import Schema
 from pydantic.config import ConfigDict
 
 from presentation.schemas.establishment_type_schema import EstablishmentTypeSchema
+from presentation.schemas.sector_schema import SectorOut
+
+if TYPE_CHECKING:
+    from presentation.schemas.formation_schema import FormationSchema
 
 
 class EstablishmentBaseSchema(Schema):
@@ -21,6 +27,9 @@ class EstablishmentBaseSchema(Schema):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     establishment_type_id: int
+    sector_id: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CreateEstablishmentSchema(EstablishmentBaseSchema):
@@ -43,6 +52,9 @@ class UpdateEstablishmentSchema(Schema):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     establishment_type_id: Optional[int] = None
+    sector_id: Optional[int] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class EstablishmentSchema(EstablishmentBaseSchema):
@@ -50,6 +62,8 @@ class EstablishmentSchema(EstablishmentBaseSchema):
 
     id: int
     establishment_type: Optional[EstablishmentTypeSchema] = None
+    sector: Optional[SectorOut] = None
+    formations: Optional[list["FormationSchema"]] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None

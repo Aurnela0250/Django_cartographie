@@ -11,6 +11,7 @@ from presentation.exceptions import (
     InternalServerError,
     NotFoundError,
     PydanticValidationError,
+    UnprocessableEntityError,
     ValidationError,
 )
 
@@ -48,7 +49,16 @@ class EstablishmentUseCase:
                 self.logger.warning(
                     f"Establishment type with ID '{establishment_data.establishment_type_id}' not found"
                 )
-                raise NotFoundError()
+                raise UnprocessableEntityError()
+
+            # Check if the sector exists
+            if not establishment_repository.check_sector_exists(
+                establishment_data.sector_id
+            ):
+                self.logger.warning(
+                    f"Sector with ID '{establishment_data.sector_id}' not found"
+                )
+                raise UnprocessableEntityError()
 
             try:
                 return establishment_repository.create(establishment_data)
@@ -103,6 +113,18 @@ class EstablishmentUseCase:
             ):
                 self.logger.warning(
                     f"Establishment type with ID '{establishment_data.establishment_type_id}' not found"
+                )
+                raise NotFoundError()
+
+            # Check if the sector exists (if provided)
+            if (
+                establishment_data.sector_id
+                and not establishment_repository.check_sector_exists(
+                    establishment_data.sector_id
+                )
+            ):
+                self.logger.warning(
+                    f"Sector with ID '{establishment_data.sector_id}' not found"
                 )
                 raise NotFoundError()
 

@@ -2,6 +2,7 @@ from typing import Optional
 
 from apps.establishment.models import Establishment
 from apps.establishment_type.models import EstablishmentType
+from apps.sector.models import Sector  # Ajout de l'import pour Sector
 from apps.users.models import User
 from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.interfaces.establishment_repository import IEstablishmentRepository
@@ -26,7 +27,11 @@ class DjangoEstablishmentRepository(
         """Converts a Django Establishment model to an EstablishmentEntity."""
         return establishment_to_entity(
             db_obj,
-            metadata=EstablishmentToEntityMetadata(establishment_type=True),
+            metadata=EstablishmentToEntityMetadata(
+                establishment_type=True,
+                sector=True,
+                formations=True,
+            ),
         )
 
     def get_by_name(self, name: str) -> Optional[EstablishmentEntity]:
@@ -41,9 +46,17 @@ class DjangoEstablishmentRepository(
         """Checks if the establishment type with the given ID exists"""
         return EstablishmentType.objects.filter(id=establishment_type_id).exists()
 
+    def check_sector_exists(self, sector_id: int) -> bool:
+        """Checks if the sector with the given ID exists"""
+        return Sector.objects.filter(id=sector_id).exists()
+
     def create(self, obj: EstablishmentEntity) -> EstablishmentEntity:
         """Creates a new establishment"""
         if not self.check_establishment_type_exists(obj.establishment_type_id):
+            raise UnprocessableEntityError()
+
+        # Vérifier que le secteur existe
+        if not self.check_sector_exists(obj.sector_id):
             raise UnprocessableEntityError()
 
         created_by_id = obj.created_by
@@ -58,6 +71,8 @@ class DjangoEstablishmentRepository(
                 "updated_at",
                 "establishment_type_id",
                 "establishment_type",
+                "sector_id",  # Exclure sector_id
+                "sector",  # Exclure sector
             }
         )
 
@@ -67,6 +82,9 @@ class DjangoEstablishmentRepository(
         db_obj.establishment_type = EstablishmentType.objects.get(
             id=obj.establishment_type_id
         )
+
+        # Set the sector
+        db_obj.sector = Sector.objects.get(id=obj.sector_id)
 
         # Set tracking fields
         if created_by_id:

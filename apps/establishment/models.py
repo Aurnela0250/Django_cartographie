@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 from apps.establishment_type.models import EstablishmentType
+from apps.sector.models import Sector  # Ajout de l'import
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
@@ -39,6 +40,15 @@ class Establishment(models.Model):
         EstablishmentType,
         on_delete=models.CASCADE,
         related_name="establishment",
+    )
+
+    # Relation ManyToOne avec Sector
+    sector = models.ForeignKey(
+        Sector,
+        on_delete=models.CASCADE,
+        related_name="establishments",
+        null=False,
+        blank=False,
     )
 
     # Tracking fields
