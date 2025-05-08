@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from ninja import Schema
 from pydantic import ConfigDict, Field
 
+from presentation.schemas.annual_headcount_schema import AnnualHeadcountResponse
 from presentation.schemas.base_schema import BaseSchema
 from presentation.schemas.formation_authorization_schema import (
     FormationAuthorizationSchema,
@@ -58,6 +59,7 @@ class FormationSchema(BaseSchema):
     mention: Optional[MentionSchema] = None
     establishment: Optional["EstablishmentSchema"] = None
     authorization: Optional[FormationAuthorizationSchema] = None
+    annual_headcounts: List[AnnualHeadcountResponse] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None

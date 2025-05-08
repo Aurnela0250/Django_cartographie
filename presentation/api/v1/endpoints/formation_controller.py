@@ -9,6 +9,7 @@ from ninja_extra import (
     http_put,
 )
 
+from core.domain.entities.annual_headcount_entity import AnnualHeadCountEntity
 from core.domain.entities.formation_authorization_entity import (
     FormationAuthorizationEntity,
 )
@@ -23,6 +24,10 @@ from presentation.exceptions import (
     InternalServerError,
     NotFoundError,
     ValidationError,
+)
+from presentation.schemas.annual_headcount_schema import (
+    AnnualHeadcountCreate,
+    AnnualHeadcountUpdate,
 )
 from presentation.schemas.formation_authorization_schema import (
     CreateFormationAuthorizationSchema,
@@ -214,6 +219,91 @@ class FormationController:
         except ValidationError as e:
             raise e
         except DatabaseError as e:
+            raise e
+        except Exception:
+            raise InternalServerError()
+
+    @http_post("/{formation_id}/annual-headcount", response={201: FormationSchema})
+    def add_annual_headcount(
+        self,
+        request,
+        formation_id: int,
+        headcount_data: AnnualHeadcountCreate,
+    ):
+        """Ajoute un effectif annuel à une formation"""
+        try:
+            entity_data = AnnualHeadCountEntity(
+                **headcount_data.model_dump(),
+                formation_id=formation_id,
+                created_by=request.auth.get("user_id"),
+                updated_by=request.auth.get("user_id"),
+            )
+
+            formation = self.formation_use_case.add_annual_headcount(
+                formation_id, entity_data
+            )
+            return 201, FormationSchema.from_orm(formation)
+        except NotFoundError as e:
+            raise e
+        except ConflictError as e:
+            raise e
+        except ValidationError as e:
+            raise e
+        except DatabaseError as e:
+            raise e
+        except Exception:
+            raise InternalServerError()
+
+    @http_put(
+        "{formation_id}/annual-headcount/{annual_headcount_id}",
+        response=FormationSchema,
+    )
+    def update_annual_headcount(
+        self,
+        request,
+        formation_id: int,
+        annual_headcount_id: int,
+        headcount_data: AnnualHeadcountUpdate,
+    ):
+        """Met à jour un effectif annuel existant"""
+        try:
+            # Convertir directement les données de la requête en entité
+            # La vérification de l'existence sera faite dans le use case
+            entity_data = AnnualHeadCountEntity(
+                id=annual_headcount_id,
+                **headcount_data.model_dump(exclude_unset=True),
+                updated_by=request.auth.get("user_id"),
+            )
+
+            # Mettre à jour l'effectif annuel via le use case
+            updated_formation = self.formation_use_case.update_annual_headcount(
+                annual_headcount_id, entity_data
+            )
+            return FormationSchema.from_orm(updated_formation)
+        except NotFoundError as e:
+            raise e
+        except ConflictError as e:
+            raise e
+        except ValidationError as e:
+            raise e
+        except DatabaseError as e:
+            raise e
+        except Exception:
+            raise InternalServerError()
+
+    @http_delete(
+        "{formation_id}/annual-headcount/{annual_headcount_id}", response={204: None}
+    )
+    def delete_annual_headcount(
+        self,
+        formation_id: int,
+        annual_headcount_id: int,
+    ):
+        """Supprime un effectif annuel"""
+        try:
+            self.formation_use_case.delete_annual_headcount(annual_headcount_id)
+            return 204, None
+        except NotFoundError as e:
             raise e
         except Exception:
             raise InternalServerError()

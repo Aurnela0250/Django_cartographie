@@ -1,5 +1,6 @@
 import logging
 
+from core.domain.entities.annual_headcount_entity import AnnualHeadCountEntity
 from core.domain.entities.formation_authorization_entity import (
     FormationAuthorizationEntity,
 )
@@ -246,4 +247,146 @@ class FormationUseCase:
                 raise
             except Exception as e:
                 self.logger.error(f"Failed to update authorization: {e}")
+                raise InternalServerError()
+
+    def add_annual_headcount(
+        self,
+        formation_id: int,
+        annual_headcount_data: AnnualHeadCountEntity,
+    ) -> FormationEntity:
+        with self.unit_of_work:
+            try:
+                formation_repository = self.unit_of_work.get_repository(
+                    DjangoFormationRepository
+                )
+
+                # Vérifier que la formation existe
+                formation = formation_repository.get(formation_id)
+                if not formation:
+                    self.logger.warning(f"Formation avec ID {formation_id} non trouvée")
+                    raise UnprocessableEntityError()
+
+                # Vérifier qu'il n'y a pas déjà un effectif pour cette année
+                existing_headcount = (
+                    formation_repository.get_annual_headcount_by_formation_and_year(
+                        formation_id=formation_id,
+                        academic_year=annual_headcount_data.academic_year,
+                    )
+                )
+
+                if existing_headcount:
+                    self.logger.warning(
+                        f"Un effectif annuel existe déjà pour la formation {formation_id} "
+                        f"et l'année universitaire {annual_headcount_data.academic_year}"
+                    )
+                    raise ConflictError()
+
+                # Assurer que l'ID de formation est correctement défini
+                annual_headcount_data.formation_id = formation_id
+
+                # Créer l'effectif annuel et récupérer la formation mise à jour
+                return formation_repository.create_annual_headcount(
+                    annual_headcount_data
+                )
+
+                # Retourner la formation mise à jour
+                return formation_repository.get(formation_id)
+
+            except UnprocessableEntityError:
+                raise
+            except ConflictError:
+                raise
+            except Exception as e:
+                self.logger.error(f"Erreur lors de l'ajout d'un effectif annuel: {e}")
+                raise InternalServerError()
+
+    def update_annual_headcount(
+        self,
+        annual_headcount_id: int,
+        annual_headcount_data: AnnualHeadCountEntity,
+    ) -> FormationEntity:
+        with self.unit_of_work:
+            try:
+                formation_repository = self.unit_of_work.get_repository(
+                    DjangoFormationRepository
+                )
+
+                # Récupérer l'effectif annuel existant
+                existing_headcount = formation_repository.get_annual_headcount(
+                    annual_headcount_id
+                )
+                if not existing_headcount:
+                    self.logger.warning(
+                        f"Effectif annuel avec ID {annual_headcount_id} non trouvé"
+                    )
+                    raise NotFoundError()
+
+                # Si l'année académique est modifiée, vérifier qu'il n'y a pas déjà un effectif pour cette nouvelle année
+                if (
+                    annual_headcount_data.academic_year
+                    != existing_headcount.academic_year
+                ):
+                    duplicate_check = (
+                        formation_repository.get_annual_headcount_by_formation_and_year(
+                            existing_headcount.formation_id,
+                            annual_headcount_data.academic_year,
+                        )
+                    )
+                    if duplicate_check:
+                        self.logger.warning(
+                            f"Un effectif annuel existe déjà pour la formation {existing_headcount.formation_id} "
+                            f"et l'année universitaire {annual_headcount_data.academic_year}"
+                        )
+                        raise ConflictError()
+
+                # Conserver la formation_id d'origine
+                annual_headcount_data.formation_id = existing_headcount.formation_id
+
+                # Mettre à jour l'effectif annuel et récupérer la formation mise à jour
+                return formation_repository.update_annual_headcount(
+                    annual_headcount_id, annual_headcount_data
+                )
+
+            except NotFoundError:
+                raise
+            except ConflictError:
+                raise
+            except Exception as e:
+                self.logger.error(
+                    f"Erreur lors de la mise à jour d'un effectif annuel: {e}"
+                )
+                raise InternalServerError()
+
+    def delete_annual_headcount(
+        self,
+        annual_headcount_id: int,
+    ) -> None:
+        with self.unit_of_work:
+            try:
+                formation_repository = self.unit_of_work.get_repository(
+                    DjangoFormationRepository
+                )
+
+                # Récupérer l'effectif annuel pour vérifier son existence et obtenir l'ID de formation
+                annual_headcount = formation_repository.get_annual_headcount(
+                    annual_headcount_id
+                )
+                if not annual_headcount:
+                    self.logger.warning(
+                        f"Effectif annuel avec ID {annual_headcount_id} non trouvé"
+                    )
+                    raise UnprocessableEntityError()
+
+                # Supprimer l'effectif annuel
+                formation_repository.delete_annual_headcount(annual_headcount_id)
+
+                # Retourner la formation mise à jour
+                return None
+
+            except UnprocessableEntityError:
+                raise
+            except Exception as e:
+                self.logger.error(
+                    f"Erreur lors de la suppression d'un effectif annuel: {e}"
+                )
                 raise InternalServerError()

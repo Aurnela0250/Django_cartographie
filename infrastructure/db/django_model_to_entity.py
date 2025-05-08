@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 from apps.establishment.models import Establishment, EstablishmentType
-from apps.formation.models import Formation
+from apps.formation.models import AnnualHeadcount, Formation
 from apps.formation_authorization.models import FormationAuthorization
 from apps.levels.models import Level
 from apps.mentions.models import Mention
@@ -13,7 +13,7 @@ from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.domain.entities.formation_authorization_entity import (
     FormationAuthorizationEntity,
 )
-from core.domain.entities.formation_entity import FormationEntity
+from core.domain.entities.formation_entity import AnnualHeadCountEntity, FormationEntity
 from core.domain.entities.level_entity import LevelEntity
 from core.domain.entities.mention_entity import MentionEntity
 from core.domain.entities.rate_entity import RateEntity
@@ -78,6 +78,7 @@ def formation_to_entity(
     mention_entity = None
     establishment_entity = None
     authorization_entity = None
+    annual_headcount_list: List[AnnualHeadCountEntity] = []
 
     # Utiliser les valeurs par défaut de metadata si non fourni
     effective_metadata = (
@@ -97,6 +98,13 @@ def formation_to_entity(
             formation.authorization
         )
 
+    for annual_headcount_model in AnnualHeadcount.objects.filter(formation=formation):
+        annual_headcount_list.append(
+            annual_headcount_to_entity(
+                annual_headcount_model,
+            ),
+        )
+
     return FormationEntity(
         id=formation.pk,
         intitule=formation.intitule,
@@ -112,10 +120,27 @@ def formation_to_entity(
         mention=mention_entity,
         establishment=establishment_entity,
         authorization=authorization_entity,
+        annual_headcounts=annual_headcount_list,
         created_at=formation.created_at,
         updated_at=formation.updated_at,
         created_by=formation.created_by.id if formation.created_by else None,
         updated_by=formation.updated_by.id if formation.updated_by else None,
+    )
+
+
+def annual_headcount_to_entity(
+    headcount: AnnualHeadcount,
+) -> AnnualHeadCountEntity:
+    """Convertit un objet EffectifAnnuelFormation Django en EffectifAnnuelFormationEntity"""
+    return AnnualHeadCountEntity(
+        id=headcount.pk,
+        formation_id=headcount.formation.pk,
+        academic_year=headcount.academic_year,
+        students=headcount.students,
+        created_at=headcount.created_at,
+        updated_at=headcount.updated_at,
+        created_by=headcount.created_by.id if headcount.created_by else None,
+        updated_by=headcount.updated_by.id if headcount.updated_by else None,
     )
 
 

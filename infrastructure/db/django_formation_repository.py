@@ -1,12 +1,13 @@
 # Implementation du repository Formation
-from typing import Optional
+from typing import List, Optional
 
 from apps.establishment.models import Establishment
-from apps.formation.models import Formation
+from apps.formation.models import AnnualHeadcount, Formation
 from apps.formation_authorization.models import FormationAuthorization
 from apps.levels.models import Level
 from apps.mentions.models import Mention
 from apps.users.models import User
+from core.domain.entities.annual_headcount_entity import AnnualHeadCountEntity
 from core.domain.entities.formation_authorization_entity import (
     FormationAuthorizationEntity,
 )
@@ -15,9 +16,9 @@ from core.interfaces.formation_repository import IFormationRepository
 from infrastructure.db.django_base_repository import DjangoBaseRepository
 from infrastructure.db.django_model_to_entity import (
     FormationToEntityMetadata,
+    annual_headcount_to_entity,
     formation_to_entity,
 )
-from presentation.exceptions import UnprocessableEntityError
 
 
 class DjangoFormationRepository(
@@ -61,18 +62,6 @@ class DjangoFormationRepository(
         return FormationAuthorization.objects.filter(id=authorization_id).exists()
 
     def create(self, obj: FormationEntity) -> FormationEntity:
-        # Validation des entités liées
-        if not self.check_level_exists(obj.level_id):
-            raise UnprocessableEntityError()
-        if not self.check_mention_exists(obj.mention_id):
-            raise UnprocessableEntityError()
-        if not self.check_establishment_exists(obj.establishment_id):
-            raise UnprocessableEntityError()
-        if obj.authorization_id and not self.check_formation_authorization_exists(
-            obj.authorization_id
-        ):
-            raise UnprocessableEntityError()
-
         created_by_id = obj.created_by
         updated_by_id = obj.updated_by
 
@@ -112,18 +101,6 @@ class DjangoFormationRepository(
         return self._to_entity(db_obj)
 
     def update(self, id: int, obj: FormationEntity) -> FormationEntity:
-        # Validation des entités liées
-        if not self.check_level_exists(obj.level_id):
-            raise UnprocessableEntityError()
-        if not self.check_mention_exists(obj.mention_id):
-            raise UnprocessableEntityError()
-        if not self.check_establishment_exists(obj.establishment_id):
-            raise UnprocessableEntityError()
-        if obj.authorization_id and not self.check_formation_authorization_exists(
-            obj.authorization_id
-        ):
-            raise UnprocessableEntityError()
-
         updated_by_id = obj.updated_by
         db_obj = self.model.objects.get(id=id)
         for key, value in obj.model_dump(
@@ -167,7 +144,7 @@ class DjangoFormationRepository(
         authorization_entity: FormationAuthorizationEntity,
     ) -> FormationEntity:
         """
-        Crée une FormationAuthorization et l'associe à la formation, puis retourne la FormationEntity enrichie (authorization=True)
+        Crée une FormationAuthorization et l'associe à la formation
         """
         formation = self.model.objects.get(id=formation_id)
         created_by_id = authorization_entity.created_by
@@ -210,13 +187,10 @@ class DjangoFormationRepository(
         authorization_entity: FormationAuthorizationEntity,
     ) -> FormationEntity:
         """
-        Met à jour la FormationAuthorization associée à la formation, puis retourne la FormationEntity enrichie (authorization=True)
+        Met à jour la FormationAuthorization associée à la formation
         """
         formation = self.model.objects.get(id=formation_id)
-        authorization = formation.authorization
-        if not authorization:
-            raise UnprocessableEntityError()
-
+        authorization = FormationAuthorization.objects.get(pk=authorization_entity.id)
         updated_by_id = authorization_entity.updated_by
 
         auth_dict = authorization_entity.model_dump(
@@ -246,3 +220,127 @@ class DjangoFormationRepository(
                 authorization=True,
             ),
         )
+
+    def get_annual_headcount(
+        self, annual_headcount_id: int
+    ) -> Optional[AnnualHeadCountEntity]:
+        """
+        Récupère un effectif annuel par son ID
+        """
+        try:
+            annual_headcount = AnnualHeadcount.objects.get(id=annual_headcount_id)
+            return annual_headcount_to_entity(annual_headcount)
+        except AnnualHeadcount.DoesNotExist:
+            return None
+
+    def get_annual_headcounts_by_formation_id(
+        self, formation_id: int
+    ) -> List[AnnualHeadCountEntity]:
+        """
+        Récupère tous les effectifs annuels d'une formation
+        """
+        db_objs = AnnualHeadcount.objects.filter(formation__id=formation_id)
+        return [annual_headcount_to_entity(db_obj) for db_obj in db_objs]
+
+    def get_annual_headcount_by_formation_and_year(
+        self,
+        formation_id: int,
+        academic_year: int,
+    ) -> Optional[AnnualHeadCountEntity]:
+        """
+        Récupère un effectif annuel par formation et année universitaire
+        """
+        try:
+            db_obj = AnnualHeadcount.objects.get(
+                formation__id=formation_id,
+                academic_year=academic_year,
+            )
+            return annual_headcount_to_entity(db_obj)
+        except AnnualHeadcount.DoesNotExist:
+            return None
+
+    def create_annual_headcount(
+        self,
+        obj: AnnualHeadCountEntity,
+    ) -> FormationEntity:
+        """
+        Crée un nouvel effectif annuel et renvoie la formation associée
+        """
+        formation = Formation.objects.get(id=obj.formation_id)
+        created_by_id = obj.created_by
+        updated_by_id = obj.updated_by
+
+        obj_dict = obj.model_dump(
+            exclude={
+                "id",
+                "created_by",
+                "updated_by",
+                "created_at",
+                "updated_at",
+                "formation_id",
+            }
+        )
+
+        db_obj = AnnualHeadcount(**obj_dict)
+        db_obj.formation = formation
+
+        if created_by_id:
+            db_obj.created_by = User.objects.get(id=created_by_id)
+        if updated_by_id:
+            db_obj.updated_by = User.objects.get(id=updated_by_id)
+
+        db_obj.save()
+
+        # Renvoyer la formation mise à jour
+        return formation_to_entity(
+            formation,
+            metadata=FormationToEntityMetadata(
+                level=True,
+                mention=True,
+                establishment=False,
+                authorization=True,
+            ),
+        )
+
+    def update_annual_headcount(
+        self,
+        id: int,
+        obj: AnnualHeadCountEntity,
+    ) -> FormationEntity:
+        """
+        Met à jour un effectif annuel existant et renvoie la formation associée
+        """
+        db_obj = AnnualHeadcount.objects.get(id=id)
+        updated_by_id = obj.updated_by
+
+        db_obj.academic_year = obj.academic_year
+        db_obj.students = obj.students
+
+        if updated_by_id:
+            db_obj.updated_by = User.objects.get(id=updated_by_id)
+
+        db_obj.save()
+
+        formation = Formation.objects.get(id=obj.formation_id)
+
+        # Renvoyer la formation associée
+        return formation_to_entity(
+            formation,
+            metadata=FormationToEntityMetadata(
+                level=True,
+                mention=True,
+                establishment=False,
+                authorization=True,
+            ),
+        )
+
+    def delete_annual_headcount(
+        self,
+        annual_headcount_id: int,
+    ) -> bool:
+        """
+        Supprime un effectif annuel
+        """
+        annual_headcount = AnnualHeadcount.objects.get(id=annual_headcount_id)
+        annual_headcount.delete()
+        return True

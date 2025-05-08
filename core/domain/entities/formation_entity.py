@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from core.domain.entities.annual_headcount_entity import AnnualHeadCountEntity
 from core.domain.entities.formation_authorization_entity import (
     FormationAuthorizationEntity,
 )
@@ -31,6 +32,7 @@ class FormationEntity(BaseModel):
     mention: Optional[MentionEntity] = None
     establishment: Optional["EstablishmentEntity"] = None
     authorization: Optional[FormationAuthorizationEntity] = None
+    annual_headcounts: List[AnnualHeadCountEntity] = []
 
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

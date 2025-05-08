@@ -61,3 +61,44 @@ class Formation(models.Model):
         verbose_name = "Formation"
         verbose_name_plural = "Formations"
         db_table = "formations"
+
+
+class AnnualHeadcount(models.Model):
+    formation = models.ForeignKey(
+        Formation,
+        on_delete=models.CASCADE,
+        related_name="annual_headcounts",
+    )
+    academic_year = models.PositiveIntegerField(
+        help_text="Année de début de l'année universitaire (ex: 2023 pour 2023-2024)",
+    )
+    students = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre d'étudiants inscrits pour cette année universitaire",
+    )
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_annual_headcounts",
+    )
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="updated_annual_headcounts",
+    )
+
+    def __str__(self) -> str:
+        return f"{self.formation.intitule} - {self.academic_year} - {self.students} étudiants"
+
+    class Meta:
+        verbose_name = "Annual Headcount"
+        verbose_name_plural = "Annual Headcounts"
+        db_table = "annual_headcounts"
+        unique_together = (("formation", "academic_year"),)
