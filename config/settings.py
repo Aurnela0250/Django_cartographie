@@ -68,6 +68,7 @@ LOCAL_APPS = [
     "apps.formation_authorization",
     "apps.formation",
     "apps.rate",
+    "apps.city",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

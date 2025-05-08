@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from apps.city.models import City
 from apps.establishment.models import Establishment, EstablishmentType
 from apps.formation.models import AnnualHeadcount, Formation
 from apps.formation_authorization.models import FormationAuthorization
@@ -9,6 +10,7 @@ from apps.levels.models import Level
 from apps.mentions.models import Mention
 from apps.rate.models import Rate
 from apps.sector.models import Sector
+from core.domain.entities.city_entity import CityEntity
 from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.domain.entities.formation_authorization_entity import (
     FormationAuthorizationEntity,
@@ -260,4 +262,19 @@ def rate_to_entity(rate: Rate) -> RateEntity:
         rating=rate.rating,
         created_at=rate.created_at,
         updated_at=rate.updated_at,
+    )
+
+
+def city_to_entity(db_obj: City) -> CityEntity:
+    """
+    Convert Django City model to CityEntity
+    """
+    return CityEntity(
+        id=db_obj.pk,
+        name=db_obj.name,
+        region_id=db_obj.region.pk,
+        created_at=db_obj.created_at,
+        updated_at=db_obj.updated_at,
+        created_by=db_obj.created_by.id if db_obj.created_by else None,
+        updated_by=db_obj.updated_by.id if db_obj.updated_by else None,
     )
