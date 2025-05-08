@@ -2,10 +2,12 @@ import logging
 
 from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.domain.entities.pagination import PaginatedResult, PaginationParams
+from core.domain.entities.rate_entity import RateEntity
 from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_establishment_repository import (
     DjangoEstablishmentRepository,
 )
+from infrastructure.db.django_rate_repository import DjangoRateRepository
 from presentation.exceptions import (
     ConflictError,
     InternalServerError,
@@ -176,4 +178,79 @@ class EstablishmentUseCase:
                 raise ValidationError(e)
             except Exception as e:
                 self.logger.error(f"Failed to get all establishments: {e}")
+                raise InternalServerError()
+
+    def rate_establishment(
+        self,
+        establishment_id: int,
+        user_id: int,
+        rating: float,
+    ) -> bool:
+        """
+        Enregistre une notation d'un utilisateur pour un établissement.
+
+        Args:
+            establishment_id: L'identifiant de l'établissement
+            user_id: L'identifiant de l'utilisateur qui note
+            rating: La note à attribuer (généralement entre 0 et 5)
+
+        Returns:
+            bool: True si la notation a été créée avec succès, False sinon
+        """
+        with self.unit_of_work:
+            establishment_repository = self.unit_of_work.get_repository(
+                DjangoEstablishmentRepository
+            )
+
+            rate_repository = self.unit_of_work.get_repository(DjangoRateRepository)
+
+            try:
+                # Vérification que la valeur du rating est valide
+                if rating < 0 or rating > 5:
+                    self.logger.warning(
+                        f"Rating invalide: {rating}. Doit être entre 0 et 5."
+                    )
+                    raise ValidationError()
+
+                # Vérifier que l'établissement existe
+                establishment = establishment_repository.get(establishment_id)
+                if not establishment:
+                    self.logger.warning(
+                        f"Établissement avec ID {establishment_id} non trouvé"
+                    )
+                    raise UnprocessableEntityError()
+
+                # Vérifier si l'utilisateur a déjà noté cet établissement
+                if rate_repository.check_if_user_already_rate(
+                    user_id,
+                    establishment_id,
+                ):
+                    self.logger.warning(
+                        f"L'utilisateur {user_id} a déjà noté l'établissement {establishment_id}"
+                    )
+                    return True
+
+                # Créer une nouvelle notation
+                rate_entity = RateEntity(
+                    establishment_id=establishment_id,
+                    user_id=user_id,
+                    rating=rating,
+                )
+
+                # Enregistrer la notation
+                rate_repository.create_rate(rate_entity)
+
+                return True
+
+            except UnprocessableEntityError:
+                self.logger.warning(
+                    f"Établissement avec ID {establishment_id} non trouvé"
+                )
+                raise
+            except ValidationError:
+                raise
+            except Exception as e:
+                self.logger.error(
+                    f"Erreur lors de l'enregistrement de la notation: {e}"
+                )
                 raise InternalServerError()

@@ -198,3 +198,28 @@ class DjangoBaseRepository(Generic[T, M, ID]):
             query &= Q(**{key: value})
         queryset = self.model.objects.filter(query)
         return self._to_pagination_result(queryset, pagination_params)
+
+    def count(self, **kwargs) -> int:
+        """
+        Compte le nombre d'entités dans la base de données
+
+        Args:
+            **kwargs: Filtres optionnels pour la requête
+
+        Returns:
+            int: Le nombre d'entités correspondant aux critères
+        """
+        try:
+            if kwargs:
+                query = Q()
+                for key, value in kwargs.items():
+                    query &= Q(**{key: value})
+                return self.model.objects.filter(query).count()
+            else:
+                return self.model.objects.count()
+        except Exception as e:
+            logger.error(
+                f"Database error counting {self.model.__name__}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseError()

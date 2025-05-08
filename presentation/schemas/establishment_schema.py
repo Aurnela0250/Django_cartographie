@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
 
-from ninja import Schema
+from ninja import Field, Schema
 from pydantic.config import ConfigDict
 
 from presentation.schemas.establishment_type_schema import EstablishmentTypeSchema
@@ -64,9 +64,18 @@ class EstablishmentSchema(EstablishmentBaseSchema):
     establishment_type: Optional[EstablishmentTypeSchema] = None
     sector: Optional[SectorOut] = None
     formations: Optional[list["FormationSchema"]] = []
+    rating: float = 0
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RateEstablishmentSchema(Schema):
+    """Schema pour noter un établissement"""
+
+    rating: float = Field(..., ge=0, le=5)
 
     model_config = ConfigDict(from_attributes=True)

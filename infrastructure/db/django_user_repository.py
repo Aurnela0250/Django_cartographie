@@ -70,3 +70,6 @@ class DjangoUserRepository(UserRepository):
 
     def filter(self, **kwargs) -> List[Any]:
         raise NotImplementedError
+
+    def count(self, **kwargs) -> int:
+        raise NotImplementedError

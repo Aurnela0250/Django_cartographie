@@ -26,6 +26,7 @@ class EstablishmentEntity(BaseModel):
     description: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    rating: float = 0
     establishment_type_id: int
     establishment_type: Optional[EstablishmentTypeEntity] = None
     sector_id: int

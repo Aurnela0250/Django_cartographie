@@ -1,4 +1,7 @@
+import logging
 from typing import Optional
+
+from django.db import IntegrityError
 
 from apps.establishment.models import Establishment
 from apps.establishment_type.models import EstablishmentType
@@ -11,7 +14,14 @@ from infrastructure.db.django_model_to_entity import (
     EstablishmentToEntityMetadata,
     establishment_to_entity,
 )
-from presentation.exceptions import UnprocessableEntityError
+from presentation.exceptions import (
+    ConflictError,
+    DatabaseError,
+    NotFoundError,
+    UnprocessableEntityError,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class DjangoEstablishmentRepository(
@@ -95,3 +105,63 @@ class DjangoEstablishmentRepository(
 
         db_obj.save()
         return self._to_entity(db_obj)
+
+    def update(self, id: int, obj: EstablishmentEntity) -> EstablishmentEntity:
+        """
+        Met à jour un établissement existant en gérant correctement les relations.
+        """
+        try:
+            updated_by_id = obj.updated_by
+
+            db_obj = self.model.objects.get(id=id)
+
+            # Mettre à jour les propriétés simples (non relationnelles)
+            obj_dict = obj.model_dump(
+                exclude={
+                    "id",
+                    "created_by",
+                    "updated_by",
+                    "created_at",
+                    "updated_at",
+                    "establishment_type",
+                    "establishment_type_id",
+                    "sector",
+                    "sector_id",
+                    "formations",
+                }
+            )
+
+            for key, value in obj_dict.items():
+                setattr(db_obj, key, value)
+
+            # Gérer les relations manuellement si leurs IDs sont présents
+            if obj.establishment_type_id:
+                db_obj.establishment_type = EstablishmentType.objects.get(
+                    id=obj.establishment_type_id
+                )
+
+            if obj.sector_id:
+                db_obj.sector = Sector.objects.get(id=obj.sector_id)
+
+            # Mettre à jour l'utilisateur qui a fait la modification
+            if updated_by_id:
+                db_obj.updated_by = User.objects.get(id=updated_by_id)
+
+            db_obj.save()
+            return self._to_entity(db_obj)
+
+        except self.model.DoesNotExist:
+            logger.warning(f"{self.model.__name__} with id {id} not found for update.")
+            raise NotFoundError()
+        except IntegrityError as e:
+            logger.error(
+                f"Database integrity error updating {self.model.__name__} with id {id}: {e}",
+                exc_info=True,
+            )
+            raise ConflictError()
+        except Exception as e:
+            logger.error(
+                f"Database error updating {self.model.__name__} with id {id}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseError()

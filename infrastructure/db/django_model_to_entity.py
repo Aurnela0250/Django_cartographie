@@ -7,6 +7,7 @@ from apps.formation.models import Formation
 from apps.formation_authorization.models import FormationAuthorization
 from apps.levels.models import Level
 from apps.mentions.models import Mention
+from apps.rate.models import Rate
 from apps.sector.models import Sector
 from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.domain.entities.formation_authorization_entity import (
@@ -15,6 +16,7 @@ from core.domain.entities.formation_authorization_entity import (
 from core.domain.entities.formation_entity import FormationEntity
 from core.domain.entities.level_entity import LevelEntity
 from core.domain.entities.mention_entity import MentionEntity
+from core.domain.entities.rate_entity import RateEntity
 from core.domain.entities.sector_entity import SectorEntity
 from core.interfaces.establishment_type_repository import EstablishmentTypeEntity
 
@@ -159,12 +161,7 @@ def establishment_to_entity(
 
     formations_list = []
     if effective_metadata.formations:
-        # Charger les formations associées à cet établissement
-        # On utilise Formation.objects.filter pour être plus explicite
         for formation_model in Formation.objects.filter(establishment=establishment):
-            # Pour l'instant, on ne charge pas les détails des formations (level, mention, etc.)
-            # pour éviter les dépendances circulaires ou une charge de données trop importante.
-            # Ceci peut être contrôlé via FormationToEntityMetadata si nécessaire.
             formations_list.append(
                 formation_to_entity(
                     formation_model,
@@ -176,6 +173,15 @@ def establishment_to_entity(
                     ),
                 )
             )
+
+    # Calcul de la moyenne des ratings pour l'établissement
+    rates = Rate.objects.filter(establishment_id=establishment.pk)
+    avg_rating = 0  # Valeur par défaut si aucune évaluation
+    if rates.exists():
+        total_ratings = rates.count()
+        sum_ratings = sum(rate.rating for rate in rates)
+        if total_ratings > 0:
+            avg_rating = round(sum_ratings / total_ratings, 2)
 
     return EstablishmentEntity(
         id=establishment.pk,
@@ -189,6 +195,7 @@ def establishment_to_entity(
         description=establishment.description,
         latitude=establishment.latitude,
         longitude=establishment.longitude,
+        rating=avg_rating,
         establishment_type_id=establishment.establishment_type.pk,
         establishment_type=establishment_type_entity,
         sector_id=establishment.sector.pk,
@@ -216,4 +223,16 @@ def establishment_type_to_entity(
         updated_by=(
             establishment_type.updated_by.id if establishment_type.updated_by else None
         ),
+    )
+
+
+def rate_to_entity(rate: Rate) -> RateEntity:
+    """Convertit un objet Rate Django en RateEntity"""
+    return RateEntity(
+        id=rate.pk,
+        establishment_id=rate.establishment.pk,
+        user_id=rate.user.pk,
+        rating=rate.rating,
+        created_at=rate.created_at,
+        updated_at=rate.updated_at,
     )

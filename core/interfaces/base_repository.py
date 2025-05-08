@@ -41,3 +41,16 @@ class BaseRepository(Generic[T], ABC):
         **kwargs,
     ) -> PaginatedResult[T]:
         pass
+
+    @abstractmethod
+    def count(self, **kwargs) -> int:
+        """
+        Compte le nombre d'entités dans la base de données
+
+        Args:
+            **kwargs: Filtres optionnels pour la requête
+
+        Returns:
+            int: Le nombre d'entités correspondant aux critères
+        """
+        pass

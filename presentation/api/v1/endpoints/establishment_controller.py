@@ -24,6 +24,7 @@ from presentation.exceptions import (
 from presentation.schemas.establishment_schema import (
     CreateEstablishmentSchema,
     EstablishmentSchema,
+    RateEstablishmentSchema,
     UpdateEstablishmentSchema,
 )
 from presentation.schemas.pagination_schema import (
@@ -154,4 +155,52 @@ class EstablishmentController:
             self.logger.warning(f"Validation error occurred: {e}")
             raise e
         except Exception:
+            raise InternalServerError()
+
+    @http_post("/{establishment_id}/rate", response={201: None, 409: None})
+    def rate_establishment(
+        self,
+        request,
+        establishment_id: int,
+        rating_data: RateEstablishmentSchema,
+    ):
+        """Noter un établissement (un utilisateur ne peut voter qu'une fois par établissement)"""
+        try:
+            # Récupération de la valeur du rating
+            rating_value = rating_data.rating
+
+            # Récupération de l'ID de l'utilisateur depuis le token JWT
+            user_id = request.auth.get("user_id")
+
+            # Appel au use case pour noter l'établissement
+            success = self.establishment_use_case.rate_establishment(
+                establishment_id=establishment_id, user_id=user_id, rating=rating_value
+            )
+
+            # Si la notation a réussi, retourner un code 201 (Created)
+            if success:
+                self.logger.info(
+                    f"Établissement {establishment_id} noté avec succès par l'utilisateur {user_id}"
+                )
+                return 201, None
+            else:
+                # Si l'utilisateur a déjà noté cet établissement, retourner un code 409 (Conflict)
+                self.logger.warning(
+                    f"L'utilisateur {user_id} a déjà noté l'établissement {establishment_id}"
+                )
+                raise ConflictError()
+
+        except NotFoundError as e:
+            self.logger.warning(f"Établissement {establishment_id} non trouvé")
+            raise e
+        except ValidationError as e:
+            self.logger.warning(f"Erreur de validation: {e}")
+            raise e
+        except ConflictError:
+            self.logger.warning("L'utilisateur a déjà voté pour cet établissement")
+            raise
+        except Exception as e:
+            self.logger.error(
+                f"Erreur lors de la notation de l'établissement: {e}", exc_info=True
+            )
             raise InternalServerError()
