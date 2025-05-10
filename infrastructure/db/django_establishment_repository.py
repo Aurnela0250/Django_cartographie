@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 
 from apps.establishment.models import Establishment
@@ -8,6 +9,7 @@ from apps.establishment_type.models import EstablishmentType
 from apps.sector.models import Sector  # Ajout de l'import pour Sector
 from apps.users.models import User
 from core.domain.entities.establishment_entity import EstablishmentEntity
+from core.domain.entities.pagination import PaginatedResult
 from core.interfaces.establishment_repository import IEstablishmentRepository
 from infrastructure.db.django_base_repository import DjangoBaseRepository
 from infrastructure.db.django_model_to_entity import (
@@ -81,8 +83,10 @@ class DjangoEstablishmentRepository(
                 "updated_at",
                 "establishment_type_id",
                 "establishment_type",
-                "sector_id",  # Exclure sector_id
-                "sector",  # Exclure sector
+                "sector_id",
+                "sector",
+                "rating",
+                "formations",
             }
         )
 
@@ -165,3 +169,91 @@ class DjangoEstablishmentRepository(
                 exc_info=True,
             )
             raise DatabaseError()
+
+    def _paginate_queryset(self, queryset, pagination_params=None):
+        """Pagine un queryset Django et retourne un objet PaginatedResult."""
+        # Valeurs par défaut de pagination
+        page = 1
+        per_page = 10
+
+        if pagination_params:
+            page = pagination_params.page
+            per_page = pagination_params.per_page
+
+        paginator = Paginator(queryset, per_page)
+        page_obj = paginator.get_page(page)
+
+        return PaginatedResult(
+            items=list(page_obj),
+            total_items=paginator.count,
+            page=page,
+            per_page=per_page,
+            total_pages=paginator.num_pages,
+        )
+
+    def filter_establishments(
+        self,
+        name: Optional[str] = None,
+        acronyme: Optional[str] = None,
+        establishment_type_id: Optional[int] = None,
+        city_id: Optional[int] = None,
+        region_id: Optional[int] = None,
+        domain_id: Optional[int] = None,
+        level_id: Optional[int] = None,
+        pagination_params=None,
+    ) -> PaginatedResult[EstablishmentEntity]:
+        """
+        Filtre les établissements selon divers critères.
+
+        Args:
+            name: Filtre par nom (commence par)
+            acronyme: Filtre par acronyme (commence par)
+            establishment_type_id: Filtre par type d'établissement
+            city_id: Filtre par ville du secteur
+            region_id: Filtre par région de la ville du secteur
+            domain_id: Filtre par domaine de formation proposé
+            level_id: Filtre par niveau de formation proposé
+            pagination_params: Paramètres de pagination
+
+        Returns:
+            Un résultat paginé d'établissements filtrés
+        """
+        query = self.model.objects.all()
+
+        # Application des filtres existants
+        if name:
+            query = query.filter(name__istartswith=name)
+
+        if acronyme:
+            query = query.filter(acronyme__istartswith=acronyme)
+
+        if establishment_type_id:
+            query = query.filter(establishment_type_id=establishment_type_id)
+
+        if city_id:
+            query = query.filter(sector__city_id=city_id)
+
+        if region_id:
+            query = query.filter(sector__city__region_id=region_id)
+
+        # Correction du filtre par domaine - Nous devons suivre la relation jusqu'à mention.domain
+        if domain_id:
+            query = query.filter(formation__mention__domain_id=domain_id).distinct()
+
+        # Filtre par niveau
+        if level_id:
+            query = query.filter(formation__level_id=level_id).distinct()
+
+        # Gestion de la pagination
+        paginated_result = self._paginate_queryset(query, pagination_params)
+
+        # Convertir les résultats en entités
+        items = [self._to_entity(item) for item in paginated_result.items]
+
+        return PaginatedResult(
+            items=items,
+            total_items=paginated_result.total_items,
+            page=paginated_result.page,
+            per_page=paginated_result.per_page,
+            total_pages=paginated_result.total_pages,
+        )

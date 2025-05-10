@@ -10,8 +10,7 @@ class DomainBase(BaseModel):
 
 
 class DomainCreate(DomainBase):
-    created_by: Optional[int] = None
-    updated_by: Optional[int] = None
+    pass
 
 
 class DomainUpdate(DomainBase):

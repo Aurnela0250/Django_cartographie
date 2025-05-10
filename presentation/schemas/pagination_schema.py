@@ -9,10 +9,6 @@ T = TypeVar("T")
 E = TypeVar("E")
 
 
-class SchemaEx(Schema):
-    name: str = Field(..., description="Nom de l'élément", max_length=255)
-
-
 class PaginationParamsSchema(Schema):
     """Schéma pour les paramètres de pagination dans les requêtes API."""
 

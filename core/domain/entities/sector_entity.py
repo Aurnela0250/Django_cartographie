@@ -10,7 +10,7 @@ class SectorEntity(BaseModel):
 
     id: Optional[int] = None
     name: str
-    region_id: int
+    city_id: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None

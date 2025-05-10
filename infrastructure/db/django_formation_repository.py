@@ -80,6 +80,7 @@ class DjangoFormationRepository(
                 "establishment",
                 "authorization_id",
                 "authorization",
+                "annual_headcounts",
             }
         )
 

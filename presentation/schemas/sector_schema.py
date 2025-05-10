@@ -10,7 +10,7 @@ class SectorBase(BaseSchema):
     """Schéma de base pour les données de secteur"""
 
     name: str = Field(..., description="Nom du secteur")
-    region_id: int = Field(..., description="ID de la région associée")
+    city_id: int = Field(..., description="ID de la ville associée")
 
 
 class SectorCreate(SectorBase):
@@ -23,7 +23,7 @@ class SectorUpdate(BaseSchema):
     """Schéma pour la mise à jour d'un secteur"""
 
     name: Optional[str] = Field(None, description="Nom du secteur")
-    region_id: Optional[int] = Field(None, description="ID de la région associée")
+    city_id: Optional[int] = Field(None, description="ID de la ville associée")
 
 
 class SectorOut(SectorBase):

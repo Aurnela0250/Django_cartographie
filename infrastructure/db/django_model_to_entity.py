@@ -151,7 +151,7 @@ def sector_to_entity(sector: Sector) -> SectorEntity:
     return SectorEntity(
         id=sector.pk,
         name=sector.name,
-        region_id=sector.region.pk,
+        city_id=sector.city.pk,
         created_at=sector.created_at,
         updated_at=sector.updated_at,
         created_by=sector.created_by.id if sector.created_by else None,
@@ -215,8 +215,6 @@ def establishment_to_entity(
         name=establishment.name,
         acronyme=establishment.acronyme,
         address=establishment.address,
-        code_postal=establishment.code_postal,
-        ville=establishment.ville,
         contacts=establishment.contacts,
         site_url=establishment.site_url,
         description=establishment.description,

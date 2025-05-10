@@ -19,8 +19,6 @@ class EstablishmentEntity(BaseModel):
     name: str
     acronyme: Optional[str] = None
     address: str
-    code_postal: int
-    ville: str
     contacts: Optional[List[str]] = None
     site_url: Optional[str] = None
     description: Optional[str] = None

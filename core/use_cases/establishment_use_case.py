@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.domain.entities.pagination import PaginatedResult, PaginationParams
@@ -26,7 +27,8 @@ class EstablishmentUseCase:
         self.logger = logging.getLogger(__name__)
 
     def create_establishment(
-        self, establishment_data: EstablishmentEntity
+        self,
+        establishment_data: EstablishmentEntity,
     ) -> EstablishmentEntity:
         """Creates a new establishment"""
         with self.unit_of_work:
@@ -253,4 +255,53 @@ class EstablishmentUseCase:
                 self.logger.error(
                     f"Erreur lors de l'enregistrement de la notation: {e}"
                 )
+                raise InternalServerError()
+
+    def filter_establishments(
+        self,
+        pagination_params: Optional[PaginationParams] = None,
+        name: Optional[str] = None,
+        acronyme: Optional[str] = None,
+        establishment_type_id: Optional[int] = None,
+        city_id: Optional[int] = None,
+        region_id: Optional[int] = None,
+        domain_id: Optional[int] = None,
+        level_id: Optional[int] = None,  # Nouveau paramètre
+    ) -> PaginatedResult[EstablishmentEntity]:
+        """
+        Filtre les établissements selon différents critères.
+
+        Args:
+            name: Filtre par nom (commence par)
+            acronyme: Filtre par acronyme (commence par)
+            establishment_type_id: Filtre par type d'établissement
+            city_id: Filtre par ville du secteur
+            region_id: Filtre par région de la ville du secteur
+            domain_id: Filtre par domaine de formation proposé
+            level_id: Filtre par niveau de formation proposé
+            pagination_params: Paramètres de pagination
+
+        Returns:
+            Un résultat paginé d'établissements filtrés
+        """
+        with self.unit_of_work:
+            establishment_repository = self.unit_of_work.get_repository(
+                DjangoEstablishmentRepository
+            )
+            try:
+                return establishment_repository.filter_establishments(
+                    name=name,
+                    acronyme=acronyme,
+                    establishment_type_id=establishment_type_id,
+                    city_id=city_id,
+                    region_id=region_id,
+                    domain_id=domain_id,
+                    level_id=level_id,  # Ajout du paramètre
+                    pagination_params=pagination_params,
+                )
+            except PydanticValidationError as e:
+                self.logger.warning(f"Validation error occurred: {e}")
+                raise ValidationError(e)
+            except Exception as e:
+                self.logger.error(f"Failed to filter establishments: {e}")
                 raise InternalServerError()

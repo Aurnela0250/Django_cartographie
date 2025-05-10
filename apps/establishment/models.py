@@ -19,8 +19,6 @@ class Establishment(models.Model):
         blank=True,
     )
     address = models.CharField(max_length=255)
-    code_postal = models.IntegerField()
-    ville = models.CharField(max_length=100)
     contacts = ArrayField(
         models.CharField(max_length=100),
         blank=True,

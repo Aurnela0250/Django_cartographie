@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, List, Optional
 
 from ninja import Field, Schema
 from pydantic.config import ConfigDict
+from pydantic.main import BaseModel
 
 from presentation.schemas.establishment_type_schema import EstablishmentTypeSchema
 from presentation.schemas.sector_schema import SectorOut
@@ -19,8 +20,6 @@ class EstablishmentBaseSchema(Schema):
     name: str
     acronyme: Optional[str] = None
     address: str
-    code_postal: int
-    ville: str
     contacts: Optional[List[str]] = None
     site_url: Optional[str] = None
     description: Optional[str] = None
@@ -44,8 +43,6 @@ class UpdateEstablishmentSchema(Schema):
     name: Optional[str] = None
     acronyme: Optional[str] = None
     address: Optional[str] = None
-    code_postal: Optional[int] = None
-    ville: Optional[str] = None
     contacts: Optional[List[str]] = None
     site_url: Optional[str] = None
     description: Optional[str] = None
@@ -79,3 +76,15 @@ class RateEstablishmentSchema(Schema):
     rating: float = Field(..., ge=0, le=5)
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class EstablishmentFilterParamsSchema(BaseModel):
+    """Schema for filtering establishments"""
+
+    name: Optional[str] = None
+    acronyme: Optional[str] = None
+    establishment_type_id: Optional[int] = None
+    city_id: Optional[int] = None
+    region_id: Optional[int] = None
+    domain_id: Optional[int] = None  # Filtre par domaine
+    level_id: Optional[int] = None  # Nouveau filtre par niveau

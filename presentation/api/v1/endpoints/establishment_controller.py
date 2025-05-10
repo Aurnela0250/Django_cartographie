@@ -23,6 +23,7 @@ from presentation.exceptions import (
 )
 from presentation.schemas.establishment_schema import (
     CreateEstablishmentSchema,
+    EstablishmentFilterParamsSchema,
     EstablishmentSchema,
     RateEstablishmentSchema,
     UpdateEstablishmentSchema,
@@ -62,6 +63,44 @@ class EstablishmentController:
         except ValidationError as e:
             raise e
         except DatabaseError as e:
+            raise e
+        except Exception:
+            raise InternalServerError()
+
+    @http_get(
+        "/filter",
+        response=PaginatedResultSchema[EstablishmentSchema],
+    )
+    def filter_establishments(
+        self,
+        request,
+        filter_params: Query[EstablishmentFilterParamsSchema],
+        pagination: Query[PaginationParamsSchema],
+    ):
+        """Filtrer les établissements selon différents critères"""
+        try:
+            pagination_params = PaginationParams(
+                page=pagination.page, per_page=pagination.per_page
+            )
+
+            establishments = self.establishment_use_case.filter_establishments(
+                name=filter_params.name,
+                acronyme=filter_params.acronyme,
+                establishment_type_id=filter_params.establishment_type_id,
+                city_id=filter_params.city_id,
+                region_id=filter_params.region_id,
+                domain_id=filter_params.domain_id,
+                level_id=filter_params.level_id,  # Ajout du paramètre
+                pagination_params=pagination_params,
+            )
+
+            return 200, PaginatedResultSchema.from_domain_result(
+                establishments,
+                EstablishmentSchema,
+                EstablishmentSchema.model_validate,
+            )
+        except ValidationError as e:
+            self.logger.warning(f"Validation error occurred: {e}")
             raise e
         except Exception:
             raise InternalServerError()
