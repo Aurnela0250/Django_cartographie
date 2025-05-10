@@ -108,6 +108,25 @@ clean:
 start: docker-check docker-check-postgres
 	gunicorn $(PYTHON_MODULE).wsgi:application --bind 0.0.0.0:8000
 
+# Environnement virtuel Python
+create-venv:
+	@if [ ! -d ".venv" ]; then \\
+		echo "Création de l'environnement virtuel .venv..."; \\
+		$(PYTHON) -m venv .venv; \\
+		echo "Environnement virtuel .venv créé."; \\
+		echo "Activez-le avec: source .venv/bin/activate"; \\
+	else \\
+		echo "L'environnement virtuel .venv existe déjà."; \\
+	fi
+
+activate-venv:
+	@echo "Pour activer l'environnement virtuel, exécutez dans votre terminal :"
+	@echo "source .venv/bin/activate"
+
+deactivate-venv:
+	@echo "Pour désactiver l'environnement virtuel, exécutez dans votre terminal :"
+	@echo "deactivate"
+
 # Création d'une application
 createapp:
 	@APP_NAME=$(word 2, $(MAKECMDGOALS)) && \
@@ -119,4 +138,4 @@ createapp:
 	$(MANAGE) startapp $$APP_NAME apps/$$APP_NAME
 	@:
 
-.PHONY: install migrate run test lint format makemigrations clean start createapp docker-check docker-start docker-stop docker-restart gen-keys superuser test-unit test-repo test-api test-all test-cov test-ci
+.PHONY: install migrate run test lint format makemigrations clean start createapp docker-check docker-start docker-stop docker-restart gen-keys superuser test-unit test-repo test-api test-all test-cov test-ci create-venv activate-venv deactivate-venv
