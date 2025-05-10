@@ -30,7 +30,10 @@ class EstablishmentTypeController:
         self.unit_of_work = DjangoUnitOfWork()
         self.establishment_type_use_case = EstablishmentTypeUseCase(self.unit_of_work)
 
-    @http_post("/", response={201: EstablishmentTypeSchema})
+    @http_post(
+        "",
+        response={201: EstablishmentTypeSchema},
+    )
     def create_establishment_type(
         self,
         request,
@@ -56,7 +59,10 @@ class EstablishmentTypeController:
         except Exception:
             raise InternalServerError()
 
-    @http_get("/{establishment_type_id}", response=EstablishmentTypeSchema)
+    @http_get(
+        "/{establishment_type_id}",
+        response=EstablishmentTypeSchema,
+    )
     def get_establishment_type(self, establishment_type_id: int):
         """Get an establishment type by ID"""
         try:
@@ -71,7 +77,10 @@ class EstablishmentTypeController:
         except Exception:
             raise InternalServerError()
 
-    @http_put("/{establishment_type_id}", response=EstablishmentTypeSchema)
+    @http_put(
+        "/{establishment_type_id}",
+        response=EstablishmentTypeSchema,
+    )
     def update_establishment_type(
         self,
         request,
@@ -111,7 +120,10 @@ class EstablishmentTypeController:
         except Exception:
             raise InternalServerError()
 
-    @http_delete("/{establishment_type_id}", response={204: None})
+    @http_delete(
+        "/{establishment_type_id}",
+        response={204: None},
+    )
     def delete_establishment_type(self, establishment_type_id: int):
         """Delete an establishment type"""
         try:
@@ -124,7 +136,10 @@ class EstablishmentTypeController:
         except Exception:
             raise InternalServerError()
 
-    @http_get("/", response=PaginatedResultSchema[EstablishmentTypeSchema])
+    @http_get(
+        "",
+        response=PaginatedResultSchema[EstablishmentTypeSchema],
+    )
     def get_all_establishment_types(
         self,
         request,

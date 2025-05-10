@@ -14,5 +14,24 @@ services:
     restart: unless-stopped
     command: redis-server --appendonly yes
 
+  postgres:
+    image: postgres:15
+    container_name: postgres_cartographie
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cartographie_db}
+      POSTGRES_USER: ${DB_USERNAME:-cartographie}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-123456}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   redis_data:
+  pg_data:

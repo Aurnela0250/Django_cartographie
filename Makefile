@@ -7,6 +7,19 @@ TEST_PATH = tests/
 COV_PATH = htmlcov/
 PYTEST_OPTS = -v -s --ds=config.settings --cov=core --cov=presentation --cov-report term-missing
 
+
+# Génération des clés JWT (privées et publiques)
+gen-keys:
+	mkdir -p keys
+	openssl genrsa -out keys/jwt_access_private.pem 2048
+	openssl rsa -in keys/jwt_access_private.pem -pubout -out keys/jwt_access_public.pem
+	openssl genrsa -out keys/jwt_refresh_private.pem 2048
+	openssl rsa -in keys/jwt_refresh_private.pem -pubout -out keys/jwt_refresh_public.pem
+
+# Création d'un super utilisateur Django
+superuser:
+	$(MANAGE) createsuperuser
+
 # Docker commands
 docker-check:
 	@echo "Vérification du conteneur Redis..."
@@ -15,6 +28,15 @@ docker-check:
 		docker-compose up -d; \
 	else \
 		echo "Le conteneur Redis est déjà en cours d'exécution."; \
+	fi
+
+docker-check-postgres:
+	@echo "Vérification du conteneur Postgres..."
+	@if ! docker ps | grep -q postgres_cartographie; then \
+		echo "Le conteneur Postgres n'est pas en cours d'exécution. Démarrage..."; \
+		docker-compose up -d; \
+	else \
+		echo "Le conteneur Postgres est déjà en cours d'exécution."; \
 	fi
 
 docker-start:
@@ -36,8 +58,9 @@ freeze:
 migrate:
 	$(MANAGE) migrate
 
-# Modifié pour vérifier et démarrer Redis automatiquement
-run: docker-check
+
+# Modifié pour vérifier et démarrer Redis et Postgres automatiquement
+run: docker-check docker-check-postgres
 	$(MANAGE) runserver
 
 test:
@@ -82,7 +105,7 @@ clean:
 	find . -type d -name "__pycache__" -delete
 
 # Déploiement local (ex: avec Gunicorn)
-start: docker-check
+start: docker-check docker-check-postgres
 	gunicorn $(PYTHON_MODULE).wsgi:application --bind 0.0.0.0:8000
 
 # Création d'une application
@@ -96,4 +119,4 @@ createapp:
 	$(MANAGE) startapp $$APP_NAME apps/$$APP_NAME
 	@:
 
-.PHONY: install migrate run test lint format makemigrations clean start createapp docker-check docker-start docker-stop docker-restart
+.PHONY: install migrate run test lint format makemigrations clean start createapp docker-check docker-start docker-stop docker-restart gen-keys superuser test-unit test-repo test-api test-all test-cov test-ci

@@ -41,7 +41,10 @@ class EstablishmentController:
         self.establishment_use_case = EstablishmentUseCase(self.unit_of_work)
         self.logger = logging.getLogger(__name__)
 
-    @http_post("/", response={201: EstablishmentSchema})
+    @http_post(
+        "",
+        response={201: EstablishmentSchema},
+    )
     def create_establishment(
         self,
         request,
@@ -105,7 +108,10 @@ class EstablishmentController:
         except Exception:
             raise InternalServerError()
 
-    @http_get("/{establishment_id}", response=EstablishmentSchema)
+    @http_get(
+        "/{establishment_id}",
+        response=EstablishmentSchema,
+    )
     def get_establishment(self, establishment_id: int):
         """Get an establishment by ID"""
         try:
@@ -118,7 +124,10 @@ class EstablishmentController:
         except Exception:
             raise InternalServerError()
 
-    @http_put("/{establishment_id}", response=EstablishmentSchema)
+    @http_put(
+        "/{establishment_id}",
+        response=EstablishmentSchema,
+    )
     def update_establishment(
         self,
         request,
@@ -154,7 +163,10 @@ class EstablishmentController:
         except Exception:
             raise InternalServerError()
 
-    @http_delete("/{establishment_id}", response={204: None})
+    @http_delete(
+        "/{establishment_id}",
+        response={204: None},
+    )
     def delete_establishment(self, establishment_id: int):
         """Delete an establishment"""
         try:
@@ -166,7 +178,7 @@ class EstablishmentController:
             raise InternalServerError()
 
     @http_get(
-        "/",
+        "",
         response=PaginatedResultSchema[EstablishmentSchema],
     )
     def get_all_establishments(
@@ -196,7 +208,10 @@ class EstablishmentController:
         except Exception:
             raise InternalServerError()
 
-    @http_post("/{establishment_id}/rate", response={201: None, 409: None})
+    @http_post(
+        "/{establishment_id}/rate",
+        response={201: None, 409: None},
+    )
     def rate_establishment(
         self,
         request,

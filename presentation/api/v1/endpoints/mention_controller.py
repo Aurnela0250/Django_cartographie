@@ -1,3 +1,5 @@
+import logging
+
 from ninja import Query
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from ninja_extra.permissions import IsAuthenticated
@@ -25,9 +27,10 @@ class MentionController:
     def __init__(self):
         self.unit_of_work = DjangoUnitOfWork()
         self.mention_use_case = MentionUseCase(self.unit_of_work)
+        self.logger = logging.getLogger(__name__)
 
     @http_post(
-        "/",
+        "",
         response={
             201: MentionSchema,
             400: ErrorResponseSchema,
@@ -42,6 +45,7 @@ class MentionController:
             # Utiliser from_orm pour pydantic v1 ou model_validate pour pydantic v2
             return 201, MentionSchema.from_orm(mention)
         except Exception as e:
+            self.logger.error(f"Error creating mention: {e}")
             raise e
 
     @http_get(
@@ -61,7 +65,7 @@ class MentionController:
             raise e
 
     @http_get(
-        "/",
+        "",
         response={
             200: PaginatedResultSchema[MentionSchema],
             500: ErrorResponseSchema,

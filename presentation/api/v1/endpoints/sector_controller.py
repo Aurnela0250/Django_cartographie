@@ -132,10 +132,10 @@ class SectorController:
                     if sector_data.name is not None
                     else existing_sector.name
                 ),
-                region_id=(
-                    sector_data.region_id
-                    if sector_data.region_id is not None
-                    else existing_sector.region_id
+                city_id=(
+                    sector_data.city_id
+                    if sector_data.city_id is not None
+                    else existing_sector.city_id
                 ),
                 created_at=existing_sector.created_at,
                 created_by=existing_sector.created_by,

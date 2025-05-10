@@ -33,7 +33,7 @@ class CityController:
         self.city_use_case = CityUseCase(self.unit_of_work)
 
     @http_post(
-        "/",
+        "",
         response={
             201: CreateCitySchemaResponse,
             400: ErrorResponseSchema,
@@ -77,7 +77,7 @@ class CityController:
             raise InternalServerError()
 
     @http_get(
-        "/",
+        "",
         response={
             200: PaginatedResultSchema[CitySchema],
             401: ErrorResponseSchema,

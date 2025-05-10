@@ -14,6 +14,11 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+# Charger les variables d'environnement depuis .env
+load_dotenv(os.path.join(Path(__file__).resolve().parent.parent, ".env"))
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,14 +27,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-0b%4yfbe^i8=td=3hydac=5mepdh@$)d(j%wok36hfj%6tperv"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-0b%4yfbe^i8=td=3hydac=5mepdh@$)d(j%wok36hfj%6tperv"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "True")
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = [
-    "*",
-    "http://localhost:3000",
+    "localhost",
+    "127.0.0.1",
 ]
 
 # OpenFGA Configuration
@@ -111,13 +118,13 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "cartographie_db",
-        "USER": "cartographie",
-        "PASSWORD": "123456789",
-        "HOST": "localhost",
-        "PORT": "5432",
-    },
+        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.getenv("DB_NAME", "cartographie_db"),
+        "USER": os.getenv("DB_USERNAME", "cartographie"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "123456"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+    }
 }
 
 
