@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   redis:
     image: redis:latest
@@ -19,9 +21,9 @@ services:
     container_name: postgres_cartographie
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-cartographie_db}
-      POSTGRES_USER: ${DB_USERNAME:-cartographie}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-123456}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
