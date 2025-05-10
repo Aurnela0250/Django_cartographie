@@ -25,6 +25,7 @@ docker-check:
 	@echo "Vérification du conteneur Redis..."
 	@if ! docker ps | grep -q redis_cartographie; then \
 		echo "Le conteneur Redis n'est pas en cours d'exécution. Démarrage..."; \
+		echo "Démarrage des services avec .env..."; \
 		docker-compose up -d; \
 	else \
 		echo "Le conteneur Redis est déjà en cours d'exécution."; \
