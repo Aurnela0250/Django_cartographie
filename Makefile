@@ -110,13 +110,13 @@ start: docker-check docker-check-postgres
 
 # Environnement virtuel Python
 create-venv:
-	@if [ ! -d ".venv" ]; then \\
-		echo "Création de l'environnement virtuel .venv..."; \\
-		$(PYTHON) -m venv .venv; \\
-		echo "Environnement virtuel .venv créé."; \\
-		echo "Activez-le avec: source .venv/bin/activate"; \\
-	else \\
-		echo "L'environnement virtuel .venv existe déjà."; \\
+	@if [ ! -d ".venv" ]; then \
+		echo "Création de l'environnement virtuel .venv..."; \
+		$(PYTHON) -m venv .venv; \
+		echo "Environnement virtuel .venv créé."; \
+		echo "Activez-le avec: source .venv/bin/activate"; \
+	else \
+		echo "L'environnement virtuel .venv existe déjà."; \
 	fi
 
 activate-venv:
