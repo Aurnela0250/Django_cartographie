@@ -21,12 +21,19 @@ class FormationAuthorizationBaseSchema(Schema):
         # Ensure values is not None and contains the necessary fields
         if values is None:
             return values
-        date_debut, date_fin = getattr(values, "date_debut", None), getattr(
-            values, "date_fin", None
-        )
+        date_debut = getattr(values, "date_debut", None)
+        date_fin = getattr(values, "date_fin", None)
 
-        if date_debut is not None and date_fin is not None and date_debut >= date_fin:
-            raise ValueError("date_debut must be before date_fin")
+        # Si date_debut et date_fin sont renseignés, vérifier l'ordre
+        if date_debut is not None and date_fin is not None:
+            if date_debut >= date_fin:
+                raise ValueError("date_debut must be before date_fin")
+        # Si uniquement date_fin est renseignée, vérifier la validité de l'année
+        elif date_debut is None and date_fin is not None:
+            if date_fin.year < 1900 or date_fin.year > 2100:
+                raise ValueError(
+                    "date_fin doit être une année valide (entre 1900 et 2100)"
+                )
         return values
 
 
@@ -45,12 +52,19 @@ class UpdateFormationAuthorizationSchema(Schema):
         # Ensure values is not None and contains the necessary fields
         if values is None:
             return values
-        date_debut, date_fin = getattr(values, "date_debut", None), getattr(
-            values, "date_fin", None
-        )
+        date_debut = getattr(values, "date_debut", None)
+        date_fin = getattr(values, "date_fin", None)
 
-        if date_debut is not None and date_fin is not None and date_debut >= date_fin:
-            raise ValueError("date_debut must be before date_fin")
+        # Si date_debut et date_fin sont renseignés, vérifier l'ordre
+        if date_debut is not None and date_fin is not None:
+            if date_debut >= date_fin:
+                raise ValueError("date_debut must be before date_fin")
+        # Si uniquement date_fin est renseignée, vérifier la validité de l'année
+        elif date_debut is None and date_fin is not None:
+            if date_fin.year < 1900 or date_fin.year > 2100:
+                raise ValueError(
+                    "date_fin doit être une année valide (entre 1900 et 2100)"
+                )
         return values
 
 

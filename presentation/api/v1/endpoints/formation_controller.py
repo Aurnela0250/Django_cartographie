@@ -51,7 +51,10 @@ class FormationController:
         self.formation_use_case = FormationUseCase(self.unit_of_work)
         self.logger = logging.getLogger(__name__)
 
-    @http_post("/", response={201: FormationSchema})
+    @http_post(
+        "",
+        response={201: FormationSchema},
+    )
     def create_formation(
         self,
         request,
@@ -75,7 +78,10 @@ class FormationController:
         except Exception:
             raise InternalServerError()
 
-    @http_get("/{formation_id}", response=FormationSchema)
+    @http_get(
+        "/{formation_id}",
+        response=FormationSchema,
+    )
     def get_formation(self, formation_id: int):
         """Get a formation by ID"""
         try:
@@ -86,7 +92,10 @@ class FormationController:
         except Exception:
             raise InternalServerError()
 
-    @http_put("/{formation_id}", response=FormationSchema)
+    @http_put(
+        "/{formation_id}",
+        response=FormationSchema,
+    )
     def update_formation(
         self,
         request,
@@ -118,9 +127,13 @@ class FormationController:
         except DatabaseError as e:
             raise e
         except Exception:
+            self.logger.error("An unexpected error occurred", exc_info=True)
             raise InternalServerError()
 
-    @http_delete("/{formation_id}", response={204: None})
+    @http_delete(
+        "/{formation_id}",
+        response={204: None},
+    )
     def delete_formation(self, formation_id: int):
         """Delete a formation"""
         try:
@@ -132,7 +145,7 @@ class FormationController:
             raise InternalServerError()
 
     @http_get(
-        "/",
+        "",
         response=PaginatedResultSchema[FormationSchema],
     )
     def get_all_formations(
@@ -161,7 +174,10 @@ class FormationController:
             self.logger.error("An unexpected error occurred", exc_info=True)
             raise InternalServerError()
 
-    @http_post("/{formation_id}/authorization", response=FormationSchema)
+    @http_post(
+        "/{formation_id}/authorization",
+        response=FormationSchema,
+    )
     def create_authorization(
         self,
         request,
@@ -178,6 +194,7 @@ class FormationController:
             formation = self.formation_use_case.create_authorization(
                 formation_id, entity_data
             )
+
             return FormationSchema.from_orm(formation)
         except NotFoundError as e:
             raise e
@@ -272,6 +289,7 @@ class FormationController:
             entity_data = AnnualHeadCountEntity(
                 id=annual_headcount_id,
                 **headcount_data.model_dump(exclude_unset=True),
+                formation_id=formation_id,
                 updated_by=request.auth.get("user_id"),
             )
 
@@ -289,6 +307,7 @@ class FormationController:
         except DatabaseError as e:
             raise e
         except Exception:
+            self.logger.error("An unexpected error occurred", exc_info=True)
             raise InternalServerError()
 
     @http_delete(

@@ -118,6 +118,7 @@ class EstablishmentController:
             establishment = self.establishment_use_case.get_establishment(
                 establishment_id
             )
+
             return EstablishmentSchema.from_orm(establishment)
         except NotFoundError as e:
             raise e

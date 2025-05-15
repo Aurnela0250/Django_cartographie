@@ -119,6 +119,7 @@ class DjangoFormationRepository(
                 "establishment",
                 "authorization_id",
                 "authorization",
+                "annual_headcounts",  # Empêche l'assignation directe du reverse set
             }
         ).items():
             setattr(db_obj, key, value)

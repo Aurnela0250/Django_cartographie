@@ -21,7 +21,10 @@ from presentation.schemas.pagination_schema import (
 
 
 @api_controller(
-    "/mentions", tags=["Mentions"], auth=jwt_auth, permissions=[IsAuthenticated]
+    "/mentions",
+    tags=["Mentions"],
+    auth=jwt_auth,
+    permissions=[IsAuthenticated],
 )
 class MentionController:
     def __init__(self):

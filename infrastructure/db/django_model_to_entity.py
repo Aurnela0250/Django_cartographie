@@ -107,7 +107,7 @@ def formation_to_entity(
             ),
         )
 
-    return FormationEntity(
+    result = FormationEntity(
         id=formation.pk,
         intitule=formation.intitule,
         description=formation.description,
@@ -128,6 +128,8 @@ def formation_to_entity(
         created_by=formation.created_by.id if formation.created_by else None,
         updated_by=formation.updated_by.id if formation.updated_by else None,
     )
+
+    return result
 
 
 def annual_headcount_to_entity(
@@ -210,7 +212,7 @@ def establishment_to_entity(
         if total_ratings > 0:
             avg_rating = round(sum_ratings / total_ratings, 2)
 
-    return EstablishmentEntity(
+    establishment_entity = EstablishmentEntity(
         id=establishment.pk,
         name=establishment.name,
         acronyme=establishment.acronyme,
@@ -231,6 +233,8 @@ def establishment_to_entity(
         created_by=establishment.created_by.id if establishment.created_by else None,
         updated_by=establishment.updated_by.id if establishment.updated_by else None,
     )
+
+    return establishment_entity
 
 
 def establishment_type_to_entity(
