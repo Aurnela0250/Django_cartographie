@@ -1,0 +1,17 @@
+{
+    "python.linting.enable": true,
+    "python.linting.pylintEnabled": true,
+    "files.exclude": {
+        "**/*.pyc": {"when": "$(basename).py"},
+        "**/__pycache__": true,
+        "**/*.pytest_cache": true,
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "python.testing.pytestEnabled": true, 
+    "python.testing.pytestArgs": [ 
+        "--cache-clear" 
+    ],
+    "python.experiments.optOutFrom": [
+    "pythonTestAdapter"
+],
+}

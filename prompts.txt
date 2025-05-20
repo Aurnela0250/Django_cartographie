@@ -1,0 +1,46 @@
+
+`On a 3 type d'utilisateurs [service_client, client, user]`
+Un `user` peut être un `service_client` ou un `client`.
+Un `client` peut créer un ou plusieurs établissement.
+Le client est le `owner` créateur de l'etablissement `establishment:x`.
+Le `owner` peut ajouter un ou plusieurs roles dans l'établissement
+
+`Un utilisateur n'est pas un client.`
+`Un utilisateur peut avoir un ou plusieurs [ Directeur, élèves, enseignants, parent, autres personnels]`
+`Les ressources sont les endpoints de mon api ["/school", "/user", ...] on ne peut pas créer des endpoints.`
+`Les "api_endpoint" on 4 méthodes possible ["post", "get", "put", "delete"]`
+`Seul les clients peuvent créer un "School"`
+`Seul les clients peuvent supprimer un "School"`
+`Les utilisateurs peuvent lire les "School" avec qui ils ont une relation`
+`"School" est un api_endpoint`
+
+`Un client peut crée des établissements.`
+`Un utilisateur peut gérer l'établissement, ex: inscription, presence,  examen, ...`
+`Un Utilisateur ne peut pas crée un établissement.`
+`Si on veut être client, on s'inscrit avec l'url `signin``
+`Tous les utilisateur peuvent se connecter avec l'url `login``
+`Les sous-ressource sont les donné dans la base de données ["school:{id}", "user:{id}", ...](si on prends un exemple les fichiers)`
+`Les actions pour les ressources "create", "read", "update", "delete"`
+`Les actions pour les ressources "create", "read", "update" et "delete"`
+`Les actions pour les sous-ressources "create", "read", "update" et "delete"`
+`Seul le client qui a créer son établissement peut voir `
+`Les ressources endpoints sont aussi des tables de base de doonées, ces tables on des relations entre elles`
+
+
+
+Le décorateur ne fonctionne pas avec Swagger j'utilise Django Ninja Api
+Ceci est une utilisation pour chaque fonction mais pour Un contrioller je fais comment ?
+@api_controller("/users", tags=["Users"])
+class UserController:
+    @http_get("/me", response=UserOut)
+    @jwt_auth
+    def get_current_user(self, request):
+        user_id = request.auth['user_id']
+        user = self.user_repository.get_user_by_id(user_id)
+        return UserOut.from_orm(user)
+
+
+{
+  "email": "ninot@email.com",
+  "password": "AspireOne40!"
+}

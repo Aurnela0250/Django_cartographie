@@ -1,0 +1,37 @@
+model
+  schema 1.1
+
+type user
+
+
+# //! Groupes d'utilisateurs
+type team
+  relations
+    define user: [user] # Il y'a des utilisateurs de type user
+    define admin: [user]  # Il y'a des utilisateurs de type admin
+    define client: [user]  # Il y'a des utilisateurs de type client
+
+# //! Pour les endpoints de l'API "/school", "/user", ...
+type api_endpoint
+  relations
+    define team: [team] # les groupes d'utilisateur
+    define create_school: [team#client]  # Seuls les clients peuvent créer une école
+    define update_school: [team#admin, team#client]  # Les administrateurs ou les clients peuvent mettre à jour l'école
+    define delete_school: [team#admin, team#client]  # Seuls les administrateurs ou les clients peuvent supprimer une école
+    define read_school: [team#user, team#admin, team#client]  # Tous les utilisateurs de l'équipe peuvent lire les informations d'une école
+
+# //! Gestions de l'entité "school" dans la base de données
+type school
+  relations
+    define owner: [user] # Le propriétaire peut être un client ou un administrateur de l'équipe
+    define director: [user] # Le directeur est un utilisateur de l'équipe
+    define staff: [user] or director or owner # Le personnel est un utilisateur ou le propriétaire
+    define teacher: [user] # Les enseignants sont des utilisateurs ou le propriétaire
+    define student: [user] # Les étudiants sont des utilisateurs membres de l'équipe
+    define parent: [user]  # Les parents sont des utilisateurs ou le propriétaire
+    define member: owner or director or staff or teacher or student or parent # Les membres de l'école incluent toutes les catégories de personnel
+
+    # Permissions d'action sur l'école
+    define can_read: [team#admin] or member  # Tous les membres peuvent lire les informations de l'école
+    define can_update: [team#admin] or (director or owner)  # Seul le directeur et le personnel peuvent mettre à jour l'école
+    define can_delete: [team#admin] or owner  # Seul le propriétaire peut supprimer l'école
