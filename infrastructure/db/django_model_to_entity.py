@@ -141,6 +141,7 @@ def annual_headcount_to_entity(
         formation_id=headcount.formation.pk,
         academic_year=headcount.academic_year,
         students=headcount.students,
+        success_rate=headcount.success_rate,
         created_at=headcount.created_at,
         updated_at=headcount.updated_at,
         created_by=headcount.created_by.id if headcount.created_by else None,

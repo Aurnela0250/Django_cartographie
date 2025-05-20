@@ -219,7 +219,7 @@ JWT_AUDIENCE = os.getenv("JWT_AUDIENCE", "lemon-users")
 JWT_ALGORITHM = "RS256"  # Changement crucial: utiliser RS256 au lieu de HS256
 
 # Durée de vie des tokens
-ACCESS_TOKEN_LIFETIME = timedelta(minutes=15)
+ACCESS_TOKEN_LIFETIME = timedelta(hours=2)
 REFRESH_TOKEN_LIFETIME = timedelta(days=7)
 
 # Charger les clés depuis les fichiers

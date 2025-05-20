@@ -1,5 +1,4 @@
 import logging
-
 from ninja import Query
 from ninja_extra import (
     api_controller,

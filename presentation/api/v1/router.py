@@ -1,6 +1,7 @@
 from ninja import Swagger
 from ninja_extra import NinjaExtraAPI
 
+from presentation.api.v1.endpoints.chat_controller import ChatController
 from presentation.api.exception_handlers import global_exception_handler
 
 # Importer les contrôleurs par version
@@ -26,6 +27,7 @@ controllers = [
     SectorController,
     FormationController,
     CityController,
+    ChatController,
 ]
 
 # Création de l'API
@@ -47,6 +49,7 @@ api = NinjaExtraAPI(
     """,
     docs=Swagger(settings={"persistAuthorization": True, "filter": True}),
 )
+
 
 # Enregistrer les contrôleurs
 api.register_controllers(*controllers)

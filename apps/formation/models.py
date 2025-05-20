@@ -94,8 +94,19 @@ class AnnualHeadcount(models.Model):
         related_name="updated_annual_headcounts",
     )
 
+    success_rate = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Taux de réussite en pourcentage (ex: 85.5 pour 85,5%)",
+    )
+
     def __str__(self) -> str:
-        return f"{self.formation.intitule} - {self.academic_year} - {self.students} étudiants"
+        taux = (
+            f" - {self.success_rate:.1f}% réussite"
+            if self.success_rate is not None
+            else ""
+        )
+        return f"{self.formation.intitule} - {self.academic_year} - {self.students} étudiants{taux}"
 
     class Meta:
         verbose_name = "Annual Headcount"

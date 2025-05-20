@@ -11,6 +11,7 @@ class AnnualHeadCountEntity(BaseModel):
     formation_id: int
     academic_year: int
     students: int
+    success_rate: Optional[float] = None
 
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

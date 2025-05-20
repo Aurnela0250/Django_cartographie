@@ -13,6 +13,12 @@ class AnnualHeadcountBase(Schema):
         ..., description="Année universitaire (ex: 2023 pour 2023-2024)"
     )
     students: int = Field(..., ge=0, description="Nombre d'étudiants inscrits")
+    success_rate: Optional[float] = Field(
+        None,
+        ge=0,
+        le=100,
+        description="Taux de réussite en pourcentage (ex: 85.5 pour 85,5%)",
+    )
 
     @field_validator("academic_year")
     @classmethod
@@ -45,6 +51,12 @@ class AnnualHeadcountUpdate(Schema):
     )
     students: Optional[int] = Field(
         None, ge=0, description="Nombre d'étudiants inscrits"
+    )
+    success_rate: Optional[float] = Field(
+        None,
+        ge=0,
+        le=100,
+        description="Taux de réussite en pourcentage (ex: 85.5 pour 85,5%)",
     )
 
     @field_validator("academic_year")

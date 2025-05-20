@@ -33,11 +33,11 @@ class Establishment(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
-    # Relation one-to-one with EstablishmentType
-    establishment_type = models.OneToOneField(
+    # Relation many-to-one avec EstablishmentType
+    establishment_type = models.ForeignKey(
         EstablishmentType,
         on_delete=models.CASCADE,
-        related_name="establishment",
+        related_name="establishments",
     )
 
     # Relation ManyToOne avec Sector
