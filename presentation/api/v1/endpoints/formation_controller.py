@@ -16,8 +16,11 @@ from core.domain.entities.formation_authorization_entity import (
 from core.domain.entities.formation_entity import FormationEntity
 from core.domain.entities.pagination import PaginationParams
 from core.use_cases.formation_use_case import FormationUseCase
+from infrastructure.cache.cache_service import CacheService
+from infrastructure.cache.cache_utils import cache_response
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
+from infrastructure.external_services.redis_service import RedisService
 from presentation.exceptions import (
     ConflictError,
     DatabaseError,
@@ -50,6 +53,12 @@ class FormationController:
         self.unit_of_work = DjangoUnitOfWork()
         self.formation_use_case = FormationUseCase(self.unit_of_work)
         self.logger = logging.getLogger(__name__)
+        self.redis_service = RedisService()
+        self.cache_service = CacheService(
+            redis_service=self.redis_service,
+            entity_name="formation",
+            logger=self.logger,
+        )
 
     @http_post(
         "",
@@ -81,6 +90,12 @@ class FormationController:
     @http_get(
         "/{formation_id}",
         response=FormationSchema,
+    )
+    @cache_response(
+        cache_type="item",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=FormationSchema,
+        get_id=lambda self, formation_id, **kwargs: formation_id,
     )
     def get_formation(self, formation_id: int):
         """Get a formation by ID"""
@@ -148,6 +163,14 @@ class FormationController:
         "",
         response=PaginatedResultSchema[FormationSchema],
     )
+    @cache_response(
+        cache_type="list",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=PaginatedResultSchema[FormationSchema],
+        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        ),
+    )
     def get_all_formations(
         self,
         request,
@@ -158,15 +181,12 @@ class FormationController:
             pagination_params = PaginationParams(
                 page=pagination.page, per_page=pagination.per_page
             )
-
             formations = self.formation_use_case.get_all_formations(pagination_params)
-
-            return 200, PaginatedResultSchema.from_domain_result(
+            return PaginatedResultSchema.from_domain_result(
                 formations,
                 FormationSchema,
                 FormationSchema.model_validate,
             )
-
         except ValidationError as e:
             self.logger.warning(f"Validation error occurred: {e}")
             raise e
