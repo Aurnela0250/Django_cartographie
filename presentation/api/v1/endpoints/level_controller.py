@@ -7,6 +7,8 @@ from pydantic import ValidationError as PydanticValidationError
 from core.domain.entities.level_entity import LevelEntity
 from core.domain.entities.pagination import PaginationParams
 from core.use_cases.level_use_case import LevelUseCase
+from infrastructure.cache.cache_service import CacheService
+from infrastructure.cache.cache_utils import cache_response
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
 from presentation.exceptions import (
@@ -31,6 +33,19 @@ class LevelController:
         self.unit_of_work = DjangoUnitOfWork()
         self.level_use_case = LevelUseCase(self.unit_of_work)
         self.logger = logging.getLogger(__name__)
+        self.redis_service = None
+        self.cache_service = None
+        try:
+            from infrastructure.external_services.redis_service import RedisService
+
+            self.redis_service = RedisService()
+            self.cache_service = CacheService(
+                redis_service=self.redis_service,
+                entity_name="level",
+                logger=self.logger,
+            )
+        except Exception as e:
+            self.logger.error(f"Redis/CacheService init failed: {e}")
 
     @http_get(
         "",
@@ -42,27 +57,27 @@ class LevelController:
         summary="Retrieve all levels",
         description="Returns a list of all available levels with pagination",
     )
+    @cache_response(
+        cache_type="list",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=PaginatedResultSchema[LevelOut],
+        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        ),
+    )
     def get_all_levels(
         self,
         request,
         pagination: Query[PaginationParamsSchema],
     ):
         """Retrieves all levels with pagination (page=1 and per_page=10 by default)"""
-        try:
-            pagination_params = PaginationParams(
-                page=pagination.page, per_page=pagination.per_page
-            )
-
-            result = self.level_use_case.get_all_levels(pagination_params)
-
-            # Convertir le PaginatedResult en PaginatedResultSchema
-            return 200, PaginatedResultSchema.from_domain_result(
-                result, LevelOut, LevelOut.model_validate
-            )
-
-        except Exception as e:
-            self.logger.error(f"Error retrieving all levels: {str(e)}")
-            raise InternalServerError()
+        pagination_params = PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        )
+        result = self.level_use_case.get_all_levels(pagination_params)
+        return PaginatedResultSchema.from_domain_result(
+            result, LevelOut, LevelOut.model_validate
+        )
 
     @http_get(
         "/{level_id}",
@@ -71,17 +86,16 @@ class LevelController:
         summary="Retrieve a level by its ID",
         description="Returns the details of a level specified by its ID",
     )
+    @cache_response(
+        cache_type="item",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=LevelOut,
+        get_id=lambda self, request, level_id, **kwargs: level_id,
+    )
     def get_level(self, request, level_id: int):
         """Retrieves a level by its ID"""
-        try:
-            level = self.level_use_case.get_level(level_id)
-            return 200, LevelOut.model_validate(level)
-        except NotFoundError:
-            self.logger.warning(f"Level with ID {level_id} not found")
-            raise
-        except Exception as e:
-            self.logger.error(f"Error retrieving level {level_id}: {str(e)}")
-            raise InternalServerError()
+        level = self.level_use_case.get_level(level_id)
+        return LevelOut.model_validate(level)
 
     @http_post(
         "",
