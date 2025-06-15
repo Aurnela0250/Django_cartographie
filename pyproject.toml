@@ -1,0 +1,15 @@
+[project]
+name = "django-cartographie"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "alembic>=1.16.1",
+    "asyncpg>=0.30.0",
+    "black>=25.1.0",
+    "fastapi[standard]>=0.115.12",
+    "greenlet>=3.2.3",
+    "sqlmodel>=0.0.24",
+    "uuid7>=0.1.0",
+]
