@@ -3,13 +3,19 @@ name = "django-cartographie"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
-    "alembic>=1.16.1",
+    "aerich[toml]>=0.9.1",
     "asyncpg>=0.30.0",
     "black>=25.1.0",
+    "click>=8.2.1",
     "fastapi[standard]>=0.115.12",
     "greenlet>=3.2.3",
-    "sqlmodel>=0.0.24",
+    "tortoise-orm[asyncpg]>=0.25.1",
     "uuid7>=0.1.0",
 ]
+
+[tool.aerich]
+tortoise_orm = "config.settings.TORTOISE_ORM"
+location = "./apps/migrations"
+src_folder = "./."

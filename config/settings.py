@@ -22,6 +22,51 @@ load_dotenv(os.path.join(Path(__file__).resolve().parent.parent, ".env"))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Tortoise ORM Configuration
+DB_USER = os.getenv("DB_USERNAME", "cartographie")
+DB_PASS = os.getenv("DB_PASSWORD", "123456")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "cartographie_db")
+
+TORTOISE_ORM = {
+    "connections": {
+        "default": {
+            "engine": "tortoise.backends.asyncpg",
+            "credentials": {
+                "host": DB_HOST,
+                "port": DB_PORT,
+                "user": DB_USER,
+                "password": DB_PASS,
+                "database": DB_NAME,
+            },
+        }
+    },
+    "apps": {
+        "models": {
+            "models": [
+                "aerich.models",
+                "apps.tortoise.annual_headcount.models",
+                "apps.tortoise.city.models",
+                "apps.tortoise.domain.models",
+                "apps.tortoise.establishment.models",
+                "apps.tortoise.establishment_type.models",
+                "apps.tortoise.formation.models",
+                "apps.tortoise.formation_authorization.models",
+                "apps.tortoise.levels.models",
+                "apps.tortoise.mentions.models",
+                "apps.tortoise.rate.models",
+                "apps.tortoise.region.models",
+                "apps.tortoise.sector.models",
+                "apps.tortoise.users.models",
+            ],
+            "default_connection": "default",
+        },
+    },
+    "use_tz": False,
+    "timezone": "UTC",
+}
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

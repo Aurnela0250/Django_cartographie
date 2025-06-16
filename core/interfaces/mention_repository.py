@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from core.domain.entities.mention_entity import MentionEntity
+from core.entities.mention_entity import MentionEntity
 from core.interfaces.base_repository import BaseRepository
 
 

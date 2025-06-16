@@ -1,7 +1,7 @@
 from typing import Optional
 
-from core.domain.entities.city_entity import CityEntity
-from core.domain.entities.pagination import PaginatedResult, PaginationParams
+from core.entities.city_entity import CityEntity
+from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository
 
 

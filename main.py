@@ -1,26 +1,28 @@
 from contextlib import asynccontextmanager
 from typing import Union
 
-from fastapi import Depends, FastAPI
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from fastapi import FastAPI  # Retrait de Depends
 
-from infrastructure.db.fastapi.engine import create_db_and_tables, get_session
-from infrastructure.db.fastapi.models.user_model import User
+from config.settings import TORTOISE_ORM
+
+# Importer les fonctions d'initialisation de Tortoise ORM et la configuration
+from config.tortoise_init import close_tortoise, init_tortoise
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Code exécuté au démarrage
-    # Note: En production, utilisez Alembic pour les migrations
-    # Cette ligne est utile pour le développement/test uniquement
-    await create_db_and_tables()
-    print("🚀 FastAPI started - Database tables ready")
-    print(
-        "📋 Use Alembic for schema migrations: python scripts/migration_helper.py status"
-    )
+    print("🚀 FastAPI starting - Initializing Tortoise ORM...")
+    await init_tortoise(TORTOISE_ORM)  # Initialiser Tortoise ORM
+    print("🐢 Tortoise ORM Initialized.")
+    print("📋 Use Aerich for schema migrations for Tortoise ORM:")
+    print("   - Check status: aerich status")
+    print("   - Create migration: aerich migrate --name <migration_name>")
+    print("   - Apply migrations: aerich upgrade")
     yield
-    # Code exécuté à l'arrêt (si nécessaire)
+    # Code exécuté à l'arrêt
+    print("🐢 Closing Tortoise ORM connections...")
+    await close_tortoise()  # Fermer les connexions Tortoise ORM
     print("⏹️  FastAPI shutting down")
 
 
@@ -37,7 +39,7 @@ async def read_root():
     return {
         "message": "Django Cartographie API",
         "status": "running",
-        "migrations": "Use Alembic for database schema management",
+        "migrations": "Use 'make help' to see all available Alembic commands",
     }
 
 
@@ -48,30 +50,29 @@ async def read_item(item_id: int, q: Union[str, None] = None):
 
 # Exemple d'endpoint pour tester la base de données
 @app.get("/users/count")
-async def get_users_count(session: AsyncSession = Depends(get_session)):
-    """Get the current number of users in the database."""
-    from sqlmodel import func
+async def get_users_count():  # Retirer la dépendance de session SQLModel
+    """Get the current number of users in the database (using Tortoise ORM)."""
+    # Exemple avec Tortoise (nécessite que vos modèles soient définis et importés)
+    from apps.users.models import (
+        User,  # Assurez-vous que ce chemin d'import est correct
+    )
 
-    statement = select(func.count()).select_from(User)
-    result = await session.execute(statement)
-    count = result.scalar()
-
+    count = await User.all().count()
     return {"users_count": count}
 
 
 @app.get("/health")
-async def health_check(session: AsyncSession = Depends(get_session)):
-    """Health check endpoint that tests database connectivity."""
+async def health_check():  # Retirer la dépendance de session SQLModel
+    """Health check endpoint that tests database connectivity (using Tortoise ORM)."""
     try:
-        # Test database connection
-        from sqlmodel import text
+        # Test database connection avec Tortoise ORM
+        from apps.users.models import User  # Exemple, utilisez un de vos modèles
 
-        result = await session.execute(text("SELECT 1"))
-        result.scalar()
+        await User.all().first()  # Tente de récupérer un enregistrement
 
         return {
             "status": "healthy",
-            "database": "connected",
+            "database": "connected (Tortoise ORM)",
             "message": "All systems operational",
         }
     except Exception as e:

@@ -1,0 +1,114 @@
+import logging
+
+from apps.tortoise.users.models import User as TortoiseUser
+from core.entities.user_entity import UserEntity
+from core.interfaces.auth_repository import IAuthRepository
+from infrastructure.db.tortoise.model_to_entity import user_to_entity
+
+logger = logging.getLogger(__name__)
+
+
+class AuthRepository(IAuthRepository):
+    """
+    Implémentation de l'interface IAuthRepository pour Tortoise ORM
+    """
+
+    async def _to_entity(self, user: TortoiseUser) -> UserEntity:
+        """
+        Méthode locale pour mapper un modèle Tortoise User vers UserEntity
+        """
+        try:
+            return await user_to_entity(user)
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de la conversion du modèle vers l'entité: {str(e)}"
+            )
+            raise ValueError(
+                f"Erreur lors de la conversion du modèle vers l'entité: {str(e)}"
+            )
+
+    async def signup(self, email: str, hashed_password: str) -> UserEntity:
+        """
+        Créer un nouvel utilisateur avec email et mot de passe hashé
+        """
+        try:
+            logger.info(f"Tentative de création d'utilisateur avec email: {email}")
+            user = await TortoiseUser.create(
+                email=email, password=hashed_password, active=True
+            )
+            logger.info(f"Utilisateur créé avec succès, ID: {user.id}")
+            return await self._to_entity(user)
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de la création de l'utilisateur avec email {email}: {str(e)}"
+            )
+            raise RuntimeError(f"Erreur lors de la création de l'utilisateur: {str(e)}")
+
+    async def get_user_by_email(self, email: str) -> UserEntity | None:
+        """
+        Récupérer un utilisateur par son email
+        """
+        try:
+            logger.debug(f"Recherche d'utilisateur par email: {email}")
+            user = await TortoiseUser.filter(email=email).first()
+            if user:
+                logger.debug(f"Utilisateur trouvé avec ID: {user.id}")
+                return await self._to_entity(user)
+            logger.debug(f"Aucun utilisateur trouvé pour l'email: {email}")
+            return None
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de la récupération de l'utilisateur par email {email}: {str(e)}"
+            )
+            raise RuntimeError(
+                f"Erreur lors de la récupération de l'utilisateur par email: {str(e)}"
+            )
+
+    async def update_password(self, user_id: str, hashed_password: str) -> bool:
+        """
+        Mettre à jour le mot de passe d'un utilisateur
+        """
+        try:
+            logger.info(
+                f"Tentative de mise à jour du mot de passe pour l'utilisateur ID: {user_id}"
+            )
+            user = await TortoiseUser.filter(id=user_id).first()
+            if user:
+                user.password = hashed_password
+                await user.save()
+                logger.info(
+                    f"Mot de passe mis à jour avec succès pour l'utilisateur ID: {user_id}"
+                )
+                return True
+            logger.warning(
+                f"Utilisateur non trouvé pour la mise à jour du mot de passe, ID: {user_id}"
+            )
+            return False
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de la mise à jour du mot de passe pour l'utilisateur ID {user_id}: {str(e)}"
+            )
+            raise RuntimeError(
+                f"Erreur lors de la mise à jour du mot de passe: {str(e)}"
+            )
+
+    async def delete_user_by_id(self, user_id: str) -> bool:
+        """
+        Supprimer un utilisateur par son ID
+        """
+        try:
+            logger.info(f"Tentative de suppression de l'utilisateur ID: {user_id}")
+            user = await TortoiseUser.filter(id=user_id).first()
+            if user:
+                await user.delete()
+                logger.info(f"Utilisateur supprimé avec succès, ID: {user_id}")
+                return True
+            logger.warning(f"Utilisateur non trouvé pour la suppression, ID: {user_id}")
+            return False
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de la suppression de l'utilisateur ID {user_id}: {str(e)}"
+            )
+            raise RuntimeError(
+                f"Erreur lors de la suppression de l'utilisateur: {str(e)}"
+            )

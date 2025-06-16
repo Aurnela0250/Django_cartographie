@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from core.domain.entities.domain_entity import DomainEntity
+from core.entities.domain_entity import DomainEntity
 from core.interfaces.base_repository import BaseRepository
 
 

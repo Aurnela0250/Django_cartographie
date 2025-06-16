@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Generic, Optional, TypeVar
 from uuid import UUID
 
-from core.domain.entities.pagination import (
+from core.entities.pagination import (
     PaginatedResult,
     PaginationParams,
 )

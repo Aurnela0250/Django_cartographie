@@ -10,16 +10,16 @@ from apps.levels.models import Level
 from apps.mentions.models import Mention
 from apps.rate.models import Rate
 from apps.sector.models import Sector
-from core.domain.entities.city_entity import CityEntity
-from core.domain.entities.establishment_entity import EstablishmentEntity
-from core.domain.entities.formation_authorization_entity import (
+from core.entities.city_entity import CityEntity
+from core.entities.establishment_entity import EstablishmentEntity
+from core.entities.formation_authorization_entity import (
     FormationAuthorizationEntity,
 )
-from core.domain.entities.formation_entity import AnnualHeadCountEntity, FormationEntity
-from core.domain.entities.level_entity import LevelEntity
-from core.domain.entities.mention_entity import MentionEntity
-from core.domain.entities.rate_entity import RateEntity
-from core.domain.entities.sector_entity import SectorEntity
+from core.entities.formation_entity import AnnualHeadCountEntity, FormationEntity
+from core.entities.level_entity import LevelEntity
+from core.entities.mention_entity import MentionEntity
+from core.entities.rate_entity import RateEntity
+from core.entities.sector_entity import SectorEntity
 from core.interfaces.establishment_type_repository import EstablishmentTypeEntity
 
 
@@ -83,19 +83,17 @@ def formation_to_entity(
     annual_headcount_list: List[AnnualHeadCountEntity] = []
 
     # Utiliser les valeurs par défaut de metadata si non fourni
-    effective_metadata = (
-        metadata if metadata is not None else FormationToEntityMetadata()
-    )
+    metadata = metadata if metadata is not None else FormationToEntityMetadata()
 
-    if effective_metadata.level and formation.level:
+    if metadata.level and formation.level:
         level_entity = level_to_entity(formation.level)
-    if effective_metadata.mention and formation.mention:
+    if metadata.mention and formation.mention:
         mention_entity = mention_to_entity(formation.mention)
-    if effective_metadata.establishment and formation.establishment:
+    if metadata.establishment and formation.establishment:
         establishment_entity = EstablishmentEntity.model_validate(
             formation.establishment
         )
-    if effective_metadata.authorization and formation.authorization:
+    if metadata.authorization and formation.authorization:
         authorization_entity = formation_authorization_to_entity(
             formation.authorization
         )

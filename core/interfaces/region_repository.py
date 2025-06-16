@@ -1,6 +1,6 @@
 from typing import Optional
 
-from core.domain.entities.region_entity import RegionEntity
+from core.entities.region_entity import RegionEntity
 from core.interfaces.base_repository import BaseRepository
 
 

@@ -1,7 +1,7 @@
 # Interface du repository pour Sector
 from typing import Optional
 
-from core.domain.entities.sector_entity import SectorEntity
+from core.entities.sector_entity import SectorEntity
 from core.interfaces.base_repository import BaseRepository
 
 
