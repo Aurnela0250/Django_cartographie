@@ -11,6 +11,7 @@ dependencies = [
     "click>=8.2.1",
     "fastapi[standard]>=0.115.12",
     "greenlet>=3.2.3",
+    "pyjwt>=2.10.1",
     "tortoise-orm[asyncpg]>=0.25.1",
     "uuid7>=0.1.0",
 ]

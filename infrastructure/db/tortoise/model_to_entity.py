@@ -344,7 +344,6 @@ async def region_to_entity(region: TortoiseRegion) -> RegionEntity:
     return RegionEntity(
         id=region.id,
         name=region.name,
-        code=region.code,
         created_at=region.created_at,
         updated_at=region.updated_at,
         created_by=region.created_by.id if region.created_by else None,

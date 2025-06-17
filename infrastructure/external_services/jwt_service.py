@@ -4,15 +4,10 @@ from uuid import uuid4
 from zoneinfo import ZoneInfo
 
 import jwt
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.http import HttpRequest
-from ninja.security import HttpBearer
 
+from config import settings
 from infrastructure.external_services.redis_service import RedisService
 from presentation.exceptions import InternalServerError, InvalidTokenError
-
-User = get_user_model()
 
 
 class JWTService:
@@ -38,8 +33,8 @@ class JWTService:
             "iat": iat,
             "jti": jti_access,
             "token_type": "access",
-            "iss": settings.JWT_ISSUER,  # Ajout d'un émetteur
-            "aud": settings.JWT_AUDIENCE,  # Ajout d'une audience
+            "iss": settings.JWT_ISSUER,
+            "aud": settings.JWT_AUDIENCE,
         }
 
         refresh_token_payload = {
@@ -155,19 +150,3 @@ class JWTService:
         """
         if jti and exp_time > 0:
             RedisService.set(f"revoked_token:{jti}", "1", exp=exp_time)
-
-
-class JWTAuth(HttpBearer):
-    def authenticate(self, request: HttpRequest, token):
-        payload = JWTService.decode_access_token(token)
-
-        try:
-            user = User.objects.get(id=payload["user_id"])
-            request.user = user
-        except User.DoesNotExist:
-            raise InvalidTokenError("User not found")
-
-        return payload
-
-
-jwt_auth = JWTAuth()

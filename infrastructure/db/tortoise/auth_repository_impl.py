@@ -64,7 +64,7 @@ class AuthRepository(IAuthRepository):
                 f"Erreur lors de la récupération de l'utilisateur par email: {str(e)}"
             )
 
-    async def update_password(self, user_id: str, hashed_password: str) -> bool:
+    async def update_password(self, user_id: int, hashed_password: str) -> bool:
         """
         Mettre à jour le mot de passe d'un utilisateur
         """
@@ -92,7 +92,7 @@ class AuthRepository(IAuthRepository):
                 f"Erreur lors de la mise à jour du mot de passe: {str(e)}"
             )
 
-    async def delete_user_by_id(self, user_id: str) -> bool:
+    async def delete_user_by_id(self, user_id: int) -> bool:
         """
         Supprimer un utilisateur par son ID
         """

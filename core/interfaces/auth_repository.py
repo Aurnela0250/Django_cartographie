@@ -16,11 +16,11 @@ class IAuthRepository(BaseRepository[UserEntity]):
         raise NotImplementedError
 
     @abstractmethod
-    def update_password(self, user_id: str, hashed_password: str) -> bool:
+    def update_password(self, user_id: int, hashed_password: str) -> bool:
         """Update user password with hashed password."""
         raise NotImplementedError
 
     @abstractmethod
-    def delete_user_by_id(self, user_id: str) -> bool:
+    def delete_user_by_id(self, user_id: int) -> bool:
         """Delete user from database by ID."""
         raise NotImplementedError

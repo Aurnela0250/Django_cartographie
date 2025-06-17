@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from core.domain.entities.token_entity import TokenEntity
-from core.domain.entities.user_entity import UserEntity
+from core.entities.token_entity import TokenEntity
+from core.entities.user_entity import UserEntity
 from core.interfaces.unit_of_work import UnitOfWork
 from infrastructure.db.django_user_repository import DjangoUserRepository
 from infrastructure.external_services.jwt_service import JWTService

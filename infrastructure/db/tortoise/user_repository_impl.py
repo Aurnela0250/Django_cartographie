@@ -3,6 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from apps.tortoise.users.models import User as TortoiseUser
+from core.entities.filters import UserFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.entities.user_entity import UserEntity
 from core.interfaces.user_repository import IUserRepository
@@ -222,29 +223,40 @@ class UserRepository(IUserRepository):
     async def filter(
         self,
         pagination_params: PaginationParams,
-        **kwargs,
+        filters: UserFilters,
     ) -> PaginatedResult[UserEntity]:
         """
-        Filtre les utilisateurs selon des critères
+        Filtre les utilisateurs selon les critères fournis avec typage strict
 
         Args:
             pagination_params: Paramètres de pagination
-            **kwargs: Critères de filtrage
+            filters: Filtres typés avec validation Pydantic
 
         Returns:
             PaginatedResult[UserEntity]: Résultat paginé des utilisateurs filtrés
         """
-        self.logger.info(
-            f"Filtrage des utilisateurs avec les critères: {kwargs} - Page: {pagination_params.page}"
-        )
         try:
+            self.logger.debug(f"Filtering users with criteria: {filters}")
             offset = pagination_params.offset
             limit = pagination_params.limit
 
-            query = TortoiseUser.filter(**kwargs).prefetch_related("updated_by")
+            query = TortoiseUser.all().prefetch_related("updated_by")
+
+            # Convertir les filtres Pydantic en dictionnaire pour Tortoise ORM
+            filter_dict = filters.to_orm_dict()
+
+            # Appliquer les filtres
+            if filter_dict:
+                query = query.filter(**filter_dict)
 
             user_models = await query.offset(offset).limit(limit)
-            total_count = await TortoiseUser.filter(**kwargs).count()
+
+            # Compter le total avec les mêmes filtres
+            total_count = (
+                await TortoiseUser.filter(**filter_dict).count()
+                if filter_dict
+                else await TortoiseUser.all().count()
+            )
 
             users = [await self._to_entity(user_model) for user_model in user_models]
 
@@ -269,15 +281,14 @@ class UserRepository(IUserRepository):
                 next_page=next_page,
                 previous_page=previous_page,
             )
+
             self.logger.info(
-                f"Filtrage réussi - {len(users)} utilisateurs trouvés sur {total_count} correspondant aux critères"
+                f"Filtered {len(users)} users out of {total_count} matching criteria"
             )
             return result
         except Exception as e:
-            self.logger.error(
-                f"Erreur lors du filtrage des utilisateurs avec les critères {kwargs}: {str(e)}"
-            )
-            raise ValueError(f"Erreur lors du filtrage des utilisateurs: {str(e)}")
+            self.logger.error(f"Error filtering users with criteria {filters}: {e}")
+            raise
 
     async def count(self, **kwargs) -> int:
         """

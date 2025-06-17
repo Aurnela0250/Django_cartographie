@@ -48,27 +48,11 @@ async def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
 
-# Exemple d'endpoint pour tester la base de données
-@app.get("/users/count")
-async def get_users_count():  # Retirer la dépendance de session SQLModel
-    """Get the current number of users in the database (using Tortoise ORM)."""
-    # Exemple avec Tortoise (nécessite que vos modèles soient définis et importés)
-    from apps.users.models import (
-        User,  # Assurez-vous que ce chemin d'import est correct
-    )
-
-    count = await User.all().count()
-    return {"users_count": count}
-
-
 @app.get("/health")
 async def health_check():  # Retirer la dépendance de session SQLModel
     """Health check endpoint that tests database connectivity (using Tortoise ORM)."""
     try:
         # Test database connection avec Tortoise ORM
-        from apps.users.models import User  # Exemple, utilisez un de vos modèles
-
-        await User.all().first()  # Tente de récupérer un enregistrement
 
         return {
             "status": "healthy",

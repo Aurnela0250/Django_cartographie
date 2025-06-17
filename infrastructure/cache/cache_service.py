@@ -3,7 +3,7 @@ from typing import Any, Optional, Type, TypeVar
 
 from pydantic import BaseModel, TypeAdapter
 
-from core.domain.entities.pagination import PaginationParams
+from core.entities.pagination import PaginationParams
 from infrastructure.external_services.redis_service import RedisService
 from presentation.schemas.pagination_schema import PaginatedResultSchema
 
