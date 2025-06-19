@@ -1,31 +1,33 @@
-from typing import Optional
-
-from ninja import Schema
+from pydantic import EmailStr
 
 from presentation.schemas.base_schema import BaseSchema
 from presentation.schemas.user_schema import UserAuthSchema
 
 
-class TokenSchema(BaseSchema):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-    exp: int
-    iat: int
-    user: UserAuthSchema
-
-
-class TokenPayload(Schema):
+class Payload(BaseSchema):
     user_id: str
     exp: int
     iat: int
-    token_type: str
+    jti: str
+    token_type: str = "access"
+    iss: str
+    aud: str
 
 
-class TokenData(Schema):
-    email: Optional[str] = None
+class Token(Payload):
+    access_token: str
+    refresh_token: str
 
 
-class Login(Schema):
-    email: str
+class TokenSchema(Token):
+    user: UserAuthSchema
+
+
+class Login(BaseSchema):
+    email: EmailStr
+    password: str
+
+
+class SignUpSchema(BaseSchema):
+    email: EmailStr
     password: str

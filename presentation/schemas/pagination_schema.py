@@ -1,15 +1,15 @@
 from typing import Callable, Generic, List, Optional, Type, TypeVar
 
-from ninja import Schema
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
-from core.domain.entities.pagination import PaginatedResult
+from core.entities.pagination import PaginatedResult
+from presentation.schemas.base_schema import BaseSchema
 
 T = TypeVar("T")
 E = TypeVar("E")
 
 
-class PaginationParamsSchema(Schema):
+class PaginationParamsSchema(BaseSchema):
     """Schéma pour les paramètres de pagination dans les requêtes API."""
 
     page: int = Field(1, ge=1, description="Numéro de la page (commence à 1)")
@@ -17,10 +17,8 @@ class PaginationParamsSchema(Schema):
         10, ge=1, le=100, description="Nombre d'éléments par page (max 100)"
     )
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class PaginatedResultSchema(BaseModel, Generic[T]):
+class PaginatedResultSchema(BaseSchema, Generic[T]):
     """Schéma générique pour les réponses API paginées."""
 
     items: List[T] = Field(
@@ -36,8 +34,6 @@ class PaginatedResultSchema(BaseModel, Generic[T]):
     previous_page: Optional[int] = Field(
         None, description="Le numéro de la page précédente, si elle existe"
     )
-
-    model_config = ConfigDict(from_attributes=True)
 
     @staticmethod
     def from_domain_result(

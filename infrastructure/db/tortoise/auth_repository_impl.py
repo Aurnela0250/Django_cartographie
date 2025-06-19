@@ -1,5 +1,7 @@
 import logging
 
+from tortoise.exceptions import DoesNotExist
+
 from apps.tortoise.users.models import User as TortoiseUser
 from core.entities.user_entity import UserEntity
 from core.interfaces.auth_repository import IAuthRepository
@@ -34,7 +36,9 @@ class AuthRepository(IAuthRepository):
         try:
             logger.info(f"Tentative de création d'utilisateur avec email: {email}")
             user = await TortoiseUser.create(
-                email=email, password=hashed_password, active=True
+                email=email,
+                password=hashed_password,
+                active=True,
             )
             logger.info(f"Utilisateur créé avec succès, ID: {user.id}")
             return await self._to_entity(user)
@@ -51,17 +55,37 @@ class AuthRepository(IAuthRepository):
         try:
             logger.debug(f"Recherche d'utilisateur par email: {email}")
             user = await TortoiseUser.filter(email=email).first()
-            if user:
-                logger.debug(f"Utilisateur trouvé avec ID: {user.id}")
-                return await self._to_entity(user)
-            logger.debug(f"Aucun utilisateur trouvé pour l'email: {email}")
-            return None
+            if not user:
+                logger.debug(f"Aucun utilisateur trouvé pour l'email: {email}")
+                return None
+            logger.debug(f"Utilisateur trouvé avec ID: {user.id}")
+            return await self._to_entity(user)
         except Exception as e:
             logger.error(
                 f"Erreur lors de la récupération de l'utilisateur par email {email}: {str(e)}"
             )
             raise RuntimeError(
                 f"Erreur lors de la récupération de l'utilisateur par email: {str(e)}"
+            )
+
+    async def get_user_by_id(self, user_id: int) -> UserEntity | None:
+        """
+        Récupérer un utilisateur par son ID
+        """
+        try:
+            logger.debug(f"Recherche d'utilisateur par ID: {user_id}")
+            user = await TortoiseUser.get(pk=user_id)
+            logger.debug(f"Utilisateur trouvé avec email: {user.email}")
+            return await self._to_entity(user)
+        except DoesNotExist:
+            logger.debug(f"Aucun utilisateur trouvé pour l'ID: {user_id}")
+            return None
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de la récupération de l'utilisateur par ID {user_id}: {str(e)}"
+            )
+            raise RuntimeError(
+                f"Erreur lors de la récupération de l'utilisateur par ID: {str(e)}"
             )
 
     async def update_password(self, user_id: int, hashed_password: str) -> bool:

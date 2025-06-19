@@ -1,11 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from ninja import Schema
-from pydantic import ConfigDict
+from presentation.schemas.base_schema import BaseSchema
 
 
-class CitySchema(Schema):
+class CitySchema(BaseSchema):
     id: int
     name: str
     region_id: int
@@ -14,10 +13,8 @@ class CitySchema(Schema):
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class CreateCitySchemaRequest(Schema):
+class CreateCitySchemaRequest(BaseSchema):
     name: str
     region_id: int
 
@@ -26,6 +23,6 @@ class CreateCitySchemaResponse(CitySchema):
     pass
 
 
-class UpdateCitySchema(Schema):
+class UpdateCitySchema(BaseSchema):
     name: Optional[str] = None
     region_id: Optional[int] = None

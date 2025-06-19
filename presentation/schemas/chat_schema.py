@@ -1,19 +1,18 @@
 from typing import Any, Dict, List
 
-from ninja import Schema
-from pydantic import BaseModel
+from presentation.schemas.base_schema import BaseSchema
 
 
-class ChatResponseSchema(Schema):
+class ChatResponseSchema(BaseSchema):
     user_id: int
     response: Dict[str, Any]
     history: List[str]
 
 
-class ChatHistoryResponseSchema(Schema):
+class ChatHistoryResponseSchema(BaseSchema):
     user_id: int
     history: List[str]
 
 
-class ChatInputSchema(BaseModel):
+class ChatInputSchema(BaseSchema):
     message: str

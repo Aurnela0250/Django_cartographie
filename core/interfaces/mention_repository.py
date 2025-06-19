@@ -1,29 +1,22 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Optional
 
+from core.entities.filters import MentionFilters
 from core.entities.mention_entity import MentionEntity
+from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository
 
 
 class IMentionRepository(BaseRepository[MentionEntity], ABC):
-    @abstractmethod
-    def check_domain_exists(self, domain_id: int) -> bool:
-        pass
 
     @abstractmethod
-    def get_by_id(self, mention_id: int) -> Optional[MentionEntity]:
-        pass
+    async def get_by_name(self, name: str) -> Optional[MentionEntity]:
+        raise NotImplementedError
 
     @abstractmethod
-    def get_all(self) -> List[MentionEntity]:
-        pass
-
-    @abstractmethod
-    def update(
-        self, mention_id: int, mention_data: MentionEntity
-    ) -> Optional[MentionEntity]:
-        pass
-
-    @abstractmethod
-    def delete(self, mention_id: int) -> bool:
-        pass
+    async def filter(
+        self,
+        pagination_params: PaginationParams,
+        filters: MentionFilters,
+    ) -> PaginatedResult[MentionEntity]:
+        raise NotImplementedError

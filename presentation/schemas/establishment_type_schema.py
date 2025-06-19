@@ -1,11 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from ninja import Schema
-from pydantic.config import ConfigDict
+from presentation.schemas.base_schema import BaseSchema
 
 
-class EstablishmentTypeBaseSchema(Schema):
+class EstablishmentTypeBaseSchema(BaseSchema):
     """Base schema for establishment type data"""
 
     name: str
@@ -18,7 +17,7 @@ class CreateEstablishmentTypeSchema(EstablishmentTypeBaseSchema):
     pass
 
 
-class UpdateEstablishmentTypeSchema(Schema):
+class UpdateEstablishmentTypeSchema(BaseSchema):
     """Schema for updating an establishment type"""
 
     name: Optional[str] = None
@@ -33,6 +32,3 @@ class EstablishmentTypeSchema(EstablishmentTypeBaseSchema):
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
-
-    class Config:
-        model_config = ConfigDict(from_attributes=True)

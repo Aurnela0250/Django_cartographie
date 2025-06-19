@@ -1,7 +1,6 @@
 from datetime import date, datetime
 from typing import Literal, Optional
 
-from ninja import Schema
 from pydantic import Field, model_validator
 
 from presentation.schemas.base_schema import BaseSchema
@@ -10,7 +9,7 @@ from presentation.schemas.base_schema import BaseSchema
 STATUS_CHOICES_LITERAL = Literal["REQUESTED", "VALIDATED", "REFUSED", "EXPIRED"]
 
 
-class FormationAuthorizationBaseSchema(Schema):
+class FormationAuthorizationBaseSchema(BaseSchema):
     date_debut: date = Field(...)
     date_fin: Optional[date] = Field(None)
     status: STATUS_CHOICES_LITERAL = Field(...)  # MODIFIED: Use Literal for status
@@ -41,7 +40,7 @@ class CreateFormationAuthorizationSchema(FormationAuthorizationBaseSchema):
     pass
 
 
-class UpdateFormationAuthorizationSchema(Schema):
+class UpdateFormationAuthorizationSchema(BaseSchema):
     date_debut: Optional[date] = None
     date_fin: Optional[date] = None
     status: Optional[STATUS_CHOICES_LITERAL] = Field(None)
@@ -73,7 +72,7 @@ class FormationAuthorizationSchema(BaseSchema):
     date_debut: date
     date_fin: Optional[date] = None
     status: str
-    arrete: Optional[str] = None
+    decree: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None

@@ -1,152 +1,260 @@
 import logging
 
-from ninja_extra import api_controller, http_get, http_post, route
-from pydantic import ValidationError as PydanticValidationError
+from dependency_injector.wiring import Provide
+from fastapi import APIRouter, Depends
 
+from core.container.container import Container
+from core.entities.user_entity import UserEntity
 from core.use_cases.auth_use_case import AuthUseCase
-from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
-from infrastructure.external_services.jwt_service import JWTService, jwt_auth
-from presentation.exceptions import (
-    AuthenticationError,
-    ConflictError,
-    InternalServerError,
-    InvalidTokenError,
-    ValidationError,
+from presentation.dependencies.auth_dependencies import (
+    get_current_user,
+    oauth2_scheme,
 )
-from presentation.schemas.auth_schema import Login, TokenSchema
+from presentation.exceptions import (
+    ConflictException,
+    InternalServerErrorException,
+    UnauthorizedException,
+)
+from presentation.schemas.auth_schema import Login, SignUpSchema, TokenSchema
 from presentation.schemas.error_schema import ErrorResponseSchema
-from presentation.schemas.user_schema import UserAuthSchema, UserSignUp
+from presentation.schemas.user_schema import UserAuthSchema
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(
+    prefix="/auth",
+    tags=["Auth", "Authentication", "authentication", "auth"],
+)
 
 
-@api_controller("/auth", tags=["Authentication"])
-class AuthController:
-    def __init__(self):
-        self.unit_of_work = DjangoUnitOfWork()
-        self.jwt_service = JWTService()
-        self.auth_use_case = AuthUseCase(
-            self.unit_of_work,
-            self.jwt_service,
+@router.post(
+    "/signup",
+    responses={
+        201: {
+            "model": UserAuthSchema,
+            "description": "User created successfully",
+            "content": {
+                "application/json": {
+                    # "schema": UserAuthSchema,
+                },
+            },
+        },
+    },
+    status_code=201,
+    response_model=UserAuthSchema,
+    summary="Sign up a new user",
+    description="Endpoint to sign up a new user. Requires email and password. Returns user details",
+    response_description="User details after successful sign up",
+)
+async def sign_up(
+    user_data: SignUpSchema,
+    auth_use_case: AuthUseCase = Depends(
+        Provide[Container.auth_use_case],
+    ),
+) -> UserAuthSchema:
+    try:
+        user_found = await auth_use_case.signup(
+            user_data.email,
+            user_data.password,
         )
-        self.logger = logging.getLogger(__name__)
+        return UserAuthSchema.model_validate(user_found)
+    # except PydanticValidationError as e:
+    #     logger.warning("Validation error during sign up")
+    #     raise ValidationError(e)
+    except ConflictException as e:
+        logger.warning("User already exists during sign up")
+        raise ConflictException(cause=e)
+    except Exception as e:
+        logger.error(
+            "Unexpected error during sign up",
+            exc_info=True,
+        )
+        raise InternalServerErrorException(cause=e)
 
-    @route.post(
-        "/signup",
-        response={
-            201: UserAuthSchema,
-            422: ErrorResponseSchema,
-            409: ErrorResponseSchema,
-            500: ErrorResponseSchema,
+
+@router.post(
+    "/login",
+    responses={
+        200: {
+            "description": "Login successful",
+            "content": {
+                "application/json": {
+                    "schema": TokenSchema,
+                },
+            },
         },
-    )
-    def sign_up(self, user_data: UserSignUp):
-        try:
-            user_found = self.auth_use_case.signup(
-                user_data.email,
-                user_data.password,
-            )
-            return 201, UserAuthSchema.from_orm(user_found)
-        except PydanticValidationError as e:
-            self.logger.warning("Validation error during sign up")
-            raise ValidationError(e)
-        except ConflictError as e:
-            self.logger.warning("User already exists during sign up")
-            raise e
-        except Exception:
-            self.logger.error(
-                "Unexpected error during sign up",
-                exc_info=True,
-            )
-            raise InternalServerError()
-
-    @route.post(
-        "/login",
-        response={
-            200: TokenSchema,
-            401: ErrorResponseSchema,
-            422: ErrorResponseSchema,
-            500: ErrorResponseSchema,
+        401: {
+            "description": "Authentication error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
         },
-    )
-    def login(self, data: Login):
-        try:
-            use_case = self.auth_use_case
-            token = use_case.login(data.email, data.password)
-
-            response = TokenSchema.from_orm(token)
-
-            return 200, response
-        except PydanticValidationError as e:
-            self.logger.warning("Validation error during login")
-            raise ValidationError(e)
-        except AuthenticationError:
-            self.logger.warning("Authentication error during login")
-            raise AuthenticationError()
-        except Exception as e:
-            self.logger.error(
-                f"Unexpected error during login {e}",
-                exc_info=True,
-            )
-            print(f"Unexpected error during login {e}")
-            raise InternalServerError()
-
-    @route.post(
-        "/refresh",
-        response={
-            200: TokenSchema,
-            401: ErrorResponseSchema,
-            500: ErrorResponseSchema,
+        422: {
+            "description": "Validation error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
         },
-    )
-    def refresh_token(self, refresh_token: str):
-        self.logger.info("Refreshing token")
-        try:
-            new_token = self.auth_use_case.refresh_token(refresh_token)
-            token = TokenSchema.from_orm(new_token)
-
-            return (
-                200,
-                token,
-            )
-        except InvalidTokenError as e:
-            raise e
-        except Exception as e:
-            self.logger.error(f"Error refreshing token: {str(e)}", exc_info=True)
-            raise InternalServerError()
-
-    @http_get("/me", response=UserAuthSchema, auth=jwt_auth)
-    def get_current_user(self, request):
-        try:
-            user_id = request.auth["user_id"]
-            user = self.auth_use_case.get_current_user(user_id)
-            return UserAuthSchema.from_orm(user)
-        except InvalidTokenError as e:
-            raise e
-        except Exception as e:
-            print(f"Error getting current user: {e}")
-            raise InternalServerError()
-
-    @http_post(
-        "/logout",
-        response={
-            200: dict,
-            401: ErrorResponseSchema,
-            500: ErrorResponseSchema,
+        500: {
+            "description": "Internal server error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
         },
-        auth=jwt_auth,
-    )
-    def logout(self, request, refresh_token: str):
-        try:
-            access_token = request.auth
+    },
+)
+async def login(
+    data: Login,
+    auth_use_case: AuthUseCase = Depends(
+        Provide[Container.auth_use_case],
+    ),
+):
+    try:
+        token = await auth_use_case.login(
+            data.email,
+            data.password,
+        )
 
-            self.auth_use_case.logout(
-                access_token,
-                refresh_token,
-            )
+        response = TokenSchema.model_validate(token)
 
-            return {"message": "Successfully logged out"}
-        except InvalidTokenError as e:
-            raise e
-        except Exception as e:
-            print(f"Unexpected error during logout {e}")
-            self.logger.error("Error during logout", exc_info=True)
-            raise InternalServerError()
+        return response
+    except UnauthorizedException as e:
+        logger.warning("Authentication error during login")
+        raise UnauthorizedException(cause=e)
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during login {e}",
+            exc_info=True,
+        )
+        print(f"Unexpected error during login {e}")
+        raise InternalServerErrorException(cause=e)
+
+
+@router.post(
+    "/refresh",
+    responses={
+        200: {
+            "description": "Refresh successful",
+            "content": {
+                "application/json": {
+                    "schema": TokenSchema,
+                },
+            },
+        },
+        401: {
+            "description": "Authentication error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
+        },
+        422: {
+            "description": "Validation error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
+        },
+        500: {
+            "description": "Internal server error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
+        },
+    },
+)
+async def refresh_token(
+    refresh_token: str,
+    auth_use_case: AuthUseCase = Depends(
+        Provide[Container.auth_use_case],
+    ),
+):
+    logger.info("Refreshing token")
+    try:
+        new_token = await auth_use_case.refresh_token(refresh_token)
+        token = TokenSchema.model_validate(new_token)
+
+        return token
+    except UnauthorizedException as e:
+        raise UnauthorizedException(cause=e)
+    except Exception as e:
+        logger.error(
+            f"Error refreshing token: {str(e)}",
+            exc_info=True,
+        )
+        raise InternalServerErrorException(cause=e)
+
+
+@router.get("/me")
+def current_user(
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        return UserAuthSchema.model_validate(user)
+    except UnauthorizedException as e:
+        raise UnauthorizedException(cause=e)
+    except Exception as e:
+        print(f"Error getting current user: {e}")
+        raise InternalServerErrorException(cause=e)
+
+
+@router.post(
+    "/logout",
+    responses={
+        200: {
+            "description": "Logout successful",
+            "content": {
+                "application/json": {
+                    "schema": dict,
+                },
+            },
+        },
+        401: {
+            "description": "Authentication error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
+        },
+        500: {
+            "description": "Internal server error",
+            "content": {
+                "application/json": {
+                    "schema": ErrorResponseSchema,
+                },
+            },
+        },
+    },
+)
+async def logout(
+    refresh_token: str,
+    auth_use_case: AuthUseCase = Depends(
+        Provide[Container.auth_use_case],
+    ),
+    access_token: str = Depends(oauth2_scheme),
+):
+    try:
+
+        await auth_use_case.logout(
+            access_token,
+            refresh_token,
+        )
+
+        return {"message": "Successfully logged out"}
+    except InternalServerErrorException as e:
+        raise InternalServerErrorException(cause=e)
+    except Exception as e:
+        print(f"Unexpected error during logout {e}")
+        logger.error("Error during logout", exc_info=True)
+        raise InternalServerErrorException(cause=e)

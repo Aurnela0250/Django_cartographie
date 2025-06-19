@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import ConfigDict, Field
+
+from pydantic import Field
 
 from presentation.schemas.base_schema import BaseSchema
 
@@ -32,5 +33,3 @@ class RegionOut(RegionBase):
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
-
-    model_config = ConfigDict(from_attributes=True)

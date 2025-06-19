@@ -3,8 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
 
-from ninja import Schema
-from pydantic import ConfigDict, Field
+from pydantic import Field
 
 from presentation.schemas.annual_headcount_schema import AnnualHeadcountResponse
 from presentation.schemas.base_schema import BaseSchema
@@ -18,7 +17,7 @@ if TYPE_CHECKING:
     from presentation.schemas.establishment_schema import EstablishmentSchema
 
 
-class FormationBaseSchema(Schema):
+class FormationBaseSchema(BaseSchema):
     intitule: str = Field(..., max_length=255)
     description: Optional[str] = Field(None)
     duration: int = Field(..., gt=0, description="Durée en mois")
@@ -27,14 +26,12 @@ class FormationBaseSchema(Schema):
     establishment_id: int = Field(..., gt=0)
     authorization_id: Optional[int] = Field(None, gt=0)
 
-    model_config = ConfigDict(from_attributes=True)
-
 
 class CreateFormationSchema(FormationBaseSchema):
     pass
 
 
-class UpdateFormationSchema(Schema):
+class UpdateFormationSchema(BaseSchema):
     intitule: Optional[str] = Field(None, max_length=255)
     description: Optional[str] = None
     duration: Optional[int] = Field(None, gt=0)
@@ -43,12 +40,10 @@ class UpdateFormationSchema(Schema):
     establishment_id: Optional[int] = Field(None, gt=0)
     authorization_id: Optional[int] = Field(None, gt=0)
 
-    model_config = ConfigDict(from_attributes=True)
-
 
 class FormationSchema(BaseSchema):
     id: int
-    intitule: str
+    name: str
     description: Optional[str] = None
     duration: int
     level_id: int
@@ -64,5 +59,3 @@ class FormationSchema(BaseSchema):
     updated_at: Optional[datetime] = None
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
-
-    model_config = ConfigDict(from_attributes=True)

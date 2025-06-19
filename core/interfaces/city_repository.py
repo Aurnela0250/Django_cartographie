@@ -1,6 +1,8 @@
+from abc import abstractmethod
 from typing import Optional
 
 from core.entities.city_entity import CityEntity
+from core.entities.filters import CityFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository
 
@@ -8,21 +10,25 @@ from core.interfaces.base_repository import BaseRepository
 class ICityRepository(BaseRepository[CityEntity]):
     """Repository pour les opérations sur les villes"""
 
-    def get_by_name(self, name: str) -> Optional[CityEntity]:
+    @abstractmethod
+    async def get_by_name(self, name: str) -> Optional[CityEntity]:
         """Récupère une ville par son nom"""
         raise NotImplementedError
 
-    def get_all(
+    @abstractmethod
+    async def filter(
         self,
         pagination_params: PaginationParams,
+        filters: CityFilters,
     ) -> PaginatedResult[CityEntity]:
-        """Récupère toutes les villes avec pagination"""
-        raise NotImplementedError
+        """
+        Filtre les villes selon les critères fournis
 
-    def get_by_region_id(
-        self,
-        region_id: int,
-        pagination_params: PaginationParams,
-    ) -> PaginatedResult[CityEntity]:
-        """Récupère toutes les villes d'une région spécifique avec pagination"""
+        Args:
+            pagination_params: Paramètres de pagination
+            filters: Dictionnaire de filtres
+
+        Returns:
+            PaginatedResult[CityEntity]: Résultat paginé des villes filtrées
+        """
         raise NotImplementedError

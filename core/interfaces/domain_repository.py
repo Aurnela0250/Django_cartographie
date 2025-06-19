@@ -9,11 +9,11 @@ from core.interfaces.base_repository import BaseRepository
 
 class IDomainRepository(BaseRepository[DomainEntity], ABC):
     @abstractmethod
-    def get_by_name(self, name: str) -> Optional[DomainEntity]:
-        pass
+    async def get_by_name(self, name: str) -> Optional[DomainEntity]:
+        raise NotImplementedError
 
     @abstractmethod
-    def filter(
+    async def filter(
         self,
         pagination_params: PaginationParams,
         filters: DomainFilters,
@@ -28,4 +28,4 @@ class IDomainRepository(BaseRepository[DomainEntity], ABC):
         Returns:
             PaginatedResult[DomainEntity]: Résultat paginé des domaines filtrés
         """
-        pass
+        raise NotImplementedError

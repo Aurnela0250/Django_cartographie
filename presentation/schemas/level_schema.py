@@ -10,7 +10,7 @@ class LevelBase(BaseSchema):
     """Base schema for level data"""
 
     name: str = Field(..., description="Name of the level")
-    acronyme: Optional[str] = Field(None, description="Acronym of the level")
+    acronym: Optional[str] = Field(None, description="Acronym of the level")
 
 
 class LevelCreate(LevelBase):
@@ -23,7 +23,7 @@ class LevelUpdate(LevelBase):
     """Schema for updating a level"""
 
     name: Optional[str] = Field(None, description="Name of the level")
-    acronyme: Optional[str] = Field(None, description="Acronym of the level")
+    acronym: Optional[str] = Field(None, description="Acronym of the level")
 
 
 class LevelOut(LevelBase):

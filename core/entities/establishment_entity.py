@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from core.entities.city_entity import CityEntity
 from core.entities.establishment_type_entity import EstablishmentTypeEntity
-from core.entities.sector_entity import SectorEntity
 
 if TYPE_CHECKING:
     from core.entities.formation_entity import FormationEntity
@@ -27,8 +27,8 @@ class EstablishmentEntity(BaseModel):
     rating: float = 0
     establishment_type_id: int
     establishment_type: Optional[EstablishmentTypeEntity] = None
-    sector_id: int
-    sector: Optional[SectorEntity] = None
+    city_id: int
+    city: Optional[CityEntity] = None
     formations: Optional[List["FormationEntity"]] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

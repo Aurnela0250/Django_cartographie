@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from presentation.schemas.base_schema import BaseSchema
 
 
-class DomainBase(BaseModel):
+class DomainBase(BaseSchema):
     name: str = Field(..., max_length=100)  # Added max_length
     description: Optional[str] = None
 
@@ -24,5 +26,3 @@ class DomainOut(DomainBase):
     updated_at: datetime
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
-
-    model_config = ConfigDict(from_attributes=True)

@@ -2,22 +2,21 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from ninja import Schema
-from pydantic import ConfigDict, EmailStr
+from pydantic import EmailStr
 
 from presentation.schemas.base_schema import BaseSchema
 
 
-class UserBase(Schema):
+class UserBase(BaseSchema):
     email: EmailStr
 
 
-class UserCreate(Schema):
+class UserCreate(BaseSchema):
     email: EmailStr
     password: str
 
 
-class UserSignUp(Schema):
+class UserSignUp(BaseSchema):
     email: EmailStr
     password: str
 
@@ -47,5 +46,3 @@ class UserAuthSchema(BaseSchema):
     updated_by: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-
-    model_config = ConfigDict(from_attributes=True)

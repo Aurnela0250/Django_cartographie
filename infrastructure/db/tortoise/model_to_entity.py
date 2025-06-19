@@ -17,7 +17,6 @@ from apps.tortoise.levels.models import Level as TortoiseLevel
 from apps.tortoise.mentions.models import Mention as TortoiseMention
 from apps.tortoise.rate.models import Rate as TortoiseRate
 from apps.tortoise.region.models import Region as TortoiseRegion
-from apps.tortoise.sector.models import Sector as TortoiseSector
 from apps.tortoise.users.models import User as TortoiseUser
 from core.entities.annual_headcount_entity import AnnualHeadCountEntity
 from core.entities.city_entity import CityEntity
@@ -30,7 +29,6 @@ from core.entities.level_entity import LevelEntity
 from core.entities.mention_entity import MentionEntity
 from core.entities.rate_entity import RateEntity
 from core.entities.region_entity import RegionEntity
-from core.entities.sector_entity import SectorEntity
 from core.entities.user_entity import UserEntity
 from infrastructure.db.tortoise.metadata import (
     EstablishmentToEntityMetadata,
@@ -202,7 +200,7 @@ async def establishment_to_entity(
     Convertit un objet Establishment (Tortoise ORM) en EstablishmentEntity (Pydantic)
     """
     establishment_type_entity = None
-    sector_entity = None
+    city_entity = None
     formations_list = []
     metadata = metadata if metadata is not None else EstablishmentToEntityMetadata()
 
@@ -211,8 +209,8 @@ async def establishment_to_entity(
             establishment.establishment_type
         )
 
-    if metadata.sector and establishment.sector:  # Ajout de la conversion du secteur
-        sector_entity = await sector_to_entity(establishment.sector)
+    if metadata.city and establishment.city:  # Conversion de la ville
+        city_entity = await city_to_entity(establishment.city)
 
     if metadata.formations:
         filtered_formations = await TortoiseFormation.filter(
@@ -253,8 +251,8 @@ async def establishment_to_entity(
         rating=avg_rating,
         establishment_type_id=establishment.establishment_type.id,
         establishment_type=establishment_type_entity,
-        sector_id=establishment.sector.id,
-        sector=sector_entity,
+        city_id=establishment.city.id,
+        city=city_entity,
         formations=formations_list,
         created_at=establishment.created_at,
         updated_at=establishment.updated_at,
@@ -348,23 +346,4 @@ async def region_to_entity(region: TortoiseRegion) -> RegionEntity:
         updated_at=region.updated_at,
         created_by=region.created_by.id if region.created_by else None,
         updated_by=region.updated_by.id if region.updated_by else None,
-    )
-
-
-async def sector_to_entity(sector: TortoiseSector) -> SectorEntity:
-    """
-    Convertit un objet Sector (Tortoise ORM) en SectorEntity (Pydantic)
-    """
-    if not hasattr(sector, "city") or sector.city is None:
-        raise ValueError(
-            "Le champ city (clé étrangère) est obligatoire pour SectorEntity mais est manquant sur l'objet Sector."
-        )
-    return SectorEntity(
-        id=sector.id,
-        name=sector.name,
-        city_id=sector.city.id,
-        created_at=sector.created_at,
-        updated_at=sector.updated_at,
-        created_by=sector.created_by.id if sector.created_by else None,
-        updated_by=sector.updated_by.id if sector.updated_by else None,
     )

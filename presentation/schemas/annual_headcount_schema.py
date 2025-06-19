@@ -2,11 +2,10 @@ import datetime as dt
 from datetime import datetime
 from typing import Optional
 
-from ninja import Schema
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class AnnualHeadcountBase(Schema):
+class AnnualHeadcountBase(BaseModel):
     """Base schema for annual headcount"""
 
     academic_year: int = Field(
@@ -43,7 +42,7 @@ class AnnualHeadcountCreate(AnnualHeadcountBase):
     pass
 
 
-class AnnualHeadcountUpdate(Schema):
+class AnnualHeadcountUpdate(BaseModel):
     """Schema for updating an annual headcount"""
 
     academic_year: Optional[int] = Field(

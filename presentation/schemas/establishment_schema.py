@@ -3,32 +3,29 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
 
-from ninja import Field, Schema
-from pydantic.config import ConfigDict
-from pydantic.main import BaseModel
+from pydantic import Field
 
+from presentation.schemas.base_schema import BaseSchema
+from presentation.schemas.city_schema import CitySchema
 from presentation.schemas.establishment_type_schema import EstablishmentTypeSchema
-from presentation.schemas.sector_schema import SectorOut
 
 if TYPE_CHECKING:
     from presentation.schemas.formation_schema import FormationSchema
 
 
-class EstablishmentBaseSchema(Schema):
+class EstablishmentBaseSchema(BaseSchema):
     """Base schema for establishment data"""
 
     name: str
-    acronyme: Optional[str] = None
+    acronym: Optional[str] = None
     address: str
     contacts: Optional[List[str]] = None
-    site_url: Optional[str] = None
+    website: Optional[str] = None
     description: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     establishment_type_id: int
-    sector_id: int
-
-    model_config = ConfigDict(from_attributes=True)
+    city_id: int
 
 
 class CreateEstablishmentSchema(EstablishmentBaseSchema):
@@ -37,7 +34,7 @@ class CreateEstablishmentSchema(EstablishmentBaseSchema):
     pass
 
 
-class UpdateEstablishmentSchema(Schema):
+class UpdateEstablishmentSchema(EstablishmentBaseSchema):
     """Schema for updating an establishment"""
 
     name: Optional[str] = None
@@ -49,9 +46,7 @@ class UpdateEstablishmentSchema(Schema):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     establishment_type_id: Optional[int] = None
-    sector_id: Optional[int] = None
-
-    model_config = ConfigDict(from_attributes=True)
+    city_id: Optional[int] = None
 
 
 class EstablishmentSchema(EstablishmentBaseSchema):
@@ -59,7 +54,7 @@ class EstablishmentSchema(EstablishmentBaseSchema):
 
     id: int
     establishment_type: Optional[EstablishmentTypeSchema] = None
-    sector: Optional[SectorOut] = None
+    city: Optional[CitySchema] = None
     formations: Optional[list["FormationSchema"]] = []
     rating: float = 0
     created_at: Optional[datetime] = None
@@ -67,22 +62,18 @@ class EstablishmentSchema(EstablishmentBaseSchema):
     created_by: Optional[int] = None
     updated_by: Optional[int] = None
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class RateEstablishmentSchema(Schema):
+class RateEstablishmentSchema(BaseSchema):
     """Schema pour noter un établissement"""
 
     rating: float = Field(..., ge=0, le=5)
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class EstablishmentFilterParamsSchema(BaseModel):
+class EstablishmentFilterParamsSchema(BaseSchema):
     """Schema for filtering establishments"""
 
     name: Optional[str] = None
-    acronyme: Optional[str] = None
+    acronym: Optional[str] = None
     establishment_type_id: Optional[int] = None
     city_id: Optional[int] = None
     region_id: Optional[int] = None

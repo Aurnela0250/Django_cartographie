@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class EstablishmentToEntityMetadata(BaseModel):
     establishment_type: Optional[bool] = False
-    sector: Optional[bool] = False
+    city: Optional[bool] = False
     formations: Optional[bool] = False
 
 

@@ -12,20 +12,16 @@ class Payload(BaseModel):
     iss: str
     aud: str
 
-    class Config:
-        model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(Payload):
     access_token: str
     refresh_token: str
 
-    class Config:
-        model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TokenEntity(Token):
     user: UserEntity
-
-    class Config:
-        model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)

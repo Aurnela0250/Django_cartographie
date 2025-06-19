@@ -310,3 +310,17 @@ NINJA_DEFAULT_THROTTLE_RATES = {
     "user": "1000/hour",
     "anon": "100/hour",
 }
+
+# Bcrypt configuration
+BCRYPT_ROUNDS = int(
+    os.getenv("BCRYPT_ROUNDS", "12")
+)  # Nombre de rounds pour le hachage bcrypt
+BCRYPT_LOG_ROUNDS = int(
+    os.getenv("BCRYPT_LOG_ROUNDS", "12")
+)  # Alternative pour la compatibilité
+
+
+INCLUDE_STACK_TRACE_IN_RESPONSE = (
+    os.getenv("INCLUDE_STACK_TRACE_IN_RESPONSE", "False") == "True"
+)
+LOG_CRITICAL_STACK_TRACE = os.getenv("LOG_CRITICAL_STACK_TRACE", "True") == "True"

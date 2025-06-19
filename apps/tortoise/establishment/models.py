@@ -19,11 +19,11 @@ class Establishment(Model):
         on_delete=fields.CASCADE,
         source_field="establishment_type_id",
     )
-    sector = fields.ForeignKeyField(
-        "models.Sector",
+    city = fields.ForeignKeyField(
+        "models.City",
         related_name="establishments",
         on_delete=fields.CASCADE,
-        source_field="sector_id",
+        source_field="city_id",
     )
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)

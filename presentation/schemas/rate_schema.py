@@ -1,15 +1,14 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from presentation.schemas.base_schema import BaseSchema
 
 
-class RateSchema(BaseModel):
+class RateSchema(BaseSchema):
     id: int
     establishment_id: int
     user_id: int
     rating: float
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class CreateRateSchema(BaseModel):
+class CreateRateSchema(BaseSchema):
     rating: float = Field(..., ge=0, le=5, description="Note entre 0 et 5")
-    model_config = ConfigDict(from_attributes=True)

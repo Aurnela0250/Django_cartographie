@@ -9,19 +9,19 @@ from core.interfaces.base_repository import BaseRepository
 
 class IUserRepository(BaseRepository[UserEntity]):
     @abstractmethod
-    def create_user(self, user: UserEntity) -> UserEntity:
-        pass
+    async def create_user(self, user: UserEntity) -> UserEntity:
+        raise NotImplementedError
 
     @abstractmethod
-    def get_user_by_email(self, email: str) -> Optional[UserEntity]:
-        pass
+    async def get_user_by_email(self, email: str) -> Optional[UserEntity]:
+        raise NotImplementedError
 
     @abstractmethod
-    def get_user_by_id(self, user_id: int) -> Optional[UserEntity]:
-        pass
+    async def get_user_by_id(self, user_id: int) -> Optional[UserEntity]:
+        raise NotImplementedError
 
     @abstractmethod
-    def filter(
+    async def filter(
         self,
         pagination_params: PaginationParams,
         filters: UserFilters,
@@ -36,4 +36,4 @@ class IUserRepository(BaseRepository[UserEntity]):
         Returns:
             PaginatedResult[UserEntity]: Résultat paginé des utilisateurs filtrés
         """
-        pass
+        raise NotImplementedError

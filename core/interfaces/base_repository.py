@@ -12,30 +12,30 @@ T = TypeVar("T")
 
 class BaseRepository(Generic[T], ABC):
     @abstractmethod
-    def create(self, data: T) -> T:
+    async def create(self, data: T) -> T:
         pass
 
     @abstractmethod
-    def get(self, id: UUID | int) -> Optional[T]:
+    async def get(self, id: UUID | int) -> Optional[T]:
         pass
 
     @abstractmethod
-    def get_all(
+    async def get_all(
         self,
         pagination_params: PaginationParams,
     ) -> PaginatedResult[T]:
         pass
 
     @abstractmethod
-    def update(self, id: UUID | int, data: T) -> Optional[T]:
+    async def update(self, id: UUID | int, data: T) -> T:
         pass
 
     @abstractmethod
-    def delete(self, id: UUID | int) -> bool:
+    async def delete(self, id: UUID | int) -> bool:
         pass
 
     @abstractmethod
-    def filter(
+    async def filter(
         self,
         pagination_params: PaginationParams,
         **kwargs,
@@ -43,7 +43,7 @@ class BaseRepository(Generic[T], ABC):
         pass
 
     @abstractmethod
-    def count(self, **kwargs) -> int:
+    async def count(self, **kwargs) -> int:
         """
         Compte le nombre d'entités dans la base de données
 

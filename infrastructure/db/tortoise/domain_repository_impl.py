@@ -139,9 +139,7 @@ class DomainRepository(IDomainRepository):
             logger.error(f"Error getting all domains: {e}")
             raise
 
-    async def update(
-        self, id: UUID | int, data: DomainEntity
-    ) -> Optional[DomainEntity]:
+    async def update(self, id: UUID | int, data: DomainEntity) -> DomainEntity:
         """
         Met à jour un domaine existant
 

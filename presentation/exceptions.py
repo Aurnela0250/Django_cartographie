@@ -1,146 +1,130 @@
-from typing import Any, Dict, List, Optional, TypeVar, Union
+import logging
+from typing import List, Optional, Union
 
-from ninja_extra.exceptions import APIException, AuthenticationFailed
-from pydantic import BaseModel
-from pydantic import ValidationError as PydanticValidationError
+from fastapi import status
 
-from presentation.constants.errors_message_constant import ErrorMessage
-from presentation.schemas.error_schema import ErrorDetailSchema, ErrorResponseSchema
+from config import settings
+from presentation.constants import errors_code, errors_message
+from presentation.schemas.error_schema import ErrorCategory, ErrorDetailSchema
 
-ModelType = TypeVar("ModelType", bound=BaseModel)
+# =============================================
+# CONFIGURATION ET LOGGING
+# =============================================
 
 
-class HTTPError(APIException):
-    """Base HTTP exception with fixed status code and detail message"""
+class ErrorConfig:
+    """Configuration centralisée pour la gestion d'erreurs."""
+
+    INCLUDE_STACK_TRACE_IN_RESPONSE = settings.INCLUDE_STACK_TRACE_IN_RESPONSE
+    LOG_CRITICAL_STACK_TRACE = settings.LOG_CRITICAL_STACK_TRACE
+
+
+# Configuration du logger
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+
+# =============================================
+# EXCEPTIONS PERSONNALISÉES (HIÉRARCHIE D'HÉRITAGE)
+# =============================================
+
+
+class APIException(Exception):
+    """Exception de base pour toutes les erreurs de l'API."""
+
+    status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
+    category: ErrorCategory = ErrorCategory.SERVER
+    message: str = errors_message.INTERNAL_SERVER_ERROR
+    code: str = errors_code.INTERNAL_SERVER
 
     def __init__(
         self,
-        error_message: ErrorMessage,
-        headers: Optional[Dict[str, Any]] = None,
+        message: Optional[str] = None,
+        category: Optional[ErrorCategory] = None,
+        code: Optional[str] = None,
+        details: Optional[Union[List[ErrorDetailSchema], ErrorDetailSchema]] = None,
+        cause: Optional[Exception] = None,
     ):
-        error_message = error_message
-        self.headers = headers
-        super().__init__()
-        self.status_code = error_message.status_code
-        self.detail = self._build_error_detail(error_message)
+        self.message = message or self.message
+        self.category = category or self.category
+        self.code = code or self.code
 
-    def _build_error_detail(self, error_message: ErrorMessage) -> Dict[str, Any]:
-        """Construct standardized error detail structure"""
-        error_response = ErrorResponseSchema(message=error_message.message)
+        if details is None:
+            self.details = []
+        elif isinstance(details, list):
+            self.details = details
+        else:
+            self.details = [details]
 
-        return error_response.model_dump(exclude_none=True)
-
-
-# 4xx Client Errors
-class BadRequestError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.BAD_REQUEST, headers)
+        self.request_id: Optional[str] = None  # Assigné par le middleware
+        self.__cause__ = cause
+        super().__init__(self.message)
 
 
-class UnauthorizedError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.UNAUTHORIZED, headers)
+# --- Classes de base pour les catégories ---
 
 
-class ForbiddenError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.FORBIDDEN, headers)
+class ClientException(APIException):
+    """Exception de base pour les erreurs 4xx (côté client)."""
+
+    category = ErrorCategory.CLIENT
 
 
-class NotFoundError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.NOT_FOUND, headers)
+class ServerException(APIException):
+    """Exception de base pour les erreurs 5xx (côté serveur)."""
+
+    category = ErrorCategory.SERVER
 
 
-class ConflictError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.CONFLICT, headers)
+# --- Erreurs Client (4xx) ---
 
 
-class UnprocessableEntityError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.UNPROCESSABLE_ENTITY, headers)
+class BadRequestException(ClientException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    message: str = errors_message.BAD_REQUEST
+    code: str = errors_code.BAD_REQUEST
 
 
-# 5xx Server Errors
-class InternalServerError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.INTERNAL_SERVER_ERROR, headers)
+class UnprocessableEntityException(ClientException):
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    message: str = errors_message.UNPROCESSABLE_ENTITY
+    code: str = errors_code.UNPROCESSABLE_ENTITY
 
 
-class ServiceUnavailableError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.SERVICE_UNAVAILABLE, headers)
+class UnauthorizedException(ClientException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    message: str = errors_message.UNAUTHORIZED
+    code: str = errors_code.UNAUTHORIZED
 
 
-# Custom Errors
-class ValidationError(HTTPError):
-    def __init__(
-        self,
-        error: Union[Dict[str, Any], PydanticValidationError, None] = None,
-        headers: Optional[Dict[str, Any]] = None,
-    ):
-        super().__init__(ErrorMessage.VALIDATION_ERROR, headers)
-        self.detail = self._build_error_detail(error)
-
-    def _build_error_detail(
-        self, error: Union[Dict[str, Any], PydanticValidationError, None]
-    ) -> Dict[str, Any]:
-        """Construct standardized error detail structure"""
-        error_response = ErrorResponseSchema(
-            message=ErrorMessage.VALIDATION_ERROR.message
-        )
-
-        if isinstance(error, PydanticValidationError):
-            error_response.details = self._format_pydantic_errors(error.errors())
-
-        return error_response.model_dump(exclude_none=True)
-
-    def _format_pydantic_errors(self, errors: List[Any]) -> List[ErrorDetailSchema]:
-        """Standardize Pydantic error format for API responses"""
-        return [
-            ErrorDetailSchema(
-                field=".".join(str(loc) for loc in error.get("loc", [])),
-                message=error.get("msg", "Invalid value"),
-                code=error.get("type", "validation_error"),
-            )
-            for error in errors
-        ]
+class ForbiddenException(ClientException):
+    status_code = status.HTTP_403_FORBIDDEN
+    message = errors_message.FORBIDDEN
+    code = errors_code.FORBIDDEN
 
 
-class InvalidCredentialsError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.INVALID_CREDENTIALS, headers)
+class NotFoundException(ClientException):
+    status_code = status.HTTP_404_NOT_FOUND
+    message = errors_message.NOT_FOUND
+    code = errors_code.NOT_FOUND
 
 
-class AuthenticationError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.AUTHENTICATION_ERROR, headers)
+class ConflictException(ClientException):
+    status_code = status.HTTP_409_CONFLICT
+    message = errors_message.CONFLICT
+    code = errors_code.CONFLICT
 
 
-class InvalidTokenError(AuthenticationFailed):
-    status_code = ErrorMessage.INVALID_TOKEN.status_code
-    default_detail = ErrorMessage.INVALID_TOKEN.message
-
-    def __init__(self, detail=None, headers=None):
-        """
-        Initialise l'exception InvalidTokenError avec un message personnalisé optionnel.
-
-        Args:
-            detail: Message d'erreur personnalisé (si None, utilise le message par défaut)
-            headers: En-têtes HTTP optionnels à inclure dans la réponse
-        """
-        if detail is None:
-            detail = self.default_detail
-
-        super().__init__(detail=detail)
+# --- Erreurs Serveur (5xx) ---
 
 
-class DatabaseError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.DATABASE_ERROR, headers)
+class InternalServerErrorException(ServerException):
+    pass
 
 
-class ExternalServiceError(HTTPError):
-    def __init__(self, headers: Optional[Dict[str, Any]] = None):
-        super().__init__(ErrorMessage.EXTERNAL_SERVICE_ERROR, headers)
+class ServiceUnavailableException(ServerException):
+    message = errors_message.SERVICE_UNAVAILABLE
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    code = errors_code.SERVICE_UNAVAILABLE
