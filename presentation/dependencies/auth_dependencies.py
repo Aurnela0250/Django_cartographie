@@ -34,12 +34,12 @@ def get_token_from_header(authorization: Optional[str] = Header(None)) -> str:
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     jwt_service: JWTService = Depends(Provide[Container.jwt_service]),
-    user_repository: IUserRepository = Depends(Provide[Container.user_repository]),
+    auth_use_case: IUserRepository = Depends(Provide[Container.auth_use_case]),
 ) -> UserEntity:
     """Récupère l'utilisateur actuel depuis le token"""
     payload = await jwt_service.decode_access_token(token)
 
-    user = await user_repository.get_user_by_id(payload.user_id)
+    user = await auth_use_case.get(payload.user_id)
     if user is None:
         raise UnauthorizedException(code=errors_code.INVALID_TOKEN)
 

@@ -7,8 +7,13 @@ from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository
 
 
-class LevelRepository(BaseRepository[LevelEntity]):
+class ILevelRepository(BaseRepository[LevelEntity]):
     """Repository for operations on levels"""
+
+    @abstractmethod
+    async def get_by_acronym(self, acronym: str) -> Optional[LevelEntity]:
+        """Retrieves a level by its acronym"""
+        raise NotImplementedError
 
     @abstractmethod
     async def get_by_name(self, name: str) -> Optional[LevelEntity]:

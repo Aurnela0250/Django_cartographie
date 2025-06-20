@@ -8,16 +8,9 @@ from core.interfaces.base_repository import BaseRepository
 
 
 class IUserRepository(BaseRepository[UserEntity]):
-    @abstractmethod
-    async def create_user(self, user: UserEntity) -> UserEntity:
-        raise NotImplementedError
 
     @abstractmethod
     async def get_user_by_email(self, email: str) -> Optional[UserEntity]:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def get_user_by_id(self, user_id: int) -> Optional[UserEntity]:
         raise NotImplementedError
 
     @abstractmethod

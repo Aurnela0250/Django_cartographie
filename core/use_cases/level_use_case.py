@@ -1,121 +1,141 @@
 import logging
 
-from core.domain.entities.level_entity import LevelEntity
-from core.domain.entities.pagination import PaginatedResult, PaginationParams
-from core.interfaces.unit_of_work import UnitOfWork
-from infrastructure.db.django_level_repository import DjangoLevelRepository
-from presentation.exceptions import ConflictError, NotFoundError
+from tortoise.transactions import atomic
+
+from core.entities.filters import LevelFilters
+from core.entities.level_entity import LevelEntity
+from core.entities.pagination import PaginatedResult, PaginationParams
+from core.interfaces.level_repository import ILevelRepository
+from presentation.exceptions import (
+    ConflictException,
+    InternalServerErrorException,
+    NotFoundException,
+)
 
 
 class LevelUseCase:
-    """Use case for CRUD operations on levels"""
+    """Cas d'utilisation pour les opérations CRUD sur les niveaux"""
 
-    def __init__(self, unit_of_work: UnitOfWork):
-        self.unit_of_work = unit_of_work
+    def __init__(self, level_repository: ILevelRepository):
+        self.level_repository = level_repository
         self.logger = logging.getLogger(__name__)
 
-    def create_level(self, level_data: LevelEntity) -> LevelEntity:
-        """Creates a new level"""
-        with self.unit_of_work:
-            level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-
-            # Check if a level with the same name already exists
-            existing_level = level_repository.get_by_name(level_data.name)
+    @atomic()
+    async def create(self, level_data: LevelEntity) -> LevelEntity:
+        try:
+            existing_level = await self.level_repository.get_by_name(level_data.name)
             if existing_level:
                 self.logger.warning(
                     f"Level with name '{level_data.name}' already exists"
                 )
-                raise ConflictError()
-
-            # Check if a level with the same acronym already exists
-            if level_data.acronyme is not None:
-                existing_level = level_repository.get_by_acronyme(level_data.acronyme)
-                if existing_level:
+                raise ConflictException()
+            if level_data.acronym is not None:
+                existing_level_acronym = await self.level_repository.get_by_acronym(
+                    level_data.acronym
+                )
+                if existing_level_acronym:
                     self.logger.warning(
-                        f"Level with acronym '{level_data.acronyme}' already exists"
+                        f"Level with acronym '{level_data.acronym}' already exists"
                     )
-                    raise ConflictError()
-
-            # Create the level
-            created_level = level_repository.create(level_data)
-            self.unit_of_work.commit()
+                    raise ConflictException()
+            created_level = await self.level_repository.create(level_data)
             return created_level
+        except ConflictException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Unexpected error during level creation: {str(e)}")
+            raise InternalServerErrorException(cause=e)
 
-    def get_level(self, level_id: int) -> LevelEntity:
-        """Retrieves a level by its ID"""
-        with self.unit_of_work:
-            level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-            level = level_repository.get(level_id)
+    @atomic()
+    async def get(self, level_id: int) -> LevelEntity:
+        try:
+            level = await self.level_repository.get(level_id)
             if not level:
-                raise NotFoundError()
+                raise NotFoundException()
             return level
+        except NotFoundException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Unexpected error during level retrieval: {str(e)}")
+            raise InternalServerErrorException(cause=e)
 
-    def update_level(self, level_id: int, level_data: LevelEntity) -> LevelEntity:
-        """Updates an existing level"""
-        with self.unit_of_work:
-            level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-
-            # Check if the level exists
-            existing_level = level_repository.get(level_id)
+    @atomic()
+    async def update(
+        self,
+        level_id: int,
+        level_data: LevelEntity,
+    ) -> LevelEntity:
+        try:
+            existing_level = await self.level_repository.get(level_id)
             if not existing_level:
-                raise NotFoundError()
-
-            # Check if the new name already exists for another level
+                raise NotFoundException()
             if level_data.name != existing_level.name:
-                name_exists = level_repository.get_by_name(level_data.name)
+                name_exists = await self.level_repository.get_by_name(level_data.name)
                 if name_exists and name_exists.id != level_id:
                     self.logger.warning(
                         f"Cannot update: Level with name '{level_data.name}' already exists"
                     )
-                    raise ConflictError()
-
-            # Check if the new acronym already exists for another level
+                    raise ConflictException()
             if (
-                level_data.acronyme is not None
-                and level_data.acronyme != existing_level.acronyme
+                level_data.acronym is not None
+                and level_data.acronym != existing_level.acronym
             ):
-                acronyme_exists = level_repository.get_by_acronyme(level_data.acronyme)
-                if acronyme_exists and acronyme_exists.id != level_id:
+                acronym_exists = await self.level_repository.get_by_acronym(
+                    level_data.acronym
+                )
+                if acronym_exists and acronym_exists.id != level_id:
                     self.logger.warning(
-                        f"Cannot update: Level with acronym '{level_data.acronyme}' already exists"
+                        f"Cannot update: Level with acronym '{level_data.acronym}' already exists"
                     )
-                    raise ConflictError()
-
-            # Update the level
-            updated_level = level_repository.update(level_id, level_data)
-            self.unit_of_work.commit()
+                    raise ConflictException()
+            updated_level = await self.level_repository.update(level_id, level_data)
             return updated_level
+        except (NotFoundException, ConflictException) as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Unexpected error during level update: {str(e)}")
+            raise InternalServerErrorException(cause=e)
 
-    def delete_level(self, level_id: int) -> bool:
-        """Deletes a level"""
-        with self.unit_of_work:
-            level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-
-            # Check if the level exists
-            existing_level = level_repository.get(level_id)
+    @atomic()
+    async def delete(self, level_id: int) -> bool:
+        try:
+            existing_level = await self.level_repository.get(level_id)
             if not existing_level:
-                raise NotFoundError()
-
-            # Delete the level
-            result = level_repository.delete(level_id)
-            self.unit_of_work.commit()
+                raise NotFoundException()
+            result = await self.level_repository.delete(level_id)
             return result
+        except NotFoundException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Unexpected error during level deletion: {str(e)}")
+            raise InternalServerErrorException(cause=e)
 
-    def get_all_levels(
+    @atomic()
+    async def get_all(
         self,
         pagination_params: PaginationParams,
     ) -> PaginatedResult[LevelEntity]:
-        """Retrieves all levels with pagination"""
-        with self.unit_of_work:
-            level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-            return level_repository.get_all(pagination_params)
+        try:
+            levels = await self.level_repository.get_all(
+                pagination_params=pagination_params
+            )
+            return levels
+        except Exception as e:
+            self.logger.error(f"Unexpected error during levels retrieval: {str(e)}")
+            raise InternalServerErrorException(cause=e)
 
-    def filter_levels(
+    @atomic()
+    async def filter(
         self,
         pagination_params: PaginationParams,
-        **kwargs,
+        filters: LevelFilters,
     ) -> PaginatedResult[LevelEntity]:
-        """Filters levels based on provided criteria with pagination"""
-        with self.unit_of_work:
-            level_repository = self.unit_of_work.get_repository(DjangoLevelRepository)
-            return level_repository.filter(pagination_params, **kwargs)
+        try:
+            levels = await self.level_repository.filter(
+                pagination_params=pagination_params,
+                filters=filters,
+            )
+            return levels
+        except Exception as e:
+            self.logger.error(f"Unexpected error during levels filtering: {str(e)}")
+            raise InternalServerErrorException(cause=e)

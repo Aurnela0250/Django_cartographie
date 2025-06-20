@@ -135,22 +135,22 @@ class AuthUseCase:
             self.logger.error(f"Unexpected error during token refresh {e}")
             raise InternalServerErrorException(cause=e)
 
-    # @atomic()
-    # async def get_current_user(self, user_id: int) -> UserEntity:
-    #     try:
-    #         user = await self.auth_repository.get_user_by_id(user_id)
+    @atomic()
+    async def get_current_user(self, user_id: int) -> UserEntity:
+        try:
+            user = await self.auth_repository.get_user_by_id(user_id)
 
-    #         if not user:
-    #             raise AuthenticationError()
-    #         if not user.id:
-    #             raise AuthenticationError()
+            if not user:
+                raise UnauthorizedException(code=errors_code.INVALID_TOKEN)
+            if not user.id:
+                raise InternalServerErrorException()
 
-    #         return user
-    #     except AuthenticationError as e:
-    #         raise e
-    #     except Exception as e:
-    #         print(f"Unexpected error during getting current user {e}")
-    #         raise InternalServerErrorException(cause=e)
+            return user
+        except UnauthorizedException as e:
+            raise e
+        except Exception as e:
+            print(f"Unexpected error during getting current user {e}")
+            raise InternalServerErrorException(cause=e)
 
     @atomic()
     async def logout(

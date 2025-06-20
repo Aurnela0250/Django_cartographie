@@ -1,132 +1,114 @@
-from core.domain.entities.city_entity import CityEntity
-from core.domain.entities.pagination import PaginatedResult, PaginationParams
-from core.interfaces.unit_of_work import UnitOfWork
-from infrastructure.db.django_city_repository import DjangoCityRepository
-from infrastructure.db.django_region_repository import DjangoRegionRepository
+import logging
+
+from tortoise.transactions import atomic
+
+from core.entities.city_entity import CityEntity
+from core.entities.filters import CityFilters
+from core.entities.pagination import PaginatedResult, PaginationParams
+from core.interfaces.city_repository import ICityRepository
 from presentation.exceptions import (
-    ConflictError,
-    InternalServerError,
-    NotFoundError,
-    UnprocessableEntityError,
-    ValidationError,
+    ConflictException,
+    InternalServerErrorException,
+    NotFoundException,
 )
-from presentation.schemas.city_schema import CreateCitySchemaRequest, UpdateCitySchema
 
 
 class CityUseCase:
-    def __init__(self, unit_of_work: UnitOfWork):
-        self.unit_of_work = unit_of_work
+    """Cas d'utilisation pour les opérations CRUD sur les villes"""
 
-    def create(
-        self,
-        city_data: CreateCitySchemaRequest,
-        created_by: int,
-    ) -> CityEntity:
-        with self.unit_of_work:
-            try:
-                city_repository = self.unit_of_work.get_repository(DjangoCityRepository)
-                region_repository = self.unit_of_work.get_repository(
-                    DjangoRegionRepository
-                )
+    def __init__(self, city_repository: ICityRepository):
+        self.city_repository = city_repository
+        self.logger = logging.getLogger(__name__)
 
-                # Vérifier si la région existe
-                region = region_repository.get(city_data.region_id)
-                if not region:
-                    raise UnprocessableEntityError()
-
-                # Vérifier si une ville avec le même nom existe déjà
-                existing_city = city_repository.get_by_name(city_data.name)
-                if existing_city:
-                    raise ConflictError()
-
-                city = CityEntity(**city_data.model_dump(), created_by=created_by)
-                city_created = city_repository.create(city)
-                return city_created
-            except ConflictError as e:
-                raise e
-            except ValidationError as e:
-                raise e
-            except Exception:
-                raise InternalServerError()
-
-    def update(
-        self,
-        id: int,
-        city_data: UpdateCitySchema,
-        updated_by: int,
-    ) -> CityEntity:
-        with self.unit_of_work:
-            try:
-                city_repository = self.unit_of_work.get_repository(DjangoCityRepository)
-                current_city = city_repository.get(id)
-
-                if not current_city:
-                    raise UnprocessableEntityError()
-
-                update_data = current_city.model_dump()
-
-                # Mettre à jour uniquement les champs non-None
-                for key, value in city_data.model_dump(exclude_unset=True).items():
-                    if value is not None:
-                        update_data[key] = value
-
-                # Vérifier si le nouveau nom est déjà utilisé
-                if city_data.name and city_data.name != current_city.name:
-                    existing_city = city_repository.get_by_name(city_data.name)
-                    if existing_city and existing_city.id != id:
-                        raise ConflictError()
-
-                update_data["updated_by"] = updated_by
-                updated_city = CityEntity(**update_data)
-                return city_repository.update(id, updated_city)
-            except NotFoundError as e:
-                raise e
-            except ConflictError as e:
-                raise e
-            except ValidationError as e:
-                raise e
-            except Exception:
-                raise InternalServerError()
-
-    def delete(self, id: int) -> bool:
-        with self.unit_of_work:
-            try:
-                city_repository = self.unit_of_work.get_repository(DjangoCityRepository)
-                city = city_repository.get(id)
-
-                if not city:
-                    raise NotFoundError()
-
-                return city_repository.delete(id)
-            except NotFoundError as e:
-                raise e
-            except Exception:
-                raise InternalServerError()
-
-    def get(self, id: int) -> CityEntity:
+    @atomic()
+    async def create(self, city_data: CityEntity) -> CityEntity:
         try:
-            city_repository = self.unit_of_work.get_repository(DjangoCityRepository)
-            city = city_repository.get(id)
-
-            if not city:
-                raise NotFoundError()
-
-            return city
-        except NotFoundError as e:
+            existing_city = await self.city_repository.get_by_name(city_data.name)
+            if existing_city:
+                self.logger.warning(f"City with name '{city_data.name}' already exists")
+                raise ConflictException()
+            created_city = await self.city_repository.create(city_data)
+            return created_city
+        except ConflictException as e:
             raise e
-        except Exception:
-            raise InternalServerError()
+        except Exception as e:
+            self.logger.error(f"Unexpected error during city creation: {str(e)}")
+            raise InternalServerErrorException(cause=e)
 
-    def get_all(
+    @atomic()
+    async def get(self, city_id: int) -> CityEntity:
+        try:
+            city = await self.city_repository.get(city_id)
+            if not city:
+                raise NotFoundException()
+            return city
+        except NotFoundException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Unexpected error during city retrieval: {str(e)}")
+            raise InternalServerErrorException(cause=e)
+
+    @atomic()
+    async def update(self, city_id: int, city_data: CityEntity) -> CityEntity:
+        try:
+            existing_city = await self.city_repository.get(city_id)
+            if not existing_city:
+                raise NotFoundException()
+            if city_data.name != existing_city.name:
+                name_exists = await self.city_repository.get_by_name(city_data.name)
+                if name_exists and name_exists.id != city_id:
+                    self.logger.warning(
+                        f"Cannot update: City with name '{city_data.name}' already exists"
+                    )
+                    raise ConflictException()
+            updated_city = await self.city_repository.update(city_id, city_data)
+            return updated_city
+        except (NotFoundException, ConflictException) as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Unexpected error during city update: {str(e)}")
+            raise InternalServerErrorException(cause=e)
+
+    @atomic()
+    async def delete(self, city_id: int) -> bool:
+        try:
+            existing_city = await self.city_repository.get(city_id)
+            if not existing_city:
+                raise NotFoundException()
+            result = await self.city_repository.delete(city_id)
+            return result
+        except NotFoundException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(f"Unexpected error during city deletion: {str(e)}")
+            raise InternalServerErrorException(cause=e)
+
+    @atomic()
+    async def get_all(
         self,
         pagination_params: PaginationParams,
     ) -> PaginatedResult[CityEntity]:
-        """
-        Récupère toutes les villes avec pagination
-        """
         try:
-            city_repository = self.unit_of_work.get_repository(DjangoCityRepository)
-            result = city_repository.get_all(pagination_params)
-            return result
-        except Exception:
-            raise InternalServerError()
+            cities = await self.city_repository.get_all(
+                pagination_params=pagination_params
+            )
+            return cities
+        except Exception as e:
+            self.logger.error(f"Unexpected error during cities retrieval: {str(e)}")
+            raise InternalServerErrorException(cause=e)
+
+    @atomic()
+    async def filter(
+        self,
+        pagination_params: PaginationParams,
+        filters: CityFilters,
+    ) -> PaginatedResult[CityEntity]:
+        try:
+            cities = await self.city_repository.filter(
+                pagination_params=pagination_params,
+                filters=filters,
+            )
+            return cities
+        except Exception as e:
+            self.logger.error(f"Unexpected error during cities filtering: {str(e)}")
+            raise InternalServerErrorException(cause=e)

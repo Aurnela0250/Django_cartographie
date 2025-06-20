@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Optional
 
 from core.entities.rate_entity import RateEntity
 from core.interfaces.base_repository import BaseRepository
@@ -11,7 +12,7 @@ class IRateRepository(BaseRepository[RateEntity]):
         self,
         user_id: int,
         establishment_id: int,
-    ) -> bool:
+    ) -> Optional[RateEntity]:
         """
         Get rate by user for  an establishment.
 
@@ -20,6 +21,6 @@ class IRateRepository(BaseRepository[RateEntity]):
             establishment_id: The ID of the establishment
 
         Returns:
-            bool: True if the user has already rated the establishment, False otherwise
+            Optional[RateEntity]: The rate entity if found, None otherwise
         """
         raise NotImplementedError

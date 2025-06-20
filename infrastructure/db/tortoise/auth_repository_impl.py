@@ -2,7 +2,7 @@ import logging
 
 from tortoise.exceptions import DoesNotExist
 
-from apps.tortoise.users.models import User as TortoiseUser
+from apps.tortoise.user.models import User as TortoiseUser
 from core.entities.user_entity import UserEntity
 from core.interfaces.auth_repository import IAuthRepository
 from infrastructure.db.tortoise.model_to_entity import user_to_entity

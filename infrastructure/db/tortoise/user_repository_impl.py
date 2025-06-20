@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 from uuid import UUID
 
-from apps.tortoise.users.models import User as TortoiseUser
+from apps.tortoise.user.models import User as TortoiseUser
 from core.entities.filters import UserFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.entities.user_entity import UserEntity
@@ -313,29 +313,6 @@ class UserRepository(IUserRepository):
             )
             raise ValueError(f"Erreur lors du comptage des utilisateurs: {str(e)}")
 
-    async def create_user(self, user: UserEntity) -> UserEntity:
-        """
-        Crée un nouvel utilisateur (méthode spécifique à IUserRepository)
-
-        Args:
-            user: L'entité utilisateur à créer
-
-        Returns:
-            UserEntity: L'utilisateur créé
-        """
-        self.logger.info(f"Appel de create_user pour l'email: {user.email}")
-        try:
-            result = await self.create(user)
-            self.logger.info(f"create_user réussi pour l'email: {user.email}")
-            return result
-        except Exception as e:
-            self.logger.error(
-                f"Erreur dans create_user pour l'email {user.email}: {str(e)}"
-            )
-            raise ValueError(
-                f"Erreur lors de la création de l'utilisateur (create_user): {str(e)}"
-            )
-
     async def get_user_by_email(self, email: str) -> Optional[UserEntity]:
         """
         Récupère un utilisateur par son email
@@ -360,27 +337,4 @@ class UserRepository(IUserRepository):
             )
             raise ValueError(
                 f"Erreur lors de la récupération de l'utilisateur avec l'email {email}: {str(e)}"
-            )
-
-    async def get_user_by_id(self, user_id: int) -> Optional[UserEntity]:
-        """
-        Récupère un utilisateur par son ID
-
-        Args:
-            user_id: L'ID de l'utilisateur
-
-        Returns:
-            Optional[UserEntity]: L'utilisateur trouvé ou None
-        """
-        self.logger.debug(f"Appel de get_user_by_id pour l'ID: {user_id}")
-        try:
-            result = await self.get(user_id)
-            self.logger.debug(f"get_user_by_id réussi pour l'ID: {user_id}")
-            return result
-        except Exception as e:
-            self.logger.error(
-                f"Erreur dans get_user_by_id pour l'ID {user_id}: {str(e)}"
-            )
-            raise ValueError(
-                f"Erreur lors de la récupération de l'utilisateur par ID: {str(e)}"
             )

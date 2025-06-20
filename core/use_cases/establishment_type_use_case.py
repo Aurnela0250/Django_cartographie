@@ -1,140 +1,153 @@
 import logging
 
-from core.domain.entities.establishment_type_entity import EstablishmentTypeEntity
-from core.domain.entities.pagination import PaginatedResult, PaginationParams
-from core.interfaces.unit_of_work import UnitOfWork
-from infrastructure.db.django_establishment_type_repository import (
-    DjangoEstablishmentTypeRepository,
+from tortoise.transactions import atomic
+
+from core.entities.establishment_type_entity import EstablishmentTypeEntity
+from core.entities.filters import EstablishmentTypeFilters
+from core.entities.pagination import PaginatedResult, PaginationParams
+from core.interfaces.establishment_type_repository import IEstablishmentTypeRepository
+from presentation.exceptions import (
+    ConflictException,
+    InternalServerErrorException,
+    NotFoundException,
 )
-from presentation.exceptions import ConflictError, NotFoundError
 
 
 class EstablishmentTypeUseCase:
-    """Use case for CRUD operations on establishment types"""
+    """Cas d'utilisation pour les opérations CRUD sur les types d'établissements"""
 
-    def __init__(self, unit_of_work: UnitOfWork):
-        self.unit_of_work = unit_of_work
+    def __init__(
+        self,
+        establishment_type_repository: IEstablishmentTypeRepository,
+    ):
+        self.establishment_type_repository = establishment_type_repository
         self.logger = logging.getLogger(__name__)
 
-    def create_establishment_type(
+    @atomic()
+    async def create(
         self, establishment_type_data: EstablishmentTypeEntity
     ) -> EstablishmentTypeEntity:
-        """Creates a new establishment type"""
-        with self.unit_of_work:
-            establishment_type_repository = self.unit_of_work.get_repository(
-                DjangoEstablishmentTypeRepository
-            )
-
-            # Check if an establishment type with the same name already exists
-            existing_establishment_type = establishment_type_repository.get_by_name(
+        try:
+            existing_type = await self.establishment_type_repository.get_by_name(
                 establishment_type_data.name
             )
-            if existing_establishment_type:
+            if existing_type:
                 self.logger.warning(
                     f"Establishment type with name '{establishment_type_data.name}' already exists"
                 )
-                raise ConflictError()
-
-            # Create the establishment type
-            created_establishment_type = establishment_type_repository.create(
+                raise ConflictException()
+            created_type = await self.establishment_type_repository.create(
                 establishment_type_data
             )
-            self.unit_of_work.commit()
-            return created_establishment_type
-
-    def get_establishment_type(
-        self, establishment_type_id: int
-    ) -> EstablishmentTypeEntity:
-        """Retrieves an establishment type by its ID"""
-        with self.unit_of_work:
-            establishment_type_repository = self.unit_of_work.get_repository(
-                DjangoEstablishmentTypeRepository
+            return created_type
+        except ConflictException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during establishment type creation: {str(e)}"
             )
-            establishment_type = establishment_type_repository.get(
+            raise InternalServerErrorException(cause=e)
+
+    @atomic()
+    async def get(self, establishment_type_id: int) -> EstablishmentTypeEntity:
+        try:
+            establishment_type = await self.establishment_type_repository.get(
                 establishment_type_id
             )
             if not establishment_type:
-                raise NotFoundError()
+                raise NotFoundException()
             return establishment_type
+        except NotFoundException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during establishment type retrieval: {str(e)}"
+            )
+            raise InternalServerErrorException(cause=e)
 
-    def update_establishment_type(
+    @atomic()
+    async def update(
         self,
         establishment_type_id: int,
         establishment_type_data: EstablishmentTypeEntity,
     ) -> EstablishmentTypeEntity:
-        """Updates an existing establishment type"""
-        with self.unit_of_work:
-            establishment_type_repository = self.unit_of_work.get_repository(
-                DjangoEstablishmentTypeRepository
-            )
-
-            # Check if the establishment type exists
-            existing_establishment_type = establishment_type_repository.get(
+        try:
+            existing_type = await self.establishment_type_repository.get(
                 establishment_type_id
             )
-            if not existing_establishment_type:
-                raise NotFoundError()
-
-            # Check if the new name already exists for another establishment type
-            if establishment_type_data.name != existing_establishment_type.name:
-                name_exists = establishment_type_repository.get_by_name(
+            if not existing_type:
+                raise NotFoundException()
+            if establishment_type_data.name != existing_type.name:
+                name_exists = await self.establishment_type_repository.get_by_name(
                     establishment_type_data.name
                 )
                 if name_exists and name_exists.id != establishment_type_id:
                     self.logger.warning(
                         f"Cannot update: Establishment type with name '{establishment_type_data.name}' already exists"
                     )
-                    raise ConflictError()
-
-            # Update the establishment type
-            updated_establishment_type = establishment_type_repository.update(
+                    raise ConflictException()
+            updated_type = await self.establishment_type_repository.update(
                 establishment_type_id, establishment_type_data
             )
-            self.unit_of_work.commit()
-            return updated_establishment_type
-
-    def delete_establishment_type(self, establishment_type_id: int) -> bool:
-        """Deletes an establishment type"""
-        with self.unit_of_work:
-            establishment_type_repository = self.unit_of_work.get_repository(
-                DjangoEstablishmentTypeRepository
+            return updated_type
+        except (NotFoundException, ConflictException) as e:
+            raise e
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during establishment type update: {str(e)}"
             )
+            raise InternalServerErrorException(cause=e)
 
-            # Check if the establishment type exists
-            existing_establishment_type = establishment_type_repository.get(
+    @atomic()
+    async def delete(self, establishment_type_id: int) -> bool:
+        try:
+            existing_type = await self.establishment_type_repository.get(
                 establishment_type_id
             )
-            if not existing_establishment_type:
-                raise NotFoundError()
-
-            # Delete the establishment type
-            result = establishment_type_repository.delete(establishment_type_id)
-            self.unit_of_work.commit()
+            if not existing_type:
+                raise NotFoundException()
+            result = await self.establishment_type_repository.delete(
+                establishment_type_id
+            )
             return result
+        except NotFoundException as e:
+            raise e
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during establishment type deletion: {str(e)}"
+            )
+            raise InternalServerErrorException(cause=e)
 
-    def get_all_establishment_types(
+    @atomic()
+    async def get_all(
         self,
         pagination_params: PaginationParams,
     ) -> PaginatedResult[EstablishmentTypeEntity]:
-        """Retrieves all establishment types with pagination"""
-        with self.unit_of_work:
-            establishment_type_repository = self.unit_of_work.get_repository(
-                DjangoEstablishmentTypeRepository
-            )
-            return establishment_type_repository.get_all(
+        try:
+            types = await self.establishment_type_repository.get_all(
                 pagination_params=pagination_params
             )
+            return types
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during establishment types retrieval: {str(e)}"
+            )
+            raise InternalServerErrorException(cause=e)
 
-    def filter_establishment_types(
+    @atomic()
+    async def filter(
         self,
         pagination_params: PaginationParams,
-        **kwargs,
+        filters: EstablishmentTypeFilters,
     ) -> PaginatedResult[EstablishmentTypeEntity]:
-        """Filters establishment types based on provided criteria with pagination"""
-        with self.unit_of_work:
-            establishment_type_repository = self.unit_of_work.get_repository(
-                DjangoEstablishmentTypeRepository
+        try:
+            types = await self.establishment_type_repository.filter(
+                pagination_params=pagination_params,
+                filters=filters,
             )
-            return establishment_type_repository.filter(
-                pagination_params=pagination_params, **kwargs
+            return types
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during establishment types filtering: {str(e)}"
             )
+            raise InternalServerErrorException(cause=e)

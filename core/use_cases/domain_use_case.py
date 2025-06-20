@@ -6,7 +6,11 @@ from core.entities.domain_entity import DomainEntity
 from core.entities.filters import DomainFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.domain_repository import IDomainRepository
-from presentation.exceptions import ConflictError, InternalServerError, NotFoundError
+from presentation.exceptions import (
+    ConflictException,
+    InternalServerErrorException,
+    NotFoundException,
+)
 
 
 class DomainUseCase:
@@ -17,74 +21,72 @@ class DomainUseCase:
         self.logger = logging.getLogger(__name__)
 
     @atomic()
-    async def create_domain(self, domain_data: DomainEntity) -> DomainEntity:
+    async def create(self, domain_data: DomainEntity) -> DomainEntity:
         try:
             existing_domain = await self.domain_repository.get_by_name(domain_data.name)
             if existing_domain:
                 self.logger.warning(
                     f"Domain with name '{domain_data.name}' already exists"
                 )
-                raise ConflictError()
+                raise ConflictException()
             created_domain = await self.domain_repository.create(domain_data)
             return created_domain
-        except ConflictError as e:
+        except ConflictException as e:
             raise e
         except Exception as e:
             self.logger.error(f"Unexpected error during domain creation: {str(e)}")
-            raise InternalServerError()
+            raise InternalServerErrorException(cause=e)
 
     @atomic()
-    async def get_domain(self, domain_id: int) -> DomainEntity:
+    async def get(self, domain_id: int) -> DomainEntity:
         try:
             domain = await self.domain_repository.get(domain_id)
             if not domain:
-                raise NotFoundError()
+                raise NotFoundException()
             return domain
-        except NotFoundError as e:
+        except NotFoundException as e:
             raise e
         except Exception as e:
             self.logger.error(f"Unexpected error during domain retrieval: {str(e)}")
-            raise InternalServerError()
+            raise InternalServerErrorException(cause=e)
 
     @atomic()
-    async def update_domain(
-        self, domain_id: int, domain_data: DomainEntity
-    ) -> DomainEntity:
+    async def update(self, domain_id: int, domain_data: DomainEntity) -> DomainEntity:
         try:
             existing_domain = await self.domain_repository.get(domain_id)
             if not existing_domain:
-                raise NotFoundError()
+                raise NotFoundException()
             if domain_data.name != existing_domain.name:
                 name_exists = await self.domain_repository.get_by_name(domain_data.name)
                 if name_exists and name_exists.id != domain_id:
                     self.logger.warning(
                         f"Cannot update: Domain with name '{domain_data.name}' already exists"
                     )
-                    raise ConflictError()
+                    raise ConflictException()
             updated_domain = await self.domain_repository.update(domain_id, domain_data)
             return updated_domain
-        except (NotFoundError, ConflictError) as e:
+        except (NotFoundException, ConflictException) as e:
             raise e
         except Exception as e:
             self.logger.error(f"Unexpected error during domain update: {str(e)}")
-            raise InternalServerError()
+            raise InternalServerErrorException(cause=e)
 
     @atomic()
-    async def delete_domain(self, domain_id: int) -> bool:
+    async def delete(self, domain_id: int) -> bool:
         try:
             existing_domain = await self.domain_repository.get(domain_id)
             if not existing_domain:
-                raise NotFoundError()
+                raise NotFoundException()
             result = await self.domain_repository.delete(domain_id)
             return result
-        except NotFoundError as e:
+        except NotFoundException as e:
             raise e
         except Exception as e:
             self.logger.error(f"Unexpected error during domain deletion: {str(e)}")
-            raise InternalServerError()
+            raise InternalServerErrorException(cause=e)
 
     @atomic()
-    async def get_all_domains(
+    async def get_all(
         self,
         pagination_params: PaginationParams,
     ) -> PaginatedResult[DomainEntity]:
@@ -95,10 +97,10 @@ class DomainUseCase:
             return domains
         except Exception as e:
             self.logger.error(f"Unexpected error during domains retrieval: {str(e)}")
-            raise InternalServerError()
+            raise InternalServerErrorException(cause=e)
 
     @atomic()
-    async def filter_domains(
+    async def filter(
         self,
         pagination_params: PaginationParams,
         filters: DomainFilters,
@@ -111,4 +113,4 @@ class DomainUseCase:
             return domains
         except Exception as e:
             self.logger.error(f"Unexpected error during domains filtering: {str(e)}")
-            raise InternalServerError()
+            raise InternalServerErrorException(cause=e)

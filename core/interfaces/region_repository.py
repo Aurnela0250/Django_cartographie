@@ -2,12 +2,12 @@ from abc import abstractmethod
 from typing import Optional
 
 from core.entities.filters import RegionFilters
-from core.entities.pagination import PaginationParams
+from core.entities.pagination import PaginatedResult, PaginationParams
 from core.entities.region_entity import RegionEntity
 from core.interfaces.base_repository import BaseRepository
 
 
-class RegionRepository(BaseRepository[RegionEntity]):
+class IRegionRepository(BaseRepository[RegionEntity]):
     """Repository pour les opérations sur les régions"""
 
     @abstractmethod
@@ -20,6 +20,6 @@ class RegionRepository(BaseRepository[RegionEntity]):
         self,
         pagination_params: PaginationParams,
         filters: RegionFilters,
-    ) -> Optional[RegionEntity]:
+    ) -> PaginatedResult[RegionEntity]:
         """Récupère une région par son code"""
         raise NotImplementedError

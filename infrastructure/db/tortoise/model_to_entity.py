@@ -13,11 +13,11 @@ from apps.tortoise.formation.models import Formation as TortoiseFormation
 from apps.tortoise.formation_authorization.models import (
     FormationAuthorization as TortoiseFormationAuthorization,
 )
-from apps.tortoise.levels.models import Level as TortoiseLevel
-from apps.tortoise.mentions.models import Mention as TortoiseMention
+from apps.tortoise.level.models import Level as TortoiseLevel
+from apps.tortoise.mention.models import Mention as TortoiseMention
 from apps.tortoise.rate.models import Rate as TortoiseRate
 from apps.tortoise.region.models import Region as TortoiseRegion
-from apps.tortoise.users.models import User as TortoiseUser
+from apps.tortoise.user.models import User as TortoiseUser
 from core.entities.annual_headcount_entity import AnnualHeadCountEntity
 from core.entities.city_entity import CityEntity
 from core.entities.domain_entity import DomainEntity

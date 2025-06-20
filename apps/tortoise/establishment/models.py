@@ -7,7 +7,7 @@ class Establishment(Model):
     id = fields.IntField(primary_key=True)
     name = fields.CharField(max_length=255)
     acronym = fields.CharField(max_length=50, unique=True, null=True)
-    address = fields.CharField(max_length=255)
+    address = fields.CharField(max_length=255, null=True)
     contacts = fields.JSONField(null=True)
     website = fields.CharField(max_length=255, null=True)
     description = fields.TextField(null=True)
