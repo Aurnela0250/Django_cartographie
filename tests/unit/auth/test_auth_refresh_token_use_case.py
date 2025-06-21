@@ -70,8 +70,8 @@ class TestAuthRefreshTokenUseCase:
         """Fixture pour un token de test"""
         return TokenEntity(
             user_id=1,
-            exp=1640995200,  # Timestamp
-            iat=1640908800,  # Timestamp
+            exp=1640995200,
+            iat=1640908800,
             jti="new-jti",
             token_type="bearer",
             iss="test-issuer",
@@ -84,9 +84,7 @@ class TestAuthRefreshTokenUseCase:
     @pytest.fixture
     def mock_jwt_payload(self):
         """Fixture pour un payload JWT mock"""
-        return MockJWTPayload(
-            user_id=1, jti="old-jti", exp=1640995200  # Timestamp futur
-        )
+        return MockJWTPayload(user_id=1, jti="old-jti", exp=1640995200)
 
     @pytest.mark.asyncio
     async def test_refresh_token_success(

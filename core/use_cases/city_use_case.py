@@ -2,10 +2,10 @@ import logging
 
 from tortoise.transactions import atomic
 
-from core.container.container import ICityRepository
 from core.entities.city import CityEntity
 from core.entities.filters import CityFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
+from core.interfaces.city_repository import ICityRepository
 from presentation.exceptions import (
     ConflictException,
     InternalServerErrorException,

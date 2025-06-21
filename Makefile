@@ -98,6 +98,27 @@ test-unit-auth-current-user:
 test-unit-auth-logout:
 	$(UV) run pytest $(TEST_PATH)unit/auth/test_auth_logout_use_case.py $(PYTEST_OPTS)
 
+test-unit-city:
+	$(UV) run pytest $(TEST_PATH)unit/city/ $(PYTEST_OPTS)
+
+test-unit-city-create:
+	$(UV) run pytest $(TEST_PATH)unit/city/test_city_create_use_case.py $(PYTEST_OPTS)
+
+test-unit-city-update:
+	$(UV) run pytest $(TEST_PATH)unit/city/test_city_update_use_case.py $(PYTEST_OPTS)
+
+test-unit-city-get:
+	$(UV) run pytest $(TEST_PATH)unit/city/test_city_get_use_case.py $(PYTEST_OPTS)
+
+test-unit-city-get-all:
+	$(UV) run pytest $(TEST_PATH)unit/city/test_city_get_all_use_case.py $(PYTEST_OPTS)
+
+test-unit-city-delete:
+	$(UV) run pytest $(TEST_PATH)unit/city/test_city_delete_use_case.py $(PYTEST_OPTS)
+
+test-unit-city-filter:
+	$(UV) run pytest $(TEST_PATH)unit/city/test_city_filter_use_case.py $(PYTEST_OPTS)
+
 test-e2e:
 	$(UV) run pytest $(TEST_PATH)e2e/ $(PYTEST_OPTS)
 
@@ -207,6 +228,13 @@ help:
 	@echo "  test-unit-auth-refresh - Tests unitaires refresh token"
 	@echo "  test-unit-auth-current-user - Tests unitaires current user"
 	@echo "  test-unit-auth-logout - Tests unitaires logout"
+	@echo "  test-unit-city       - Tests unitaires city"
+	@echo "  test-unit-city-create - Tests unitaires city create"
+	@echo "  test-unit-city-update - Tests unitaires city update"
+	@echo "  test-unit-city-get    - Tests unitaires city get"
+	@echo "  test-unit-city-get-all - Tests unitaires city get_all"
+	@echo "  test-unit-city-delete - Tests unitaires city delete"
+	@echo "  test-unit-city-filter - Tests unitaires city filter"
 	@echo "  test-e2e             - Tests end-to-end"
 	@echo "  test-api             - Tests API"
 	@echo "  test-cov             - Tests avec couverture"
@@ -232,4 +260,4 @@ help:
 	@echo "  clean                - Nettoyer les fichiers Python"
 	@echo "  gen-keys             - Générer les clés JWT"
 
-.PHONY: install add-package add-dev-package run start test test-unit test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-e2e test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb
+.PHONY: install add-package add-dev-package run start test test-unit test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-unit-city test-unit-city-create test-unit-city-update test-unit-city-get test-unit-city-get-all test-unit-city-delete test-unit-city-filter test-e2e test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb

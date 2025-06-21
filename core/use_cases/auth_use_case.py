@@ -190,6 +190,9 @@ class AuthUseCase:
                 await self.jwt_service.revoke_token(jti, exp_time)
 
             return None
+        except UnauthorizedException as e:
+            self.logger.warning(f"Token logout failed: {e}")
+            raise UnauthorizedException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during logout {e}")
             raise InternalServerErrorException(cause=e)
