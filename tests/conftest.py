@@ -1,63 +1,48 @@
-import os
-import uuid
-
-import django
-
-# Configurez Django avant d'importer des modules qui en dépendent
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-django.setup()
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
-from django.contrib.auth import get_user_model
+from tortoise import Tortoise
 
-from core.domain.entities.user_entity import UserEntity
-from infrastructure.db.django_user_repository import DjangoUserRepository
-from infrastructure.external_services.jwt_service import JWTService
-
-User = get_user_model()
+from core.entities.user import UserEntity
 
 
 @pytest.fixture
-def user_repository():
-    return DjangoUserRepository()
-
-
-@pytest.fixture
-def jwt_service():
-    return JWTService()
-
-
-@pytest.fixture
-def test_user(db):
-    """Create a test user in the database."""
-    user = User.objects.create_user(
-        email="testuser@example.com", password="testpassword"
-    )
-    return user
-
-
-@pytest.fixture
-def test_user_entity():
-    """Return a test user entity without saving to the database."""
+def sample_user():
+    """Utilisateur de test - fixture globale"""
     return UserEntity(
-        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
-        email="testuser@example.com",
-        password="",
-        active=True,
-        updated_by=None,
-        created_at=None,
-        updated_at=None,
+        id=1,
+        email="test@example.com",
+        password="hashed_password",
+        created_at=datetime.now(ZoneInfo("UTC")),
+        updated_at=datetime.now(ZoneInfo("UTC")),
     )
 
 
-@pytest.fixture
-def auth_tokens(test_user, jwt_service):
-    """Generate authentication tokens for a test user."""
-    access_token, refresh_token = jwt_service.generate_tokens(str(test_user.id))
-    return {"access_token": access_token, "refresh_token": refresh_token}
-
-
-@pytest.fixture
-def auth_header(auth_tokens):
-    """Return an Authorization header with a bearer token."""
-    return {"Authorization": f"Bearer {auth_tokens['access_token']}"}
+@pytest.fixture(scope="function", autouse=True)
+async def initialize_db():
+    """
+    Initialise la base de données pour les tests.
+    """
+    await Tortoise.init(
+        db_url="sqlite://:memory:",
+        modules={
+            "models": [
+                "apps.tortoise.user",
+                "apps.tortoise.region",
+                "apps.tortoise.city",
+                "apps.tortoise.establishment_type",
+                "apps.tortoise.establishment",
+                "apps.tortoise.domain",
+                "apps.tortoise.level",
+                "apps.tortoise.mention",
+                "apps.tortoise.rate",
+                "apps.tortoise.formation_authorization",
+                "apps.tortoise.formation",
+                "apps.tortoise.annual_headcount",
+            ]
+        },
+    )
+    await Tortoise.generate_schemas()
+    yield
+    await Tortoise.close_connections()

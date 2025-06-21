@@ -23,3 +23,9 @@ dependencies = [
 tortoise_orm = "config.settings.TORTOISE_ORM"
 location = "./apps/migrations"
 src_folder = "./."
+
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=1.0.0",
+    "pytest-cov>=6.2.1",
+]

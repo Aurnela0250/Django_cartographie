@@ -89,6 +89,8 @@ class AuthUseCase:
         except UnauthorizedException as e:
             self.logger.warning(f"Login failed for user {login}: {e}")
             raise UnauthorizedException(cause=e)
+        except InternalServerErrorException as e:
+            raise e
         except Exception as e:
             self.logger.warning(f"Unexpected error during login {e}")
             raise InternalServerErrorException(cause=e)
