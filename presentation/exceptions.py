@@ -5,7 +5,7 @@ from fastapi import status
 
 from config import settings
 from presentation.constants import errors_code, errors_message
-from presentation.schemas.error_schema import ErrorCategory, ErrorDetailSchema
+from presentation.schemas.error import ErrorCategory, ErrorDetailSchema
 
 # =============================================
 # CONFIGURATION ET LOGGING

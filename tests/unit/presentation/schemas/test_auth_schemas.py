@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from presentation.schemas.auth_schema import Login, Token, TokenData, TokenPayload
+from presentation.schemas.auth import Login, Token, TokenData, TokenPayload
 
 
 @pytest.mark.unit
@@ -46,7 +46,7 @@ class TestAuthSchemas:
             Token(
                 access_token="access_token_value", refresh_token="refresh_token_value"
             )
-            
+
         # Test avec seulement access_token et token_type (refresh_token est optionnel)
         token = Token(access_token="access_token_value", token_type="bearer")
         assert token.access_token == "access_token_value"

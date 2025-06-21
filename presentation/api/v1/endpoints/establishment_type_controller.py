@@ -1,175 +1,213 @@
-from ninja import Query
-from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from typing import Annotated
 
-from core.domain.entities.establishment_type_entity import EstablishmentTypeEntity
-from core.domain.entities.pagination import PaginationParams
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, Path, Query
+
+from core.container.container import Container
+from core.entities.establishment_type import EstablishmentTypeEntity
+from core.entities.filters import EstablishmentTypeFilters
+from core.entities.pagination import PaginationParams
+from core.entities.user import UserEntity
 from core.use_cases.establishment_type_use_case import EstablishmentTypeUseCase
-from infrastructure.cache.cache_service import CacheService
-from infrastructure.cache.cache_utils import cache_response
-from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
-from infrastructure.external_services.jwt_service import jwt_auth
+from presentation.dependencies.auth_dependencies import get_current_user
 from presentation.exceptions import (
-    ConflictError,
-    DatabaseError,
-    InternalServerError,
-    NotFoundError,
-    ValidationError,
+    ConflictException,
+    InternalServerErrorException,
+    NotFoundException,
 )
-from presentation.schemas.establishment_type_schema import (
-    CreateEstablishmentTypeSchema,
+from presentation.schemas.establishment_type import (
     EstablishmentTypeSchema,
+    CreateEstablishmentTypeSchema,
     UpdateEstablishmentTypeSchema,
 )
-from presentation.schemas.pagination_schema import (
+from presentation.schemas.pagination import (
     PaginatedResultSchema,
     PaginationParamsSchema,
 )
 
+router = APIRouter(
+    prefix="/establishment-types",
+    tags=["Establishment Types"],
+)
 
-@api_controller("/establishment-types", tags=["Establishment Types"], auth=jwt_auth)
-class EstablishmentTypeController:
-    def __init__(self):
-        self.unit_of_work = DjangoUnitOfWork()
-        self.establishment_type_use_case = EstablishmentTypeUseCase(self.unit_of_work)
-        from infrastructure.external_services.redis_service import RedisService
 
-        self.redis_service = RedisService()
-        self.cache_service = CacheService(
-            redis_service=self.redis_service,
-            entity_name="establishment_type",
+@router.post(
+    "/",
+    response_model=EstablishmentTypeSchema,
+    status_code=201,
+)
+@inject
+async def create(
+    *,
+    establishment_type_data: CreateEstablishmentTypeSchema,
+    establishment_type_use_case: EstablishmentTypeUseCase = Depends(
+        Provide[Container.establishment_type_use_case]
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        entity = EstablishmentTypeEntity(
+            **establishment_type_data.model_dump(),
+            created_by=user.id,
         )
+        created = await establishment_type_use_case.create(entity)
+        return EstablishmentTypeSchema.model_validate(created)
+    except ConflictException as e:
+        raise e
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
 
-    @http_post(
-        "",
-        response={201: EstablishmentTypeSchema},
-    )
-    def create_establishment_type(
-        self,
-        request,
-        establishment_type_data: CreateEstablishmentTypeSchema,
-    ):
-        """Create a new establishment type"""
-        try:
-            entity_data = EstablishmentTypeEntity(
-                **establishment_type_data.model_dump(),
-                created_by=request.auth.get("user_id")
-            )
 
-            establishment_type = (
-                self.establishment_type_use_case.create_establishment_type(entity_data)
-            )
-            return 201, EstablishmentTypeSchema.from_orm(establishment_type)
-        except ConflictError as e:
-            raise e
-        except ValidationError as e:
-            raise e
-        except DatabaseError as e:
-            raise e
-        except Exception:
-            raise InternalServerError()
-
-    @http_get(
-        "/{establishment_type_id}",
-        response=EstablishmentTypeSchema,
-    )
-    @cache_response(
-        cache_type="item",
-        cache_service=lambda self, *a, **kw: self.cache_service,
-        schema_type=EstablishmentTypeSchema,
-        get_id=lambda self, establishment_type_id, **kwargs: establishment_type_id,
-    )
-    def get_establishment_type(self, establishment_type_id: int):
-        establishment_type = self.establishment_type_use_case.get_establishment_type(
+@router.get(
+    "/{establishment_type_id}/",
+    response_model=EstablishmentTypeSchema,
+    status_code=200,
+)
+@inject
+async def get(
+    *,
+    establishment_type_id: int = Path(
+        ...,
+        title="ID du type d'établissement",
+        gt=0,
+    ),
+    establishment_type_use_case: EstablishmentTypeUseCase = Depends(
+        Provide[Container.establishment_type_use_case]
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        establishment_type = await establishment_type_use_case.get(
             establishment_type_id
         )
-        return EstablishmentTypeSchema.from_orm(establishment_type)
+        return EstablishmentTypeSchema.model_validate(establishment_type)
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
 
-    @http_put(
-        "/{establishment_type_id}",
-        response=EstablishmentTypeSchema,
+
+@router.get(
+    "/",
+    response_model=PaginatedResultSchema[EstablishmentTypeSchema],
+    status_code=200,
+)
+@inject
+async def get_all(
+    *,
+    pagination: Annotated[
+        PaginationParamsSchema,
+        Query(),
+    ],
+    establishment_type_use_case: EstablishmentTypeUseCase = Depends(
+        Provide[Container.establishment_type_use_case]
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page,
+        per_page=pagination.per_page,
     )
-    def update_establishment_type(
-        self,
-        request,
-        establishment_type_id: int,
-        establishment_type_data: UpdateEstablishmentTypeSchema,
-    ):
-        """Update an existing establishment type"""
-        try:
-            # Get the existing establishment type first
-            current_establishment_type = (
-                self.establishment_type_use_case.get_establishment_type(
-                    establishment_type_id
-                )
-            )
-
-            # Update with new data, keeping existing values for fields not in the update
-            update_data = current_establishment_type.model_dump()
-            update_data.update(establishment_type_data.model_dump(exclude_unset=True))
-            update_data["updated_by"] = request.auth.get("user_id")
-
-            entity_to_update = EstablishmentTypeEntity(**update_data)
-
-            updated_establishment_type = (
-                self.establishment_type_use_case.update_establishment_type(
-                    establishment_type_id, entity_to_update
-                )
-            )
-            return EstablishmentTypeSchema.from_orm(updated_establishment_type)
-        except NotFoundError as e:
-            raise e
-        except ConflictError as e:
-            raise e
-        except ValidationError as e:
-            raise e
-        except DatabaseError as e:
-            raise e
-        except Exception:
-            raise InternalServerError()
-
-    @http_delete(
-        "/{establishment_type_id}",
-        response={204: None},
+    result = await establishment_type_use_case.get_all(pagination_params)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        EstablishmentTypeSchema,
+        EstablishmentTypeSchema.model_validate,
     )
-    def delete_establishment_type(self, establishment_type_id: int):
-        """Delete an establishment type"""
-        try:
-            self.establishment_type_use_case.delete_establishment_type(
-                establishment_type_id
-            )
-            return 204, None
-        except NotFoundError as e:
-            raise e
-        except Exception:
-            raise InternalServerError()
 
-    @http_get(
-        "",
-        response=PaginatedResultSchema[EstablishmentTypeSchema],
-    )
-    @cache_response(
-        cache_type="list",
-        cache_service=lambda self, *a, **kw: self.cache_service,
-        schema_type=PaginatedResultSchema[EstablishmentTypeSchema],
-        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
-            page=pagination.page, per_page=pagination.per_page
-        ),
-    )
-    def get_all_establishment_types(
-        self,
-        request,
-        pagination: Query[PaginationParamsSchema],
-    ):
-        pagination_params = PaginationParams(
-            page=pagination.page, per_page=pagination.per_page
+
+@router.put(
+    "/{establishment_type_id}/",
+    response_model=EstablishmentTypeSchema,
+    status_code=200,
+)
+@inject
+async def update(
+    *,
+    establishment_type_id: int = Path(
+        ...,
+        title="ID du type d'établissement",
+        gt=0,
+    ),
+    establishment_type_data: UpdateEstablishmentTypeSchema,
+    establishment_type_use_case: EstablishmentTypeUseCase = Depends(
+        Provide[Container.establishment_type_use_case]
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        entity = EstablishmentTypeEntity(
+            **establishment_type_data.model_dump(),
+            updated_by=user.id,
         )
-        establishment_types = (
-            self.establishment_type_use_case.get_all_establishment_types(
-                pagination_params
-            )
+        updated = await establishment_type_use_case.update(
+            establishment_type_id,
+            entity,
         )
-        return PaginatedResultSchema.from_domain_result(
-            establishment_types,
-            EstablishmentTypeSchema,
-            EstablishmentTypeSchema.model_validate,
-        )
+        return EstablishmentTypeSchema.model_validate(updated)
+    except ConflictException as e:
+        raise ConflictException(cause=e)
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
+
+
+@router.delete(
+    "/{establishment_type_id}/",
+    response_model=None,
+    status_code=204,
+)
+@inject
+async def delete(
+    *,
+    establishment_type_id: int = Path(
+        ...,
+        title="ID du type d'établissement",
+        gt=0,
+    ),
+    establishment_type_use_case: EstablishmentTypeUseCase = Depends(
+        Provide[Container.establishment_type_use_case]
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        await establishment_type_use_case.delete(establishment_type_id)
+        return None
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
+
+
+@router.get(
+    "/filter/",
+    response_model=PaginatedResultSchema[EstablishmentTypeSchema],
+    status_code=200,
+)
+@inject
+async def filter(
+    *,
+    pagination: Annotated[
+        PaginationParamsSchema,
+        Query(),
+    ],
+    filters: Annotated[
+        EstablishmentTypeFilters,
+        Query(),
+    ],
+    establishment_type_use_case: EstablishmentTypeUseCase = Depends(
+        Provide[Container.establishment_type_use_case]
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page,
+        per_page=pagination.per_page,
+    )
+    result = await establishment_type_use_case.filter(pagination_params, filters)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        EstablishmentTypeSchema,
+        EstablishmentTypeSchema.model_validate,
+    )

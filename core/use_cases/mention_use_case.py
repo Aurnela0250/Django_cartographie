@@ -3,7 +3,7 @@ import logging
 from tortoise.transactions import atomic
 
 from core.entities.filters import MentionFilters
-from core.entities.mention_entity import MentionEntity
+from core.entities.mention import MentionEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.mention_repository import IMentionRepository
 from presentation.exceptions import (

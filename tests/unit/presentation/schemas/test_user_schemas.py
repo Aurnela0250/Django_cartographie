@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from presentation.schemas.user_schema import UserBase, UserCreate, UserOut
+from presentation.schemas.user import UserBase, UserCreate, UserOut
 
 
 @pytest.mark.unit

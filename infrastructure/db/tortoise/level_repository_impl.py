@@ -4,7 +4,7 @@ from uuid import UUID
 
 from apps.tortoise.level.models import Level as TortoiseLevel
 from core.entities.filters import LevelFilters
-from core.entities.level_entity import LevelEntity
+from core.entities.level import LevelEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.level_repository import ILevelRepository
 from infrastructure.db.tortoise.model_to_entity import level_to_entity

@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from apps.tortoise.domain.models import Domain as TortoiseDomain
-from core.entities.domain_entity import DomainEntity
+from core.entities.domain import DomainEntity
 from core.entities.filters import DomainFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.domain_repository import IDomainRepository

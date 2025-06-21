@@ -5,7 +5,7 @@ from uuid import UUID
 from apps.tortoise.user.models import User as TortoiseUser
 from core.entities.filters import UserFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
-from core.entities.user_entity import UserEntity
+from core.entities.user import UserEntity
 from core.interfaces.user_repository import IUserRepository
 from infrastructure.db.tortoise.model_to_entity import user_to_entity
 

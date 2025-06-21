@@ -3,7 +3,7 @@ import logging
 from tortoise.transactions import atomic
 
 from core.entities.filters import LevelFilters
-from core.entities.level_entity import LevelEntity
+from core.entities.level import LevelEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.level_repository import ILevelRepository
 from presentation.exceptions import (

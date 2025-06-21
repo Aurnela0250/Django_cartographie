@@ -5,7 +5,7 @@ from uuid import UUID
 from apps.tortoise.region.models import Region as TortoiseRegion
 from core.entities.filters import RegionFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
-from core.entities.region_entity import RegionEntity
+from core.entities.region import RegionEntity
 from core.interfaces.region_repository import IRegionRepository
 from infrastructure.db.tortoise.model_to_entity import region_to_entity
 

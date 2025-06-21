@@ -10,15 +10,15 @@ from apps.levels.models import Level
 from apps.mentions.models import Mention
 from apps.rate.models import Rate
 from apps.sector.models import Sector
-from core.entities.city_entity import CityEntity
-from core.entities.establishment_entity import EstablishmentEntity
-from core.entities.formation_authorization_entity import (
+from core.entities.city import CityEntity
+from core.entities.establishment import EstablishmentEntity
+from core.entities.formation_authorization import (
     FormationAuthorizationEntity,
 )
-from core.entities.formation_entity import AnnualHeadCountEntity, FormationEntity
-from core.entities.level_entity import LevelEntity
-from core.entities.mention_entity import MentionEntity
-from core.entities.rate_entity import RateEntity
+from core.entities.formation import AnnualHeadCountEntity, FormationEntity
+from core.entities.level import LevelEntity
+from core.entities.mention import MentionEntity
+from core.entities.rate import RateEntity
 from core.entities.sector_entity import SectorEntity
 from core.interfaces.establishment_type_repository import EstablishmentTypeEntity
 

@@ -5,7 +5,7 @@ from uuid import UUID
 from apps.tortoise.establishment_type.models import (
     EstablishmentType as TortoiseEstablishmentType,
 )
-from core.entities.establishment_type_entity import EstablishmentTypeEntity
+from core.entities.establishment_type import EstablishmentTypeEntity
 from core.entities.filters import EstablishmentTypeFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.establishment_type_repository import IEstablishmentTypeRepository

@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-from core.entities.rate_entity import RateEntity
+from core.entities.rate import RateEntity
 from core.interfaces.base_repository import BaseRepository
 
 

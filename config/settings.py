@@ -53,12 +53,11 @@ TORTOISE_ORM = {
                 "apps.tortoise.establishment_type.models",
                 "apps.tortoise.formation.models",
                 "apps.tortoise.formation_authorization.models",
-                "apps.tortoise.levels.models",
-                "apps.tortoise.mentions.models",
+                "apps.tortoise.level.models",
+                "apps.tortoise.mention.models",
                 "apps.tortoise.rate.models",
                 "apps.tortoise.region.models",
-                "apps.tortoise.sector.models",
-                "apps.tortoise.users.models",
+                "apps.tortoise.user.models",
             ],
             "default_connection": "default",
         },
@@ -261,7 +260,7 @@ LOGGING = {
 # JWT configuration
 JWT_ISSUER = os.getenv("JWT_ISSUER", "lemon-app")
 JWT_AUDIENCE = os.getenv("JWT_AUDIENCE", "lemon-users")
-JWT_ALGORITHM = "RS256"  # Changement crucial: utiliser RS256 au lieu de HS256
+JWT_ALGORITHM = "RS256"
 
 # Durée de vie des tokens
 ACCESS_TOKEN_LIFETIME = timedelta(hours=2)

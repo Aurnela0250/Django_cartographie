@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from core.entities.user_entity import UserEntity
+from core.entities.user import UserEntity
 from core.interfaces.base_repository import BaseRepository
 
 

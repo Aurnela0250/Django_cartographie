@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Optional
 
 from core.entities.filters import LevelFilters
-from core.entities.level_entity import LevelEntity
+from core.entities.level import LevelEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository
 

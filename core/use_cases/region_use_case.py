@@ -4,7 +4,7 @@ from tortoise.transactions import atomic
 
 from core.entities.filters import RegionFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
-from core.entities.region_entity import RegionEntity
+from core.entities.region import RegionEntity
 from core.interfaces.region_repository import IRegionRepository
 from presentation.exceptions import (
     ConflictException,
@@ -16,7 +16,10 @@ from presentation.exceptions import (
 class RegionUseCase:
     """Cas d'utilisation pour les opérations CRUD sur les régions"""
 
-    def __init__(self, region_repository: IRegionRepository):
+    def __init__(
+        self,
+        region_repository: IRegionRepository,
+    ):
         self.region_repository = region_repository
         self.logger = logging.getLogger(__name__)
 

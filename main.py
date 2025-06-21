@@ -4,8 +4,8 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Optional
-from presentation.api.v1.endpoints.auth_controller import router as auth_router
-from fastapi import FastAPI, HTTPException, Request
+
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse  # Retrait de Depends
 
@@ -14,13 +14,15 @@ from config.settings import TORTOISE_ORM
 
 # Importer les fonctions d'initialisation de Tortoise ORM et la configuration
 from config.tortoise_init import close_tortoise, init_tortoise
+from core.container.container import Container
+from presentation.api.v1.router import v1_router
 from presentation.constants import errors_code
 from presentation.exceptions import (
     APIException,
     InternalServerErrorException,
     UnprocessableEntityException,
 )
-from presentation.schemas.error_schema import (
+from presentation.schemas.error import (
     ErrorCategory,
     ErrorDetailSchema,
     ErrorResponseSchema,
@@ -65,11 +67,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+container = Container()
+
 # =============================================
 # GESTIONNAIRES D'EXCEPTIONS
 # =============================================
-
-app = FastAPI(title="API avec Gestion d'Erreurs Structurée")
 
 
 @app.middleware("http")
@@ -165,7 +167,7 @@ async def handle_api_exception(request: Request, exc: APIException):
 
         return JSONResponse(
             status_code=exc.status_code,
-            content=error_content.model_dump(exclude_none=True),
+            content=error_content.model_dump(mode="json", exclude_none=True),
         )
     except Exception as handler_error:
         logger.critical(
@@ -249,33 +251,4 @@ async def read_root():
     }
 
 
-# @app.get("/items/{item_id}")
-# async def read_item(item_id: int, q: Union[str, None] = None):
-#     return {"item_id": item_id, "q": q}
-
-items = {"foo": "The Foo Wrestlers"}
-
-
-@app.get("/items/{item_id}")
-async def read_item(item_id: str):
-    if item_id not in items:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return {"item": items[item_id]}
-
-
-@app.get("/health")
-async def health_check():  # Retirer la dépendance de session SQLModel
-    """Health check endpoint that tests database connectivity (using Tortoise ORM)."""
-    try:
-        # Test database connection avec Tortoise ORM
-
-        return {
-            "status": "healthy",
-            "database": "connected (Tortoise ORM)",
-            "message": "All systems operational",
-        }
-    except Exception as e:
-        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
-
-
-app.include_router(auth_router, prefix="/api")
+app.include_router(v1_router)

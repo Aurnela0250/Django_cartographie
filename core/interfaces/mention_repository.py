@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from core.entities.filters import MentionFilters
-from core.entities.mention_entity import MentionEntity
+from core.entities.mention import MentionEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository
 

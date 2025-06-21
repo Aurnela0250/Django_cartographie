@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 import jwt
 
 from config import settings
-from core.entities.token_entity import Payload, Token
+from core.entities.token import Payload, Token
 from infrastructure.external_services.redis_service import RedisService
 from presentation.constants import errors_code
 from presentation.exceptions import (

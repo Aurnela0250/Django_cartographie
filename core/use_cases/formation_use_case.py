@@ -3,7 +3,7 @@ import logging
 from tortoise.transactions import atomic
 
 from core.entities.filters import FormationFilters
-from core.entities.formation_entity import FormationEntity
+from core.entities.formation import FormationEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.formation_repository import IFormationRepository
 from presentation.exceptions import (

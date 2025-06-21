@@ -1,9 +1,11 @@
 import logging
+from uuid import UUID
 
 from tortoise.exceptions import DoesNotExist
 
 from apps.tortoise.user.models import User as TortoiseUser
-from core.entities.user_entity import UserEntity
+from core.entities.pagination import PaginatedResult, PaginationParams
+from core.entities.user import UserEntity
 from core.interfaces.auth_repository import IAuthRepository
 from infrastructure.db.tortoise.model_to_entity import user_to_entity
 
@@ -136,3 +138,28 @@ class AuthRepository(IAuthRepository):
             raise RuntimeError(
                 f"Erreur lors de la suppression de l'utilisateur: {str(e)}"
             )
+
+    async def create(self, data: UserEntity) -> UserEntity:
+        raise NotImplementedError
+
+    async def get(self, id: UUID | int) -> UserEntity | None:
+        raise NotImplementedError
+
+    async def get_all(
+        self, pagination_params: PaginationParams
+    ) -> PaginatedResult[UserEntity]:
+        raise NotImplementedError
+
+    async def update(self, id: UUID | int, data: UserEntity) -> UserEntity:
+        raise NotImplementedError
+
+    async def delete(self, id: UUID | int) -> bool:
+        raise NotImplementedError
+
+    async def filter(
+        self, pagination_params: PaginationParams, **kwargs
+    ) -> PaginatedResult[UserEntity]:
+        raise NotImplementedError
+
+    async def count(self, **kwargs) -> int:
+        raise NotImplementedError

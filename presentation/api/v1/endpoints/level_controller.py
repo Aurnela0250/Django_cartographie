@@ -1,200 +1,180 @@
-import logging
+from typing import Annotated
 
-from ninja import Query
-from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
-from pydantic import ValidationError as PydanticValidationError
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, Path, Query
 
-from core.domain.entities.level_entity import LevelEntity
-from core.domain.entities.pagination import PaginationParams
+from core.container.container import Container
+from core.entities.filters import LevelFilters
+from core.entities.level import LevelEntity
+from core.entities.pagination import PaginationParams
+from core.entities.user import UserEntity
 from core.use_cases.level_use_case import LevelUseCase
-from infrastructure.cache.cache_service import CacheService
-from infrastructure.cache.cache_utils import cache_response
-from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
-from infrastructure.external_services.jwt_service import jwt_auth
+from presentation.dependencies.auth_dependencies import get_current_user
 from presentation.exceptions import (
-    ConflictError,
-    InternalServerError,
-    NotFoundError,
-    ValidationError,
+    ConflictException,
+    InternalServerErrorException,
+    NotFoundException,
 )
-from presentation.schemas.error_schema import ErrorResponseSchema
-from presentation.schemas.level_schema import LevelCreate, LevelOut, LevelUpdate
-from presentation.schemas.pagination_schema import (
+from presentation.schemas.level import (
+    CreateLevelSchema,
+    LevelSchema,
+    UpdateLevelSchema,
+)
+from presentation.schemas.pagination import (
     PaginatedResultSchema,
     PaginationParamsSchema,
 )
 
+router = APIRouter(
+    prefix="/levels",
+    tags=["Levels"],
+)
 
-@api_controller("/levels", tags=["Levels"])
-class LevelController:
-    """Controller for managing levels"""
 
-    def __init__(self):
-        self.unit_of_work = DjangoUnitOfWork()
-        self.level_use_case = LevelUseCase(self.unit_of_work)
-        self.logger = logging.getLogger(__name__)
-        self.redis_service = None
-        self.cache_service = None
-        try:
-            from infrastructure.external_services.redis_service import RedisService
+@router.post(
+    "/",
+    response_model=LevelSchema,
+    status_code=201,
+)
+@inject
+async def create(
+    *,
+    level_data: CreateLevelSchema,
+    level_use_case: LevelUseCase = Depends(Provide[Container.level_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        entity = LevelEntity(**level_data.model_dump(), created_by=user.id)
+        created = await level_use_case.create(entity)
+        return LevelSchema.model_validate(created)
+    except ConflictException as e:
+        raise e
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
 
-            self.redis_service = RedisService()
-            self.cache_service = CacheService(
-                redis_service=self.redis_service,
-                entity_name="level",
-                logger=self.logger,
-            )
-        except Exception as e:
-            self.logger.error(f"Redis/CacheService init failed: {e}")
 
-    @http_get(
-        "",
-        response={
-            200: PaginatedResultSchema[LevelOut],
-            500: ErrorResponseSchema,
-        },
-        auth=jwt_auth,
-        summary="Retrieve all levels",
-        description="Returns a list of all available levels with pagination",
+@router.get(
+    "/{level_id}/",
+    response_model=LevelSchema,
+    status_code=200,
+)
+@inject
+async def get(
+    *,
+    level_id: int = Path(..., title="ID du niveau", gt=0),
+    level_use_case: LevelUseCase = Depends(Provide[Container.level_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        level = await level_use_case.get(level_id)
+        return LevelSchema.model_validate(level)
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
+
+
+@router.get(
+    "/",
+    response_model=PaginatedResultSchema[LevelSchema],
+    status_code=200,
+)
+@inject
+async def get_all(
+    *,
+    pagination: Annotated[
+        PaginationParamsSchema,
+        Query(),
+    ],
+    level_use_case: LevelUseCase = Depends(Provide[Container.level_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page, per_page=pagination.per_page
     )
-    @cache_response(
-        cache_type="list",
-        cache_service=lambda self, *a, **kw: self.cache_service,
-        schema_type=PaginatedResultSchema[LevelOut],
-        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
-            page=pagination.page, per_page=pagination.per_page
-        ),
+    result = await level_use_case.get_all(pagination_params)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        LevelSchema,
+        LevelSchema.model_validate,
     )
-    def get_all_levels(
-        self,
-        request,
-        pagination: Query[PaginationParamsSchema],
-    ):
-        """Retrieves all levels with pagination (page=1 and per_page=10 by default)"""
-        pagination_params = PaginationParams(
-            page=pagination.page, per_page=pagination.per_page
+
+
+@router.put(
+    "/{level_id}/",
+    response_model=LevelSchema,
+    status_code=200,
+)
+@inject
+async def update(
+    *,
+    level_id: int = Path(..., title="ID du niveau", gt=0),
+    level_data: UpdateLevelSchema,
+    level_use_case: LevelUseCase = Depends(Provide[Container.level_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        entity = LevelEntity(
+            **level_data.model_dump(),
+            updated_by=user.id,
         )
-        result = self.level_use_case.get_all_levels(pagination_params)
-        return PaginatedResultSchema.from_domain_result(
-            result, LevelOut, LevelOut.model_validate
-        )
+        updated = await level_use_case.update(level_id, entity)
+        return LevelSchema.model_validate(updated)
+    except ConflictException as e:
+        raise ConflictException(cause=e)
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
 
-    @http_get(
-        "/{level_id}",
-        response={200: LevelOut, 404: ErrorResponseSchema, 500: ErrorResponseSchema},
-        auth=jwt_auth,
-        summary="Retrieve a level by its ID",
-        description="Returns the details of a level specified by its ID",
+
+@router.delete(
+    "/{level_id}/",
+    response_model=None,
+    status_code=204,
+)
+@inject
+async def delete(
+    *,
+    level_id: int = Path(..., title="ID du niveau", gt=0),
+    level_use_case: LevelUseCase = Depends(Provide[Container.level_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        await level_use_case.delete(level_id)
+        return None
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
+
+
+@router.get(
+    "/filter/",
+    response_model=PaginatedResultSchema[LevelSchema],
+    status_code=200,
+)
+@inject
+async def filter(
+    *,
+    pagination: Annotated[
+        PaginationParamsSchema,
+        Query(),
+    ],
+    filters: Annotated[
+        LevelFilters,
+        Query(),
+    ],
+    level_use_case: LevelUseCase = Depends(Provide[Container.level_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page,
+        per_page=pagination.per_page,
     )
-    @cache_response(
-        cache_type="item",
-        cache_service=lambda self, *a, **kw: self.cache_service,
-        schema_type=LevelOut,
-        get_id=lambda self, request, level_id, **kwargs: level_id,
+    result = await level_use_case.filter(pagination_params, filters)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        LevelSchema,
+        LevelSchema.model_validate,
     )
-    def get_level(self, request, level_id: int):
-        """Retrieves a level by its ID"""
-        level = self.level_use_case.get_level(level_id)
-        return LevelOut.model_validate(level)
-
-    @http_post(
-        "",
-        response={
-            201: LevelOut,
-            409: ErrorResponseSchema,
-            422: ErrorResponseSchema,
-            500: ErrorResponseSchema,
-        },
-        auth=jwt_auth,
-        summary="Create a new level",
-        description="Creates a new level with the provided data",
-    )
-    def create_level(self, request, level_data: LevelCreate):
-        """Creates a new level"""
-        try:
-            level_entity = LevelEntity(
-                **level_data.model_dump(),
-                created_by=request.user.id,
-            )
-            created_level = self.level_use_case.create_level(level_entity)
-            return 201, LevelOut.model_validate(created_level)
-        except PydanticValidationError as e:
-            self.logger.warning(f"Validation error during level creation: {str(e)}")
-            raise ValidationError(e)
-        except ConflictError:
-            self.logger.warning("Conflict error during level creation")
-            raise
-        except Exception as e:
-            self.logger.error(f"Error creating level: {str(e)}")
-            raise InternalServerError()
-
-    @http_put(
-        "/{level_id}",
-        response={
-            200: LevelOut,
-            404: ErrorResponseSchema,
-            409: ErrorResponseSchema,
-            422: ErrorResponseSchema,
-            500: ErrorResponseSchema,
-        },
-        auth=jwt_auth,
-        summary="Update a level",
-        description="Updates the data of an existing level",
-    )
-    def update_level(self, request, level_id: int, level_data: LevelUpdate):
-        """Updates an existing level"""
-        try:
-            # First, retrieve the existing level
-            existing_level = self.level_use_case.get_level(level_id)
-
-            # Update only the provided fields
-            update_data = LevelEntity(
-                id=existing_level.id,
-                name=(
-                    level_data.name
-                    if level_data.name is not None
-                    else existing_level.name
-                ),
-                acronyme=(
-                    level_data.acronyme
-                    if level_data.acronyme is not None
-                    else existing_level.acronyme
-                ),
-                created_at=existing_level.created_at,
-                created_by=existing_level.created_by,
-                updated_by=request.user.id,
-            )
-
-            updated_level = self.level_use_case.update_level(level_id, update_data)
-            return 200, LevelOut.model_validate(updated_level)
-        except NotFoundError:
-            self.logger.warning(f"Level with ID {level_id} not found for update")
-            raise
-        except PydanticValidationError as e:
-            self.logger.warning(f"Validation error during level update: {str(e)}")
-            raise ValidationError(e)
-        except ConflictError:
-            self.logger.warning("Conflict error during level update")
-            raise
-        except Exception as e:
-            self.logger.error(f"Error updating level {level_id}: {str(e)}")
-            raise InternalServerError()
-
-    @http_delete(
-        "/{level_id}",
-        response={204: None, 404: ErrorResponseSchema, 500: ErrorResponseSchema},
-        auth=jwt_auth,
-        summary="Delete a level",
-        description="Deletes an existing level by its ID",
-    )
-    def delete_level(self, request, level_id: int):
-        """Deletes a level"""
-        try:
-            self.level_use_case.delete_level(level_id)
-            return 204, None
-        except NotFoundError:
-            self.logger.warning(f"Level with ID {level_id} not found for deletion")
-            raise
-        except Exception as e:
-            self.logger.error(f"Error deleting level {level_id}: {str(e)}")
-            raise InternalServerError()

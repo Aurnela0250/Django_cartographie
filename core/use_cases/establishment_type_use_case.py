@@ -2,7 +2,7 @@ import logging
 
 from tortoise.transactions import atomic
 
-from core.entities.establishment_type_entity import EstablishmentTypeEntity
+from core.entities.establishment_type import EstablishmentTypeEntity
 from core.entities.filters import EstablishmentTypeFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.establishment_type_repository import IEstablishmentTypeRepository

@@ -18,18 +18,18 @@ from apps.tortoise.mention.models import Mention as TortoiseMention
 from apps.tortoise.rate.models import Rate as TortoiseRate
 from apps.tortoise.region.models import Region as TortoiseRegion
 from apps.tortoise.user.models import User as TortoiseUser
-from core.entities.annual_headcount_entity import AnnualHeadCountEntity
-from core.entities.city_entity import CityEntity
-from core.entities.domain_entity import DomainEntity
-from core.entities.establishment_entity import EstablishmentEntity
-from core.entities.establishment_type_entity import EstablishmentTypeEntity
-from core.entities.formation_authorization_entity import FormationAuthorizationEntity
-from core.entities.formation_entity import FormationEntity
-from core.entities.level_entity import LevelEntity
-from core.entities.mention_entity import MentionEntity
-from core.entities.rate_entity import RateEntity
-from core.entities.region_entity import RegionEntity
-from core.entities.user_entity import UserEntity
+from core.entities.annual_headcount import AnnualHeadCountEntity
+from core.entities.city import CityEntity
+from core.entities.domain import DomainEntity
+from core.entities.establishment import EstablishmentEntity
+from core.entities.establishment_type import EstablishmentTypeEntity
+from core.entities.formation_authorization import FormationAuthorizationEntity
+from core.entities.formation import FormationEntity
+from core.entities.level import LevelEntity
+from core.entities.mention import MentionEntity
+from core.entities.rate import RateEntity
+from core.entities.region import RegionEntity
+from core.entities.user import UserEntity
 from infrastructure.db.tortoise.metadata import (
     EstablishmentToEntityMetadata,
     FormationToEntityMetadata,

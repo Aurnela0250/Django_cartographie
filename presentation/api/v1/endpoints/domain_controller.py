@@ -1,167 +1,179 @@
-import logging
+from typing import Annotated
 
-from ninja import Query
-from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
-from pydantic import ValidationError as PydanticValidationError
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, Path, Query
 
-from core.domain.entities.domain_entity import DomainEntity
-from core.domain.entities.pagination import PaginationParams
+from core.container.container import Container
+from core.entities.domain import DomainEntity
+from core.entities.filters import DomainFilters
+from core.entities.pagination import PaginationParams
+from core.entities.user import UserEntity
 from core.use_cases.domain_use_case import DomainUseCase
-from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
-from infrastructure.external_services.jwt_service import jwt_auth
+from presentation.dependencies.auth_dependencies import get_current_user
 from presentation.exceptions import (
-    ConflictError,
-    InternalServerError,
-    NotFoundError,
-    ValidationError,
+    ConflictException,
+    InternalServerErrorException,
+    NotFoundException,
 )
-from presentation.schemas.domain_schema import DomainCreate, DomainOut, DomainUpdate
-from presentation.schemas.error_schema import ErrorResponseSchema
-from presentation.schemas.pagination_schema import (
+from presentation.schemas.domain import (
+    CreateDomainSchema,
+    DomainSchema,
+    UpdateDomainSchema,
+)
+from presentation.schemas.pagination import (
     PaginatedResultSchema,
     PaginationParamsSchema,
 )
 
+router = APIRouter(
+    prefix="/domains",
+    tags=["Domains"],
+)
 
-@api_controller("/domains", tags=["Domains"])
-class DomainController:
-    """Contrôleur pour la gestion des domaines"""
 
-    def __init__(self):
-        self.unit_of_work = DjangoUnitOfWork()
-        self.domain_use_case = DomainUseCase(self.unit_of_work)
-        self.logger = logging.getLogger(__name__)
+@router.post(
+    "/",
+    response_model=DomainSchema,
+    status_code=201,
+)
+@inject
+async def create(
+    *,
+    domain_data: CreateDomainSchema,
+    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        domain_entity = DomainEntity(**domain_data.model_dump(), created_by=user.id)
+        created_domain = await domain_use_case.create(domain_entity)
+        return DomainSchema.model_validate(created_domain)
+    except ConflictException as e:
+        raise e
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
 
-    @http_get(
-        "",
-        response={200: PaginatedResultSchema[DomainOut], 500: ErrorResponseSchema},
-        auth=jwt_auth,
-        summary="Récupérer tous les domaines",
-        description="Renvoie la liste de tous les domaines disponibles",
+
+@router.get(
+    "/{domain_id}/",
+    response_model=DomainSchema,
+    status_code=200,
+)
+@inject
+async def get(
+    *,
+    domain_id: int = Path(..., title="ID du domaine", gt=0),
+    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        domain = await domain_use_case.get(domain_id)
+        return DomainSchema.model_validate(domain)
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
+
+
+@router.get(
+    "/",
+    response_model=PaginatedResultSchema[DomainSchema],
+    status_code=200,
+)
+@inject
+async def get_all(
+    *,
+    pagination: Annotated[
+        PaginationParamsSchema,
+        Query(),
+    ],
+    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page, per_page=pagination.per_page
     )
-    def get_all_domains(
-        self,
-        request,
-        pagination: Query[PaginationParamsSchema],
-    ):
-        try:
-            pagination_params = PaginationParams(
-                page=pagination.page, per_page=pagination.per_page
-            )
-
-            domains = self.domain_use_case.get_all_domains(pagination_params)
-            return 200, PaginatedResultSchema.from_domain_result(
-                domains, DomainOut, DomainOut.model_validate
-            )
-        except Exception as e:
-            self.logger.error(f"Error retrieving all domains: {str(e)}")
-            raise InternalServerError()
-
-    @http_get(
-        "/{domain_id}",
-        response={200: DomainOut, 404: ErrorResponseSchema, 500: ErrorResponseSchema},
-        auth=jwt_auth,
-        summary="Récupérer un domaine par son ID",
-        description="Renvoie les détails d'un domaine spécifié par son ID",
+    result = await domain_use_case.get_all(pagination_params)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        DomainSchema,
+        DomainSchema.model_validate,
     )
-    def get_domain(self, request, domain_id: int):
-        try:
-            domain = self.domain_use_case.get_domain(domain_id)
-            return 200, DomainOut.model_validate(domain)
-        except NotFoundError as e:
-            self.logger.warning(f"Domain with ID {domain_id} not found")
-            raise e
-        except Exception as e:
-            self.logger.error(f"Error retrieving domain {domain_id}: {str(e)}")
-            raise InternalServerError()
 
-    @http_post(
-        "",
-        response={
-            201: DomainOut,
-            409: ErrorResponseSchema,
-            422: ErrorResponseSchema,
-            500: ErrorResponseSchema,
-        },
-        auth=jwt_auth,
-        summary="Créer un nouveau domaine",
-        description="Crée un nouveau domaine avec les données fournies",
+
+@router.put(
+    "/{domain_id}/",
+    response_model=DomainSchema,
+    status_code=200,
+)
+@inject
+async def update(
+    *,
+    domain_id: int = Path(..., title="ID du domaine", gt=0),
+    domain_data: UpdateDomainSchema,
+    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        domain_entity = DomainEntity(
+            **domain_data.model_dump(),
+            updated_by=user.id,
+        )
+        updated_domain = await domain_use_case.update(domain_id, domain_entity)
+        return DomainSchema.model_validate(updated_domain)
+    except ConflictException as e:
+        raise ConflictException(cause=e)
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
+
+
+@router.delete(
+    "/{domain_id}/",
+    response_model=None,
+    status_code=204,
+)
+@inject
+async def delete(
+    *,
+    domain_id: int = Path(..., title="ID du domaine", gt=0),
+    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        await domain_use_case.delete(domain_id)
+        return None
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
+
+
+@router.get(
+    "/filter/",
+    response_model=PaginatedResultSchema[DomainSchema],
+    status_code=200,
+)
+@inject
+async def filter(
+    *,
+    pagination: Annotated[
+        PaginationParamsSchema,
+        Query(),
+    ],
+    filters: Annotated[
+        DomainFilters,
+        Query(),
+    ],
+    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page, per_page=pagination.per_page
     )
-    def create_domain(self, request, domain_data: DomainCreate):
-        try:
-            # Mettre à jour created_by dans le dictionnaire avant l'instanciation
-            domain_dict = domain_data.model_dump()
-            domain_dict["created_by"] = request.user.id
-            domain_entity = DomainEntity(**domain_dict)
-
-            created_domain = self.domain_use_case.create_domain(domain_entity)
-            return 201, DomainOut.model_validate(created_domain)
-        except PydanticValidationError as e:
-            self.logger.warning(f"Validation error during domain creation: {str(e)}")
-            raise ValidationError(e)
-        except ConflictError as e:
-            self.logger.warning("Conflict error during domain creation")
-            raise e
-        except Exception as e:
-            self.logger.error(f"Error creating domain: {str(e)}")
-            raise InternalServerError()
-
-    @http_put(
-        "/{domain_id}",
-        response={
-            200: DomainOut,
-            404: ErrorResponseSchema,
-            409: ErrorResponseSchema,
-            422: ErrorResponseSchema,
-            500: ErrorResponseSchema,
-        },
-        auth=jwt_auth,
-        summary="Mettre à jour un domaine",
-        description="Met à jour les données d'un domaine existant",
+    result = await domain_use_case.filter(pagination_params, filters)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        DomainSchema,
+        DomainSchema.model_validate,
     )
-    def update_domain(self, request, domain_id: int, domain_data: DomainUpdate):
-        try:
-            existing_domain = self.domain_use_case.get_domain(domain_id)
-            update_data = DomainEntity(
-                id=existing_domain.id,
-                name=(
-                    domain_data.name
-                    if domain_data.name is not None
-                    else existing_domain.name
-                ),
-                created_at=existing_domain.created_at,
-                created_by=existing_domain.created_by,
-                updated_by=request.user.id,
-            )
-            updated_domain = self.domain_use_case.update_domain(domain_id, update_data)
-            return 200, DomainOut.model_validate(updated_domain)
-        except NotFoundError as e:
-            self.logger.warning(f"Domain with ID {domain_id} not found for update")
-            raise e
-        except PydanticValidationError as e:
-            self.logger.warning(f"Validation error during domain update: {str(e)}")
-            raise ValidationError(e)
-        except ConflictError:
-            self.logger.warning("Conflict error during domain update")
-            raise
-        except Exception as e:
-            self.logger.error(f"Error updating domain {domain_id}: {str(e)}")
-            raise InternalServerError()
-
-    @http_delete(
-        "/{domain_id}",
-        response={204: None, 404: ErrorResponseSchema, 500: ErrorResponseSchema},
-        auth=jwt_auth,
-        summary="Supprimer un domaine",
-        description="Supprime un domaine existant par son ID",
-    )
-    def delete_domain(self, request, domain_id: int):
-        try:
-            self.domain_use_case.delete_domain(domain_id)
-            return 204, None
-        except NotFoundError:
-            self.logger.warning(f"Domain with ID {domain_id} not found for deletion")
-            raise
-        except Exception as e:
-            self.logger.error(f"Error deleting domain {domain_id}: {str(e)}")
-            raise InternalServerError()

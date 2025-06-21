@@ -5,7 +5,7 @@ from uuid import UUID
 from tortoise.exceptions import DoesNotExist, FieldError
 
 from apps.tortoise.establishment.models import Establishment as TortoiseEstablishment
-from core.entities.establishment_entity import EstablishmentEntity
+from core.entities.establishment import EstablishmentEntity
 from core.entities.filters import EstablishmentFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.establishment_repository import IEstablishmentRepository

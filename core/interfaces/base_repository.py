@@ -13,7 +13,7 @@ T = TypeVar("T")
 class BaseRepository(Generic[T], ABC):
     @abstractmethod
     async def create(self, data: T) -> T:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     async def get(self, id: UUID | int) -> Optional[T]:

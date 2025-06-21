@@ -3,7 +3,7 @@ from typing import Optional
 
 from core.entities.filters import RegionFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
-from core.entities.region_entity import RegionEntity
+from core.entities.region import RegionEntity
 from core.interfaces.base_repository import BaseRepository
 
 

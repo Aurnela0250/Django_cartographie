@@ -2,7 +2,7 @@ import logging
 
 from tortoise.transactions import atomic
 
-from core.entities.domain_entity import DomainEntity
+from core.entities.domain import DomainEntity
 from core.entities.filters import DomainFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.domain_repository import IDomainRepository
@@ -16,7 +16,10 @@ from presentation.exceptions import (
 class DomainUseCase:
     """Cas d'utilisation pour les opérations CRUD sur les domaines"""
 
-    def __init__(self, domain_repository: IDomainRepository):
+    def __init__(
+        self,
+        domain_repository: IDomainRepository,
+    ):
         self.domain_repository = domain_repository
         self.logger = logging.getLogger(__name__)
 

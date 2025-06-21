@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from apps.tortoise.city.models import City as TortoiseCity
-from core.entities.city_entity import CityEntity
+from core.entities.city import CityEntity
 from core.entities.filters import CityFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.city_repository import ICityRepository

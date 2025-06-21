@@ -4,13 +4,14 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
-from core.container.container import Container, IUserRepository
-from core.entities.user_entity import UserEntity
+from core.container.container import Container
+from core.entities.user import UserEntity
+from infrastructure.db.tortoise.user_repository_impl import UserRepository
 from infrastructure.external_services.jwt_service import JWTService
 from presentation.constants import errors_code
 from presentation.exceptions import UnauthorizedException
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="v1/auth/token")
 
 
 def get_token_from_header(authorization: Optional[str] = Header(None)) -> str:
@@ -34,7 +35,7 @@ def get_token_from_header(authorization: Optional[str] = Header(None)) -> str:
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     jwt_service: JWTService = Depends(Provide[Container.jwt_service]),
-    auth_use_case: IUserRepository = Depends(Provide[Container.auth_use_case]),
+    auth_use_case: UserRepository = Depends(Provide[Container.user_repository]),
 ) -> UserEntity:
     """Récupère l'utilisateur actuel depuis le token"""
     payload = await jwt_service.decode_access_token(token)

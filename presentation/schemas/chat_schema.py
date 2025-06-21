@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from presentation.schemas.base_schema import BaseSchema
+from presentation.schemas.bases.base import BaseSchema
 
 
 class ChatResponseSchema(BaseSchema):

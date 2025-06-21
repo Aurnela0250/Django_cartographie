@@ -5,7 +5,7 @@ from pydantic import BaseModel, TypeAdapter
 
 from core.entities.pagination import PaginationParams
 from infrastructure.external_services.redis_service import RedisService
-from presentation.schemas.pagination_schema import PaginatedResultSchema
+from presentation.schemas.pagination import PaginatedResultSchema
 
 T = TypeVar("T", bound=BaseModel)
 SchemaType = TypeVar("SchemaType", bound=BaseModel)

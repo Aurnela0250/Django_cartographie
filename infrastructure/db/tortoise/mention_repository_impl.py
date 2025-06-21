@@ -4,7 +4,7 @@ from uuid import UUID
 
 from apps.tortoise.mention.models import Mention as TortoiseMention
 from core.entities.filters import MentionFilters
-from core.entities.mention_entity import MentionEntity
+from core.entities.mention import MentionEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.mention_repository import IMentionRepository
 from infrastructure.db.tortoise.model_to_entity import mention_to_entity

@@ -2,10 +2,10 @@ import logging
 
 from tortoise.transactions import atomic
 
-from core.entities.city_entity import CityEntity
+from core.container.container import ICityRepository
+from core.entities.city import CityEntity
 from core.entities.filters import CityFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
-from core.interfaces.city_repository import ICityRepository
 from presentation.exceptions import (
     ConflictException,
     InternalServerErrorException,
@@ -16,7 +16,10 @@ from presentation.exceptions import (
 class CityUseCase:
     """Cas d'utilisation pour les opérations CRUD sur les villes"""
 
-    def __init__(self, city_repository: ICityRepository):
+    def __init__(
+        self,
+        city_repository: ICityRepository,
+    ):
         self.city_repository = city_repository
         self.logger = logging.getLogger(__name__)
 
@@ -49,7 +52,11 @@ class CityUseCase:
             raise InternalServerErrorException(cause=e)
 
     @atomic()
-    async def update(self, city_id: int, city_data: CityEntity) -> CityEntity:
+    async def update(
+        self,
+        city_id: int,
+        city_data: CityEntity,
+    ) -> CityEntity:
         try:
             existing_city = await self.city_repository.get(city_id)
             if not existing_city:
@@ -63,7 +70,9 @@ class CityUseCase:
                     raise ConflictException()
             updated_city = await self.city_repository.update(city_id, city_data)
             return updated_city
-        except (NotFoundException, ConflictException) as e:
+        except ConflictException as e:
+            raise e
+        except NotFoundException as e:
             raise e
         except Exception as e:
             self.logger.error(f"Unexpected error during city update: {str(e)}")

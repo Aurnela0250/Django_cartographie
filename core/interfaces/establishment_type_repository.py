@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from core.entities.establishment_type_entity import EstablishmentTypeEntity
+from core.entities.establishment_type import EstablishmentTypeEntity
 from core.entities.filters import EstablishmentTypeFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository

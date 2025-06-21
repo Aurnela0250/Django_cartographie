@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from core.entities.filters import FormationFilters
-from core.entities.formation_entity import FormationEntity
+from core.entities.formation import FormationEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository
 

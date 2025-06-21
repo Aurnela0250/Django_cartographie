@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-from core.entities.city_entity import CityEntity
+from core.entities.city import CityEntity
 from core.entities.filters import CityFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository

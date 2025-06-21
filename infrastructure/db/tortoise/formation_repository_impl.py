@@ -4,7 +4,7 @@ from uuid import UUID
 
 from apps.tortoise.formation.models import Formation as TortoiseFormation
 from core.entities.filters import FormationFilters
-from core.entities.formation_entity import FormationEntity
+from core.entities.formation import FormationEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.formation_repository import IFormationRepository
 from infrastructure.db.tortoise.metadata import FormationToEntityMetadata

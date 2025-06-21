@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from apps.tortoise.rate.models import Rate as TortoiseRate
-from core.entities.rate_entity import RateEntity
+from core.entities.rate import RateEntity
 from core.interfaces.rate_repository import IRateRepository
 from infrastructure.db.tortoise.model_to_entity import rate_to_entity
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from core.entities.domain_entity import DomainEntity
+from core.entities.domain import DomainEntity
 from core.entities.filters import DomainFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.base_repository import BaseRepository

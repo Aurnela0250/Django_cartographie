@@ -4,8 +4,8 @@ from zoneinfo import ZoneInfo
 
 from tortoise.transactions import atomic
 
-from core.entities.token_entity import TokenEntity
-from core.entities.user_entity import UserEntity
+from core.entities.token import TokenEntity
+from core.entities.user import UserEntity
 from core.interfaces.auth_repository import IAuthRepository
 from infrastructure.external_services.bcrypt_service import BcryptService
 from infrastructure.external_services.jwt_service import JWTService
@@ -33,7 +33,8 @@ class AuthUseCase:
     async def signup(self, email: str, password: str) -> UserEntity:
         try:
             # Check if email already exists
-            if self.auth_repository.get_user_by_email(email):
+            existing_user = await self.auth_repository.get_user_by_email(email)
+            if existing_user:
                 # Log without revealing the exact email in production logs
                 self.logger.info("Signup attempt with existing account")
                 raise ConflictException()

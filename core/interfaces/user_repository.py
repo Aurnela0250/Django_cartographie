@@ -3,7 +3,7 @@ from typing import Optional
 
 from core.entities.filters import UserFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
-from core.entities.user_entity import UserEntity
+from core.entities.user import UserEntity
 from core.interfaces.base_repository import BaseRepository
 
 
