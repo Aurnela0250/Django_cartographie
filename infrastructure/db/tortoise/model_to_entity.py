@@ -23,8 +23,8 @@ from core.entities.city import CityEntity
 from core.entities.domain import DomainEntity
 from core.entities.establishment import EstablishmentEntity
 from core.entities.establishment_type import EstablishmentTypeEntity
-from core.entities.formation_authorization import FormationAuthorizationEntity
 from core.entities.formation import FormationEntity
+from core.entities.formation_authorization import FormationAuthorizationEntity
 from core.entities.level import LevelEntity
 from core.entities.mention import MentionEntity
 from core.entities.rate import RateEntity

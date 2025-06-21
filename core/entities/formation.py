@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional, Sequence
 
 from core.entities.bases.annual_headcount import AnnualHeadcountBaseEntity
 from core.entities.bases.establishment import EstablishmentBaseEntity
@@ -15,4 +15,4 @@ class FormationEntity(FormationBaseEntity):
     mention: Optional[MentionBaseEntity] = None
     establishment: Optional[EstablishmentBaseEntity] = None
     authorization: Optional[FormationAuthorizationBaseEntity] = None
-    annual_headcounts: List[AnnualHeadcountBaseEntity] = []
+    annual_headcounts: Sequence[AnnualHeadcountBaseEntity] = []
