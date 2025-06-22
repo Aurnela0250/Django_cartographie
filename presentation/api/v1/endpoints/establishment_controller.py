@@ -16,14 +16,15 @@ from presentation.exceptions import (
     NotFoundException,
 )
 from presentation.schemas.establishment import (
-    EstablishmentSchema,
     CreateEstablishmentSchema,
+    EstablishmentSchema,
     UpdateEstablishmentSchema,
 )
 from presentation.schemas.pagination import (
     PaginatedResultSchema,
     PaginationParamsSchema,
 )
+from presentation.schemas.rate import CreateRateSchema, RateSchema
 
 router = APIRouter(
     prefix="/establishments",
@@ -106,6 +107,36 @@ async def get_all(
         EstablishmentSchema,
         EstablishmentSchema.model_validate,
     )
+
+
+@router.post(
+    "/{establishment_id}/rate/",
+    response_model=RateSchema,
+    status_code=201,
+)
+@inject
+async def rate_establishment(
+    *,
+    establishment_id: int = Path(..., title="ID de l'établissement", gt=0),
+    rate_data: CreateRateSchema,
+    establishment_use_case: EstablishmentUseCase = Depends(
+        Provide[Container.establishment_use_case]
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    try:
+        # Ensure user.id is not None, as get_current_user should provide an authenticated user
+        assert user.id is not None
+        rated = await establishment_use_case.rate_establishment(
+            user_id=user.id,
+            establishment_id=establishment_id,
+            rating=rate_data.rating,
+        )
+        return RateSchema.model_validate(rated)
+    except NotFoundException as e:
+        raise NotFoundException(cause=e)
+    except Exception as e:
+        raise InternalServerErrorException(cause=e)
 
 
 @router.put(

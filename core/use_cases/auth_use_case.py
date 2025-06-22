@@ -61,16 +61,21 @@ class AuthUseCase:
 
             if not user:
                 raise UnauthorizedException(code=errors_code.INVALID_CREDENTIALS)
-            if not user.id:
-                raise InternalServerErrorException()
 
-            # Verify the password
+            # Verify the password first
             is_password_valid = await self.bcrypt_service.verify_password(
                 password, user.password
             )
 
             if not is_password_valid:
                 raise UnauthorizedException(code=errors_code.INVALID_CREDENTIALS)
+
+            # Then check if user ID is valid
+            if not user.id:
+                self.logger.error(
+                    f"Unexpected error during login: User ID is None for user {login}"
+                )
+                raise InternalServerErrorException()
 
             token = await self.jwt_service.generate_tokens(int(user.id))
 
@@ -88,17 +93,16 @@ class AuthUseCase:
             )
         except UnauthorizedException as e:
             self.logger.warning(f"Login failed for user {login}: {e}")
-            raise UnauthorizedException(cause=e)
+            raise e  # Preserve the original exception with its code
         except InternalServerErrorException as e:
             raise e
         except Exception as e:
-            self.logger.warning(f"Unexpected error during login {e}")
+            self.logger.warning(f"Unexpected error during login: {e}")
             raise InternalServerErrorException(cause=e)
 
     @atomic()
     async def refresh_token(self, token: str) -> TokenEntity:
         try:
-
             # Décoder le refresh token
             payload = await self.jwt_service.decode_refresh_token(token)
             user_id = payload.user_id
@@ -110,14 +114,15 @@ class AuthUseCase:
             if exp_time > 0:
                 await self.jwt_service.revoke_token(jti, exp_time)
 
-            # Générer de nouveaux tokens
+            # Vérifier que l'utilisateur existe avant de générer de nouveaux tokens
             user_found = await self.auth_repository.get_user_by_id(user_id)
-            new_token = await self.jwt_service.generate_tokens(user_id)
-
             if not user_found:
                 raise UnauthorizedException(code=errors_code.INVALID_TOKEN)
             if not user_found.id:
                 raise InternalServerErrorException()
+
+            # Générer de nouveaux tokens seulement si l'utilisateur est valide
+            new_token = await self.jwt_service.generate_tokens(user_id)
 
             return TokenEntity(
                 user_id=new_token.user_id,
@@ -133,9 +138,9 @@ class AuthUseCase:
             )
         except UnauthorizedException as e:
             self.logger.warning(f"Token refresh failed: {e}")
-            raise UnauthorizedException(cause=e)
+            raise e  # Preserve the original exception with its code
         except Exception as e:
-            self.logger.error(f"Unexpected error during token refresh {e}")
+            self.logger.error(f"Unexpected error during token refresh: {e}")
             raise InternalServerErrorException(cause=e)
 
     @atomic()

@@ -44,12 +44,14 @@ class APIException(Exception):
         message: Optional[str] = None,
         category: Optional[ErrorCategory] = None,
         code: Optional[str] = None,
+        status_code: Optional[int] = None,  # Ajouté le paramètre status_code
         details: Optional[Union[List[ErrorDetailSchema], ErrorDetailSchema]] = None,
         cause: Optional[Exception] = None,
     ):
         self.message = message or self.message
         self.category = category or self.category
         self.code = code or self.code
+        self.status_code = status_code or self.status_code
 
         if details is None:
             self.details = []

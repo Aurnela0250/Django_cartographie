@@ -1,120 +1,101 @@
-from unittest.mock import AsyncMock
-
 import pytest
 
-from core.entities.city import CityEntity
-from core.use_cases.city_use_case import CityUseCase
 from presentation.exceptions import InternalServerErrorException, NotFoundException
 
 
 class TestCityDeleteUseCase:
     """Tests unitaires pour la méthode delete de CityUseCase"""
 
-    @pytest.fixture
-    def mock_city_repository(self):
-        """Mock du repository de ville"""
-        mock_repo = AsyncMock()
-        mock_repo.get = AsyncMock()
-        mock_repo.delete = AsyncMock()
-        return mock_repo
+    class TestSuccess:
+        """Tests des cas de succès"""
 
-    @pytest.fixture
-    def city_use_case(self, mock_city_repository):
-        """Fixture pour créer une instance de CityUseCase avec des mocks"""
-        return CityUseCase(
-            city_repository=mock_city_repository,
-        )
+        @pytest.mark.asyncio
+        async def test_should_delete_city_successfully(
+            self, city_use_case, mock_city_repository, city_factory
+        ):
+            """Test de suppression de ville réussie"""
+            # Given
+            city_id = 1
+            existing_city = city_factory(id=city_id, name="Paris", region_id=1)
+            mock_city_repository.get.return_value = existing_city
+            mock_city_repository.delete.return_value = True
 
-    @pytest.fixture
-    def sample_city(self):
-        """Fixture pour une ville de test"""
-        return CityEntity(
-            id=1,
-            name="Paris",
-            region_id=1,
-            created_at=None,
-            updated_at=None,
-        )
+            # When
+            result = await city_use_case.delete(city_id)
 
-    @pytest.mark.asyncio
-    async def test_delete_success(
-        self, city_use_case, mock_city_repository, sample_city
-    ):
-        """Test de suppression de ville réussie"""
-        # Arrange
-        city_id = 1
-        mock_city_repository.get.return_value = sample_city
-        mock_city_repository.delete.return_value = True
+            # Then
+            assert result is True
+            mock_city_repository.get.assert_called_once_with(city_id)
+            mock_city_repository.delete.assert_called_once_with(city_id)
 
-        # Act
-        result = await city_use_case.delete(city_id)
+        @pytest.mark.asyncio
+        async def test_should_return_false_when_delete_fails(
+            self, city_use_case, mock_city_repository, city_factory
+        ):
+            """Test de suppression qui retourne False (échec de suppression)"""
+            # Given
+            city_id = 1
+            existing_city = city_factory(id=city_id, name="Paris", region_id=1)
+            mock_city_repository.get.return_value = existing_city
+            mock_city_repository.delete.return_value = False
 
-        # Assert
-        assert result is True
-        mock_city_repository.get.assert_called_once_with(city_id)
-        mock_city_repository.delete.assert_called_once_with(city_id)
+            # When
+            result = await city_use_case.delete(city_id)
 
-    @pytest.mark.asyncio
-    async def test_delete_city_not_found(self, city_use_case, mock_city_repository):
-        """Test de suppression d'une ville inexistante"""
-        # Arrange
-        city_id = 999
-        mock_city_repository.get.return_value = None
+            # Then
+            assert result is False
+            mock_city_repository.get.assert_called_once_with(city_id)
+            mock_city_repository.delete.assert_called_once_with(city_id)
 
-        # Act & Assert
-        with pytest.raises(NotFoundException):
-            await city_use_case.delete(city_id)
+    class TestFailures:
+        """Tests des cas d'échec"""
 
-        mock_city_repository.get.assert_called_once_with(city_id)
-        mock_city_repository.delete.assert_not_called()
+        @pytest.mark.asyncio
+        async def test_should_raise_not_found_when_city_does_not_exist(
+            self, city_use_case, mock_city_repository
+        ):
+            """Test de suppression d'une ville inexistante"""
+            # Given
+            city_id = 999
+            mock_city_repository.get.return_value = None
 
-    @pytest.mark.asyncio
-    async def test_delete_repository_get_error(
-        self, city_use_case, mock_city_repository
-    ):
-        """Test de gestion d'erreur lors de la vérification d'existence"""
-        # Arrange
-        city_id = 1
-        mock_city_repository.get.side_effect = Exception("Database error")
+            # When & Then
+            with pytest.raises(NotFoundException):
+                await city_use_case.delete(city_id)
 
-        # Act & Assert
-        with pytest.raises(InternalServerErrorException):
-            await city_use_case.delete(city_id)
+            mock_city_repository.get.assert_called_once_with(city_id)
+            mock_city_repository.delete.assert_not_called()
 
-        mock_city_repository.get.assert_called_once_with(city_id)
-        mock_city_repository.delete.assert_not_called()
+        @pytest.mark.asyncio
+        async def test_should_raise_internal_error_on_get_failure(
+            self, city_use_case, mock_city_repository
+        ):
+            """Test de gestion d'erreur lors de la vérification d'existence"""
+            # Given
+            city_id = 1
+            mock_city_repository.get.side_effect = Exception("Database error")
 
-    @pytest.mark.asyncio
-    async def test_delete_repository_delete_error(
-        self, city_use_case, mock_city_repository, sample_city
-    ):
-        """Test de gestion d'erreur lors de la suppression en base"""
-        # Arrange
-        city_id = 1
-        mock_city_repository.get.return_value = sample_city
-        mock_city_repository.delete.side_effect = Exception("Database error")
+            # When & Then
+            with pytest.raises(InternalServerErrorException):
+                await city_use_case.delete(city_id)
 
-        # Act & Assert
-        with pytest.raises(InternalServerErrorException):
-            await city_use_case.delete(city_id)
+            mock_city_repository.get.assert_called_once_with(city_id)
+            mock_city_repository.delete.assert_not_called()
 
-        mock_city_repository.get.assert_called_once_with(city_id)
-        mock_city_repository.delete.assert_called_once_with(city_id)
+        @pytest.mark.asyncio
+        async def test_should_raise_internal_error_on_delete_failure(
+            self, city_use_case, mock_city_repository, city_factory
+        ):
+            """Test de gestion d'erreur lors de la suppression en base"""
+            # Given
+            city_id = 1
+            existing_city = city_factory(id=city_id, name="Paris", region_id=1)
+            mock_city_repository.get.return_value = existing_city
+            mock_city_repository.delete.side_effect = Exception("Database error")
 
-    @pytest.mark.asyncio
-    async def test_delete_returns_false(
-        self, city_use_case, mock_city_repository, sample_city
-    ):
-        """Test de suppression qui retourne False (échec de suppression)"""
-        # Arrange
-        city_id = 1
-        mock_city_repository.get.return_value = sample_city
-        mock_city_repository.delete.return_value = False
+            # When & Then
+            with pytest.raises(InternalServerErrorException):
+                await city_use_case.delete(city_id)
 
-        # Act
-        result = await city_use_case.delete(city_id)
-
-        # Assert
-        assert result is False
-        mock_city_repository.get.assert_called_once_with(city_id)
-        mock_city_repository.delete.assert_called_once_with(city_id)
+            mock_city_repository.get.assert_called_once_with(city_id)
+            mock_city_repository.delete.assert_called_once_with(city_id)

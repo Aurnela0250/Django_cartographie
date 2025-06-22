@@ -1,365 +1,343 @@
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from core.use_cases.auth_use_case import AuthUseCase
-from infrastructure.external_services.bcrypt_service import BcryptService
-from infrastructure.external_services.jwt_service import JWTService
 from presentation.exceptions import InternalServerErrorException, UnauthorizedException
 
 
 class TestAuthLogoutUseCase:
-    """Tests unitaires pour la méthode logout de AuthUseCase"""
+    """Unit tests for the logout method of AuthUseCase"""
 
-    @pytest.fixture
-    def mock_jwt_service(self):
-        """Mock du service JWT"""
-        mock_service = MagicMock(spec=JWTService)
-        mock_service.decode_access_token = AsyncMock()
-        mock_service.decode_refresh_token = AsyncMock()
-        mock_service.revoke_token = AsyncMock()
-        return mock_service
+    class TestSuccess:
+        """Tests for success cases"""
 
-    @pytest.fixture
-    def mock_bcrypt_service(self):
-        """Mock du service Bcrypt"""
-        mock_service = MagicMock(spec=BcryptService)
-        return mock_service
+        @pytest.mark.asyncio
+        async def test_should_logout_successfully(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for successful logout"""
+            # Arrange
+            access_token = "valid_access_token"
+            refresh_token = "valid_refresh_token"
 
-    @pytest.fixture
-    def mock_auth_repository(self):
-        """Mock du repository d'authentification"""
-        mock_repo = AsyncMock()
-        return mock_repo
+            fixed_time = 1721600000
 
-    @pytest.fixture
-    def auth_use_case(
-        self, mock_jwt_service, mock_bcrypt_service, mock_auth_repository
-    ):
-        """Fixture pour créer une instance d'AuthUseCase avec des mocks"""
-        return AuthUseCase(
-            jwt_service=mock_jwt_service,
-            bcrypt_service=mock_bcrypt_service,
-            auth_repository=mock_auth_repository,
-        )
+            # Mock token payloads
+            access_payload = MagicMock()
+            access_payload.jti = "jti-access"
+            access_payload.exp = fixed_time + 1000  # Token expires in 1000 seconds
 
-    @pytest.mark.asyncio
-    async def test_logout_success(self, auth_use_case, mock_jwt_service):
-        """Test de déconnexion réussie"""
-        # Arrange
-        access_token = "valid_access_token"
-        refresh_token = "valid_refresh_token"
+            refresh_payload = MagicMock()
+            refresh_payload.jti = "jti-refresh"
+            refresh_payload.exp = fixed_time + 2000  # Token expires in 2000 seconds
 
-        fixed_time = 1721600000
+            mock_jwt_service.decode_access_token.return_value = access_payload
+            mock_jwt_service.decode_refresh_token.return_value = refresh_payload
+            mock_jwt_service.revoke_token.return_value = None
 
-        # Mock des payloads des tokens
-        access_payload = MagicMock()
-        access_payload.jti = "jti-access"
-        access_payload.exp = fixed_time + 1000  # Token expire dans 1000 secondes
+            # Mock datetime.now to return a fixed time
+            with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
+                mock_now = MagicMock()
+                mock_now.timestamp.return_value = fixed_time
+                mock_datetime.now.return_value = mock_now
 
-        refresh_payload = MagicMock()
-        refresh_payload.jti = "jti-refresh"
-        refresh_payload.exp = fixed_time + 2000  # Token expire dans 2000 secondes
+                # Act
+                result = await auth_use_case.logout(access_token, refresh_token)
 
-        mock_jwt_service.decode_access_token.return_value = access_payload
-        mock_jwt_service.decode_refresh_token.return_value = refresh_payload
-        mock_jwt_service.revoke_token.return_value = None
+                # Assert
+                assert result is None
+                mock_jwt_service.decode_access_token.assert_awaited_once_with(
+                    access_token
+                )
+                mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
+                    refresh_token
+                )
+                mock_jwt_service.revoke_token.assert_any_await("jti-access", 1000)
+                mock_jwt_service.revoke_token.assert_any_await("jti-refresh", 2000)
+                assert mock_jwt_service.revoke_token.await_count == 2
 
-        # Mock datetime.now pour avoir un temps fixe
-        with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = fixed_time
-            mock_datetime.now.return_value = mock_now
+        @pytest.mark.asyncio
+        async def test_should_handle_empty_tokens(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for logout with empty tokens"""
+            # Arrange
+            access_token = ""
+            refresh_token = ""
 
-            # Act
-            result = await auth_use_case.logout(access_token, refresh_token)
+            # Mock expired token payloads
+            fixed_time = 1721600000
 
-            # Assert
-            assert result is None
-            mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-            mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
-                refresh_token
+            access_payload = MagicMock()
+            access_payload.jti = "jti-access"
+            access_payload.exp = fixed_time - 1000  # Token already expired
+
+            refresh_payload = MagicMock()
+            refresh_payload.jti = "jti-refresh"
+            refresh_payload.exp = fixed_time - 1000  # Token already expired
+
+            mock_jwt_service.decode_access_token.return_value = access_payload
+            mock_jwt_service.decode_refresh_token.return_value = refresh_payload
+
+            with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
+                mock_now = MagicMock()
+                mock_now.timestamp.return_value = fixed_time
+                mock_datetime.now.return_value = mock_now
+
+                # Act
+                result = await auth_use_case.logout(access_token, refresh_token)
+
+                # Assert
+                assert result is None
+                mock_jwt_service.decode_access_token.assert_awaited_once_with(
+                    access_token
+                )
+                mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
+                    refresh_token
+                )
+                mock_jwt_service.revoke_token.assert_not_awaited()
+
+        @pytest.mark.asyncio
+        async def test_should_handle_none_tokens(self, auth_use_case, mock_jwt_service):
+            """Test for logout with None tokens"""
+            # Arrange
+            access_token = None
+            refresh_token = None
+
+            # Mock valid token payloads
+            fixed_time = 1721600000
+
+            access_payload = MagicMock()
+            access_payload.jti = "jti-access"
+            access_payload.exp = fixed_time + 1000
+
+            refresh_payload = MagicMock()
+            refresh_payload.jti = "jti-refresh"
+            refresh_payload.exp = fixed_time + 1000
+
+            mock_jwt_service.decode_access_token.return_value = access_payload
+            mock_jwt_service.decode_refresh_token.return_value = refresh_payload
+
+            with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
+                mock_now = MagicMock()
+                mock_now.timestamp.return_value = fixed_time
+                mock_datetime.now.return_value = mock_now
+
+                # Act
+                result = await auth_use_case.logout(access_token, refresh_token)
+
+                # Assert
+                assert result is None
+                mock_jwt_service.decode_access_token.assert_awaited_once_with(
+                    access_token
+                )
+                mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
+                    refresh_token
+                )
+                assert mock_jwt_service.revoke_token.await_count == 2
+
+        @pytest.mark.asyncio
+        async def test_should_handle_partial_tokens(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for logout with only one of the tokens"""
+            # Arrange - Test with only access_token
+            access_token = "valid_access_token"
+            refresh_token = None
+
+            fixed_time = 1721600000
+
+            access_payload = MagicMock()
+            access_payload.jti = "jti-access"
+            access_payload.exp = fixed_time + 1000
+
+            refresh_payload = MagicMock()
+            refresh_payload.jti = "jti-refresh"
+            refresh_payload.exp = fixed_time + 1000
+
+            mock_jwt_service.decode_access_token.return_value = access_payload
+            mock_jwt_service.decode_refresh_token.return_value = refresh_payload
+
+            with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
+                mock_now = MagicMock()
+                mock_now.timestamp.return_value = fixed_time
+                mock_datetime.now.return_value = mock_now
+
+                # Act
+                result = await auth_use_case.logout(access_token, refresh_token)
+
+                # Assert
+                assert result is None
+                mock_jwt_service.decode_access_token.assert_awaited_once_with(
+                    access_token
+                )
+                mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
+                    refresh_token
+                )
+                assert mock_jwt_service.revoke_token.await_count == 2
+
+            # Reset mock for the second test
+            mock_jwt_service.reset_mock()
+            mock_jwt_service.decode_access_token.return_value = access_payload
+            mock_jwt_service.decode_refresh_token.return_value = refresh_payload
+
+            # Arrange - Test with only refresh_token
+            access_token = None
+            refresh_token = "valid_refresh_token"
+
+            with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
+                mock_now = MagicMock()
+                mock_now.timestamp.return_value = fixed_time
+                mock_datetime.now.return_value = mock_now
+
+                # Act
+                result = await auth_use_case.logout(access_token, refresh_token)
+
+                # Assert
+                assert result is None
+                mock_jwt_service.decode_access_token.assert_awaited_once_with(
+                    access_token
+                )
+                mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
+                    refresh_token
+                )
+                assert mock_jwt_service.revoke_token.await_count == 2
+
+    class TestFailures:
+        """Tests for failure cases"""
+
+        @pytest.mark.asyncio
+        async def test_should_raise_internal_error_on_generic_decode_failure(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for generic error handling during token decode"""
+            # Arrange
+            access_token = "valid_access_token"
+            refresh_token = "valid_refresh_token"
+
+            mock_jwt_service.decode_access_token.side_effect = Exception(
+                "Unexpected error during token decode"
             )
-            mock_jwt_service.revoke_token.assert_any_await("jti-access", 1000)
-            mock_jwt_service.revoke_token.assert_any_await("jti-refresh", 2000)
-            assert mock_jwt_service.revoke_token.await_count == 2
 
-    @pytest.mark.asyncio
-    async def test_logout_with_empty_tokens(self, auth_use_case, mock_jwt_service):
-        """Test de déconnexion avec tokens vides"""
-        # Arrange
-        access_token = ""
-        refresh_token = ""
+            # Act & Assert
+            with pytest.raises(InternalServerErrorException):
+                await auth_use_case.logout(access_token, refresh_token)
 
-        # Mock des payloads avec des tokens expirés (exp dans le passé)
-        fixed_time = 1721600000
-
-        access_payload = MagicMock()
-        access_payload.jti = "jti-access"
-        access_payload.exp = fixed_time - 1000  # Token déjà expiré
-
-        refresh_payload = MagicMock()
-        refresh_payload.jti = "jti-refresh"
-        refresh_payload.exp = fixed_time - 1000  # Token déjà expiré
-
-        mock_jwt_service.decode_access_token.return_value = access_payload
-        mock_jwt_service.decode_refresh_token.return_value = refresh_payload
-
-        with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = fixed_time
-            mock_datetime.now.return_value = mock_now
-
-            # Act
-            result = await auth_use_case.logout(access_token, refresh_token)
-
-            # Assert
-            assert result is None
             mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-            mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
-                refresh_token
+
+        @pytest.mark.asyncio
+        async def test_should_raise_unauthorized_on_access_token_decode_failure(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for UnauthorizedException during access token decode"""
+            # Arrange
+            access_token = "invalid_access_token"
+            refresh_token = "valid_refresh_token"
+
+            mock_jwt_service.decode_access_token.side_effect = UnauthorizedException(
+                code="TOKEN_EXPIRED", message="Token has expired"
             )
-            # Aucun token ne devrait être révoqué car ils sont expirés
-            mock_jwt_service.revoke_token.assert_not_awaited()
-
-    @pytest.mark.asyncio
-    async def test_logout_generic_error(self, auth_use_case, mock_jwt_service):
-        """Test de gestion d'erreur générique lors du décodage des tokens"""
-        # Arrange
-        access_token = "valid_access_token"
-        refresh_token = "valid_refresh_token"
-
-        # Simuler une erreur générique lors du décodage du token d'accès
-        mock_jwt_service.decode_access_token.side_effect = Exception(
-            "Unexpected error during token decode"
-        )
-
-        # Act & Assert
-        with pytest.raises(InternalServerErrorException):
-            await auth_use_case.logout(access_token, refresh_token)
-
-        mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-
-    @pytest.mark.asyncio
-    async def test_logout_with_none_tokens(self, auth_use_case, mock_jwt_service):
-        """Test de déconnexion avec tokens None"""
-        # Arrange
-        access_token = None
-        refresh_token = None
-
-        # Mock des payloads même pour des tokens None
-        fixed_time = 1721600000
-
-        access_payload = MagicMock()
-        access_payload.jti = "jti-access"
-        access_payload.exp = fixed_time + 1000
-
-        refresh_payload = MagicMock()
-        refresh_payload.jti = "jti-refresh"
-        refresh_payload.exp = fixed_time + 1000
-
-        mock_jwt_service.decode_access_token.return_value = access_payload
-        mock_jwt_service.decode_refresh_token.return_value = refresh_payload
-
-        with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = fixed_time
-            mock_datetime.now.return_value = mock_now
-
-            # Act
-            result = await auth_use_case.logout(access_token, refresh_token)
-
-            # Assert
-            assert result is None
-            mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-            mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
-                refresh_token
-            )
-            # Les tokens devraient être révoqués car ils sont valides
-            assert mock_jwt_service.revoke_token.await_count == 2
-
-    @pytest.mark.asyncio
-    async def test_logout_partial_tokens(self, auth_use_case, mock_jwt_service):
-        """Test de déconnexion avec seulement un des deux tokens"""
-        # Arrange - Test avec seulement access_token
-        access_token = "valid_access_token"
-        refresh_token = None
-
-        fixed_time = 1721600000
-
-        access_payload = MagicMock()
-        access_payload.jti = "jti-access"
-        access_payload.exp = fixed_time + 1000
-
-        refresh_payload = MagicMock()
-        refresh_payload.jti = "jti-refresh"
-        refresh_payload.exp = fixed_time + 1000
-
-        mock_jwt_service.decode_access_token.return_value = access_payload
-        mock_jwt_service.decode_refresh_token.return_value = refresh_payload
-
-        with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = fixed_time
-            mock_datetime.now.return_value = mock_now
-
-            # Act
-            result = await auth_use_case.logout(access_token, refresh_token)
-
-            # Assert
-            assert result is None
-            mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-            mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
-                refresh_token
-            )
-            assert mock_jwt_service.revoke_token.await_count == 2
-
-        # Reset mock pour le deuxième test
-        mock_jwt_service.reset_mock()
-        mock_jwt_service.decode_access_token.return_value = access_payload
-        mock_jwt_service.decode_refresh_token.return_value = refresh_payload
-
-        # Arrange - Test avec seulement refresh_token
-        access_token = None
-        refresh_token = "valid_refresh_token"
-
-        with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = fixed_time
-            mock_datetime.now.return_value = mock_now
-
-            # Act
-            result = await auth_use_case.logout(access_token, refresh_token)
-
-            # Assert
-            assert result is None
-            mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-            mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
-                refresh_token
-            )
-            assert mock_jwt_service.revoke_token.await_count == 2
-
-    @pytest.mark.asyncio
-    async def test_logout_decode_access_token_unauthorized(
-        self, auth_use_case, mock_jwt_service
-    ):
-        """Test de gestion d'UnauthorizedException lors du décodage du token d'accès"""
-        # Arrange
-        access_token = "invalid_access_token"
-        refresh_token = "valid_refresh_token"
-
-        # Simuler une UnauthorizedException lors du décodage du token d'accès
-        mock_jwt_service.decode_access_token.side_effect = UnauthorizedException(
-            code="TOKEN_EXPIRED", message="Token has expired"
-        )
-
-        # Act & Assert
-        with pytest.raises(UnauthorizedException):
-            await auth_use_case.logout(access_token, refresh_token)
-
-        mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-        # Le refresh token ne devrait pas être traité si l'access token échoue
-        mock_jwt_service.decode_refresh_token.assert_not_awaited()
-
-    @pytest.mark.asyncio
-    async def test_logout_decode_refresh_token_unauthorized(
-        self, auth_use_case, mock_jwt_service
-    ):
-        """Test de gestion d'UnauthorizedException lors du décodage du token de rafraîchissement"""
-        # Arrange
-        access_token = "valid_access_token"
-        refresh_token = "invalid_refresh_token"
-
-        fixed_time = 1721600000
-
-        # Mock d'un payload valide pour l'access token
-        access_payload = MagicMock()
-        access_payload.jti = "jti-access"
-        access_payload.exp = fixed_time + 1000
-
-        mock_jwt_service.decode_access_token.return_value = access_payload
-
-        # Simuler une UnauthorizedException lors du décodage du refresh token
-        mock_jwt_service.decode_refresh_token.side_effect = UnauthorizedException(
-            code="TOKEN_REVOKED", message="Token has been revoked"
-        )
-
-        with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = fixed_time
-            mock_datetime.now.return_value = mock_now
 
             # Act & Assert
             with pytest.raises(UnauthorizedException):
                 await auth_use_case.logout(access_token, refresh_token)
 
             mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-            mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
-                refresh_token
+            mock_jwt_service.decode_refresh_token.assert_not_awaited()
+
+        @pytest.mark.asyncio
+        async def test_should_raise_unauthorized_on_refresh_token_decode_failure(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for UnauthorizedException during refresh token decode"""
+            # Arrange
+            access_token = "valid_access_token"
+            refresh_token = "invalid_refresh_token"
+
+            fixed_time = 1721600000
+
+            access_payload = MagicMock()
+            access_payload.jti = "jti-access"
+            access_payload.exp = fixed_time + 1000
+
+            mock_jwt_service.decode_access_token.return_value = access_payload
+            mock_jwt_service.decode_refresh_token.side_effect = UnauthorizedException(
+                code="TOKEN_REVOKED", message="Token has been revoked"
             )
-            # Aucun token ne devrait être révoqué si le décodage échoue
-            mock_jwt_service.revoke_token.assert_not_awaited()
 
-    @pytest.mark.asyncio
-    async def test_logout_both_tokens_unauthorized(
-        self, auth_use_case, mock_jwt_service
-    ):
-        """Test de gestion d'UnauthorizedException pour les deux tokens"""
-        # Arrange
-        access_token = "invalid_access_token"
-        refresh_token = "invalid_refresh_token"
+            with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
+                mock_now = MagicMock()
+                mock_now.timestamp.return_value = fixed_time
+                mock_datetime.now.return_value = mock_now
 
-        # Simuler des UnauthorizedException pour les deux tokens
-        mock_jwt_service.decode_access_token.side_effect = UnauthorizedException(
-            code="INVALID_TOKEN", message="Invalid access token"
-        )
-        mock_jwt_service.decode_refresh_token.side_effect = UnauthorizedException(
-            code="INVALID_TOKEN", message="Invalid refresh token"
-        )
+                # Act & Assert
+                with pytest.raises(UnauthorizedException):
+                    await auth_use_case.logout(access_token, refresh_token)
 
-        # Act & Assert
-        with pytest.raises(UnauthorizedException):
-            await auth_use_case.logout(access_token, refresh_token)
+                mock_jwt_service.decode_access_token.assert_awaited_once_with(
+                    access_token
+                )
+                mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
+                    refresh_token
+                )
+                mock_jwt_service.revoke_token.assert_not_awaited()
 
-        mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-        # Le refresh token ne devrait pas être traité si l'access token échoue
-        mock_jwt_service.decode_refresh_token.assert_not_awaited()
+        @pytest.mark.asyncio
+        async def test_should_raise_unauthorized_on_both_tokens_decode_failure(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for UnauthorizedException on both tokens decode failure"""
+            # Arrange
+            access_token = "invalid_access_token"
+            refresh_token = "invalid_refresh_token"
 
-    @pytest.mark.asyncio
-    async def test_logout_access_token_valid_refresh_token_unauthorized(
-        self, auth_use_case, mock_jwt_service
-    ):
-        """Test avec access token valide mais refresh token invalide"""
-        # Arrange
-        access_token = "valid_access_token"
-        refresh_token = "expired_refresh_token"
-
-        fixed_time = 1721600000
-
-        # Mock d'un payload valide pour l'access token
-        access_payload = MagicMock()
-        access_payload.jti = "jti-access"
-        access_payload.exp = fixed_time + 1000
-
-        mock_jwt_service.decode_access_token.return_value = access_payload
-
-        # Simuler une UnauthorizedException pour le refresh token seulement
-        mock_jwt_service.decode_refresh_token.side_effect = UnauthorizedException(
-            code="TOKEN_EXPIRED", message="Refresh token has expired"
-        )
-
-        with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = fixed_time
-            mock_datetime.now.return_value = mock_now
+            mock_jwt_service.decode_access_token.side_effect = UnauthorizedException(
+                code="INVALID_TOKEN", message="Invalid access token"
+            )
+            mock_jwt_service.decode_refresh_token.side_effect = UnauthorizedException(
+                code="INVALID_TOKEN", message="Invalid refresh token"
+            )
 
             # Act & Assert
             with pytest.raises(UnauthorizedException):
                 await auth_use_case.logout(access_token, refresh_token)
 
             mock_jwt_service.decode_access_token.assert_awaited_once_with(access_token)
-            mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
-                refresh_token
+            mock_jwt_service.decode_refresh_token.assert_not_awaited()
+
+        @pytest.mark.asyncio
+        async def test_should_raise_unauthorized_on_access_token_valid_refresh_token_invalid(
+            self, auth_use_case, mock_jwt_service
+        ):
+            """Test for UnauthorizedException when access token is valid but refresh token is invalid"""
+            # Arrange
+            access_token = "valid_access_token"
+            refresh_token = "expired_refresh_token"
+
+            fixed_time = 1721600000
+
+            access_payload = MagicMock()
+            access_payload.jti = "jti-access"
+            access_payload.exp = fixed_time + 1000
+
+            mock_jwt_service.decode_access_token.return_value = access_payload
+            mock_jwt_service.decode_refresh_token.side_effect = UnauthorizedException(
+                code="TOKEN_EXPIRED", message="Refresh token has expired"
             )
-            # Aucun token ne devrait être révoqué si le décodage du refresh token échoue
-            mock_jwt_service.revoke_token.assert_not_awaited()
+
+            with patch("core.use_cases.auth_use_case.datetime") as mock_datetime:
+                mock_now = MagicMock()
+                mock_now.timestamp.return_value = fixed_time
+                mock_datetime.now.return_value = mock_now
+
+                # Act & Assert
+                with pytest.raises(UnauthorizedException):
+                    await auth_use_case.logout(access_token, refresh_token)
+
+                mock_jwt_service.decode_access_token.assert_awaited_once_with(
+                    access_token
+                )
+                mock_jwt_service.decode_refresh_token.assert_awaited_once_with(
+                    refresh_token
+                )
+                mock_jwt_service.revoke_token.assert_not_awaited()

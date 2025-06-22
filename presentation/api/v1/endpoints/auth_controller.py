@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/auth",
-    tags=["Auth", "Authentication", "authentication", "auth"],
+    tags=["Auth"],
 )
 
 

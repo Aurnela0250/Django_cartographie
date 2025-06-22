@@ -5,7 +5,9 @@ from tortoise.transactions import atomic
 from core.entities.establishment import EstablishmentEntity
 from core.entities.filters import EstablishmentFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
+from core.entities.rate import RateEntity
 from core.interfaces.establishment_repository import IEstablishmentRepository
+from core.interfaces.rate_repository import IRateRepository
 from presentation.exceptions import (
     ConflictException,
     InternalServerErrorException,
@@ -19,8 +21,10 @@ class EstablishmentUseCase:
     def __init__(
         self,
         establishment_repository: IEstablishmentRepository,
+        rate_repository: IRateRepository,
     ):
         self.establishment_repository = establishment_repository
+        self.rate_repository = rate_repository
         self.logger = logging.getLogger(__name__)
 
     @atomic()
@@ -149,4 +153,41 @@ class EstablishmentUseCase:
             self.logger.error(
                 f"Unexpected error during establishments filtering: {str(e)}"
             )
+            raise InternalServerErrorException(cause=e)
+
+    @atomic()
+    async def rate_establishment(
+        self, user_id: int, establishment_id: int, rating: float
+    ) -> RateEntity:
+        try:
+            existing_rate = (
+                await self.rate_repository.get_rate_by_user_for_establishment(
+                    user_id=user_id, establishment_id=establishment_id
+                )
+            )
+
+            if existing_rate:
+                # Update existing rate
+                existing_rate.rating = rating
+                # Assert that existing_rate.id is not None, as it comes from the database
+                assert existing_rate.id is not None
+                updated_rate = await self.rate_repository.update(
+                    existing_rate.id, existing_rate
+                )
+                self.logger.info(
+                    f"Rate updated for user {user_id} on establishment {establishment_id}"
+                )
+                return updated_rate
+            else:
+                # Create new rate
+                new_rate = RateEntity(
+                    user_id=user_id, establishment_id=establishment_id, rating=rating
+                )
+                created_rate = await self.rate_repository.create(new_rate)
+                self.logger.info(
+                    f"New rate created for user {user_id} on establishment {establishment_id}"
+                )
+                return created_rate
+        except Exception as e:
+            self.logger.error(f"Unexpected error during establishment rating: {str(e)}")
             raise InternalServerErrorException(cause=e)

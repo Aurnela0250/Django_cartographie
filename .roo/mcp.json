@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "${env:SUPABASE_ACCESS_TOKEN}"
+      ],
+      "alwaysAllow": [
+        "list_tables",
+        "execute_sql",
+        "listTables",
+        "list_projects",
+        "list_organizations",
+        "get_organization",
+        "apply_migration",
+        "get_project",
+        "execute_query",
+        "generate_typescript_types",
+        "listProjects"
+      ]
+    },
+    "github.com/pashpashpash/perplexity-mcp": {
+      "command": "node",
+      "args": [
+        "/Users/ninotwilrich/Documents/Cline/MCP/perplexity-mcp/build/index.js"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": "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"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "search",
+        "get_documentation",
+        "find_apis",
+        "check_deprecated_code"
+      ],
+      "alwaysAllow": [
+        "search",
+        "get_documentation",
+        "find_apis",
+        "check_deprecated_code"
+      ]
+    }
+  }
+}

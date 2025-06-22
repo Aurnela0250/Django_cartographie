@@ -1,144 +1,126 @@
-from unittest.mock import AsyncMock, MagicMock
-
 import pytest
 
-from core.entities.user import UserEntity
-from core.use_cases.auth_use_case import AuthUseCase
-from infrastructure.external_services.bcrypt_service import BcryptService
-from infrastructure.external_services.jwt_service import JWTService
 from presentation.exceptions import ConflictException, InternalServerErrorException
 
 
 class TestAuthSignupUseCase:
-    """Tests unitaires pour la méthode signup de AuthUseCase"""
+    """Unit tests for the signup method of AuthUseCase"""
 
-    @pytest.fixture
-    def mock_jwt_service(self):
-        """Mock du service JWT"""
-        mock_service = MagicMock(spec=JWTService)
-        return mock_service
+    class TestSuccess:
+        """Tests for success cases"""
 
-    @pytest.fixture
-    def mock_bcrypt_service(self):
-        """Mock du service Bcrypt"""
-        mock_service = MagicMock(spec=BcryptService)
-        mock_service.hash_password = AsyncMock()
-        return mock_service
+        @pytest.mark.asyncio
+        async def test_should_signup_successfully(
+            self, auth_use_case, mock_auth_repository, mock_bcrypt_service, user_factory
+        ):
+            """Test for successful user signup"""
+            # Given
+            email = "test@example.com"
+            password = "password123"
+            expected_user = user_factory(id=1, email=email, password="hashed_password")
+            mock_auth_repository.get_user_by_email.return_value = (
+                None  # No existing user
+            )
+            mock_bcrypt_service.hash_password.return_value = "hashed_password"
+            mock_auth_repository.signup.return_value = expected_user
 
-    @pytest.fixture
-    def mock_auth_repository(self):
-        """Mock du repository d'authentification"""
-        mock_repo = AsyncMock()
-        mock_repo.get_user_by_email = AsyncMock()
-        mock_repo.signup = AsyncMock()
-        return mock_repo
+            # When
+            result = await auth_use_case.signup(email, password)
 
-    @pytest.fixture
-    def auth_use_case(
-        self, mock_jwt_service, mock_bcrypt_service, mock_auth_repository
-    ):
-        """Fixture pour créer une instance d'AuthUseCase avec des mocks"""
-        return AuthUseCase(
-            jwt_service=mock_jwt_service,
-            bcrypt_service=mock_bcrypt_service,
-            auth_repository=mock_auth_repository,
-        )
+            # Then
+            assert result == expected_user
+            mock_auth_repository.get_user_by_email.assert_called_once_with(email)
+            mock_bcrypt_service.hash_password.assert_called_once_with(password)
+            mock_auth_repository.signup.assert_called_once_with(
+                email=email, hashed_password="hashed_password"
+            )
 
-    @pytest.fixture
-    def sample_user(self):
-        """Fixture pour un utilisateur de test"""
-        return UserEntity(
-            id=1,
-            email="test@example.com",
-            password="hashed_password",
-            created_at=None,
-            updated_at=None,
-        )
+    class TestFailures:
+        """Tests for failure cases"""
 
-    @pytest.mark.asyncio
-    async def test_signup_success(
-        self, auth_use_case, mock_auth_repository, mock_bcrypt_service, sample_user
-    ):
-        """Test de création de compte réussie"""
-        # Arrange
-        email = "test@example.com"
-        password = "password123"
-        hashed_password = "hashed_password"
+        @pytest.mark.asyncio
+        async def test_should_raise_conflict_when_email_exists(
+            self, auth_use_case, mock_auth_repository, user_factory, caplog
+        ):
+            """Test for signup with existing email"""
+            # Given
+            email = "existing@example.com"
+            password = "password123"
+            mock_auth_repository.get_user_by_email.return_value = user_factory(
+                id=1, email=email, password="hashed_password"
+            )
 
-        mock_auth_repository.get_user_by_email.return_value = None
-        mock_bcrypt_service.hash_password.return_value = hashed_password
-        mock_auth_repository.signup.return_value = sample_user
+            # When & Then
+            with pytest.raises(ConflictException):
+                await auth_use_case.signup(email, password)
 
-        # Act
-        result = await auth_use_case.signup(email, password)
+            mock_auth_repository.get_user_by_email.assert_called_once_with(email)
+            mock_auth_repository.signup.assert_not_called()
+            assert "Signup attempt with existing account" in caplog.text
 
-        # Assert
-        assert result == sample_user
-        mock_auth_repository.get_user_by_email.assert_called_once_with(email)
-        mock_bcrypt_service.hash_password.assert_called_once_with(password)
-        mock_auth_repository.signup.assert_called_once_with(
-            email=email, hashed_password=hashed_password
-        )
+        @pytest.mark.asyncio
+        async def test_should_raise_internal_error_on_get_user_by_email_failure(
+            self, auth_use_case, mock_auth_repository, caplog
+        ):
+            """Test for internal server error during user retrieval by email"""
+            # Given
+            email = "test@example.com"
+            password = "password123"
+            mock_auth_repository.get_user_by_email.side_effect = Exception("DB error")
 
-    @pytest.mark.asyncio
-    async def test_signup_email_already_exists(
-        self, auth_use_case, mock_auth_repository, mock_bcrypt_service, sample_user
-    ):
-        """Test de création de compte avec email déjà existant"""
-        # Arrange
-        email = "test@example.com"
-        password = "password123"
+            # When & Then
+            with pytest.raises(InternalServerErrorException) as excinfo:
+                await auth_use_case.signup(email, password)
 
-        mock_auth_repository.get_user_by_email.return_value = sample_user
+            assert "Unexpected error during signup" in caplog.text
+            assert "DB error" in str(excinfo.value.__cause__)
+            mock_auth_repository.get_user_by_email.assert_called_once_with(email)
+            mock_auth_repository.signup.assert_not_called()
 
-        # Act & Assert
-        with pytest.raises(ConflictException):
-            await auth_use_case.signup(email, password)
+        @pytest.mark.asyncio
+        async def test_should_raise_internal_error_on_hash_password_failure(
+            self, auth_use_case, mock_auth_repository, mock_bcrypt_service, caplog
+        ):
+            """Test for internal server error during password hashing"""
+            # Given
+            email = "test@example.com"
+            password = "password123"
+            mock_auth_repository.get_user_by_email.return_value = (
+                None  # No existing user
+            )
+            mock_bcrypt_service.hash_password.side_effect = Exception("Hashing error")
 
-        mock_auth_repository.get_user_by_email.assert_called_once_with(email)
-        mock_bcrypt_service.hash_password.assert_not_called()
-        mock_auth_repository.signup.assert_not_called()
+            # When & Then
+            with pytest.raises(InternalServerErrorException) as excinfo:
+                await auth_use_case.signup(email, password)
 
-    @pytest.mark.asyncio
-    async def test_signup_bcrypt_service_error(
-        self, auth_use_case, mock_auth_repository, mock_bcrypt_service
-    ):
-        """Test de gestion d'erreur lors du hashage du mot de passe"""
-        # Arrange
-        email = "test@example.com"
-        password = "password123"
+            assert "Unexpected error during signup" in caplog.text
+            assert "Hashing error" in str(excinfo.value.__cause__)
+            mock_auth_repository.get_user_by_email.assert_called_once_with(email)
+            mock_bcrypt_service.hash_password.assert_called_once_with(password)
+            mock_auth_repository.signup.assert_not_called()
 
-        mock_auth_repository.get_user_by_email.return_value = None
-        mock_bcrypt_service.hash_password.side_effect = Exception("Bcrypt error")
+        @pytest.mark.asyncio
+        async def test_should_raise_internal_error_on_signup_failure(
+            self, auth_use_case, mock_auth_repository, mock_bcrypt_service, caplog
+        ):
+            """Test for internal server error during user signup"""
+            # Given
+            email = "test@example.com"
+            password = "password123"
+            mock_auth_repository.get_user_by_email.return_value = (
+                None  # No existing user
+            )
+            mock_bcrypt_service.hash_password.return_value = "hashed_password"
+            mock_auth_repository.signup.side_effect = Exception("Signup DB error")
 
-        # Act & Assert
-        with pytest.raises(InternalServerErrorException):
-            await auth_use_case.signup(email, password)
+            # When & Then
+            with pytest.raises(InternalServerErrorException) as excinfo:
+                await auth_use_case.signup(email, password)
 
-        mock_auth_repository.get_user_by_email.assert_called_once_with(email)
-        mock_bcrypt_service.hash_password.assert_called_once_with(password)
-        mock_auth_repository.signup.assert_not_called()
-
-    @pytest.mark.asyncio
-    async def test_signup_repository_error(
-        self, auth_use_case, mock_auth_repository, mock_bcrypt_service
-    ):
-        """Test de gestion d'erreur lors de la création en base"""
-        # Arrange
-        email = "test@example.com"
-        password = "password123"
-        hashed_password = "hashed_password"
-
-        mock_auth_repository.get_user_by_email.return_value = None
-        mock_bcrypt_service.hash_password.return_value = hashed_password
-        mock_auth_repository.signup.side_effect = Exception("Database error")
-
-        # Act & Assert
-        with pytest.raises(InternalServerErrorException):
-            await auth_use_case.signup(email, password)
-
-        mock_auth_repository.get_user_by_email.assert_called_once_with(email)
-        mock_bcrypt_service.hash_password.assert_called_once_with(password)
-        mock_auth_repository.signup.assert_called_once_with(
-            email=email, hashed_password=hashed_password
-        )
+            assert "Unexpected error during signup" in caplog.text
+            assert "Signup DB error" in str(excinfo.value.__cause__)
+            mock_auth_repository.get_user_by_email.assert_called_once_with(email)
+            mock_auth_repository.signup.assert_called_once_with(
+                email=email, hashed_password="hashed_password"
+            )

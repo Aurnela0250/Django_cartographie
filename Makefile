@@ -119,6 +119,72 @@ test-unit-city-delete:
 test-unit-city-filter:
 	$(UV) run pytest $(TEST_PATH)unit/city/test_city_filter_use_case.py $(PYTEST_OPTS)
 
+test-unit-domain:
+	$(UV) run pytest $(TEST_PATH)unit/domain/ $(PYTEST_OPTS)
+
+test-unit-domain-create:
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_create_use_case.py $(PYTEST_OPTS)
+
+test-unit-domain-update:
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_update_use_case.py $(PYTEST_OPTS)
+
+test-unit-domain-get:
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_get_use_case.py $(PYTEST_OPTS)
+
+test-unit-domain-get-all:
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_get_all_use_case.py $(PYTEST_OPTS)
+
+test-unit-domain-delete:
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_delete_use_case.py $(PYTEST_OPTS)
+
+test-unit-domain-filter:
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_filter_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-type:
+	$(UV) run pytest $(TEST_PATH)unit/establishment_type/ $(PYTEST_OPTS)
+
+test-unit-establishment-type-create:
+	$(UV) run pytest $(TEST_PATH)unit/establishment_type/test_establishment_type_create_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-type-update:
+	$(UV) run pytest $(TEST_PATH)unit/establishment_type/test_establishment_type_update_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-type-get:
+	$(UV) run pytest $(TEST_PATH)unit/establishment_type/test_establishment_type_get_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-type-get-all:
+	$(UV) run pytest $(TEST_PATH)unit/establishment_type/test_establishment_type_get_all_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-type-delete:
+	$(UV) run pytest $(TEST_PATH)unit/establishment_type/test_establishment_type_delete_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-type-filter:
+	$(UV) run pytest $(TEST_PATH)unit/establishment_type/test_establishment_type_filter_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/ $(PYTEST_OPTS)
+
+test-unit-establishment-create:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/test_establishment_create_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-get:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/test_establishment_get_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-update:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/test_establishment_update_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-delete:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/test_establishment_delete_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-get-all:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/test_establishment_get_all_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-filter:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/test_establishment_filter_use_case.py $(PYTEST_OPTS)
+
+test-unit-establishment-rate:
+	$(UV) run pytest $(TEST_PATH)unit/establishment/test_establishment_rate_use_case.py $(PYTEST_OPTS)
+
 test-e2e:
 	$(UV) run pytest $(TEST_PATH)e2e/ $(PYTEST_OPTS)
 
@@ -235,6 +301,28 @@ help:
 	@echo "  test-unit-city-get-all - Tests unitaires city get_all"
 	@echo "  test-unit-city-delete - Tests unitaires city delete"
 	@echo "  test-unit-city-filter - Tests unitaires city filter"
+	@echo "  test-unit-domain     - Tests unitaires domain"
+	@echo "  test-unit-domain-create - Tests unitaires domain create"
+	@echo "  test-unit-domain-update - Tests unitaires domain update"
+	@echo "  test-unit-domain-get    - Tests unitaires domain get"
+	@echo "  test-unit-domain-get-all - Tests unitaires domain get_all"
+	@echo "  test-unit-domain-delete - Tests unitaires domain delete"
+	@echo "  test-unit-domain-filter - Tests unitaires domain filter"
+	@echo "  test-unit-establishment-type - Tests unitaires establishment_type"
+	@echo "  test-unit-establishment-type-create - Tests unitaires establishment_type create"
+	@echo "  test-unit-establishment-type-update - Tests unitaires establishment_type update"
+	@echo "  test-unit-establishment-type-get    - Tests unitaires establishment_type get"
+	@echo "  test-unit-establishment-type-get-all - Tests unitaires establishment_type get_all"
+	@echo "  test-unit-establishment-type-delete - Tests unitaires establishment_type delete"
+	@echo "  test-unit-establishment-type-filter - Tests unitaires establishment_type filter"
+	@echo "  test-unit-establishment - Tests unitaires establishment"
+	@echo "  test-unit-establishment-create - Tests unitaires establishment create"
+	@echo "  test-unit-establishment-get    - Tests unitaires establishment get"
+	@echo "  test-unit-establishment-update - Tests unitaires establishment update"
+	@echo "  test-unit-establishment-delete - Tests unitaires establishment delete"
+	@echo "  test-unit-establishment-get-all - Tests unitaires establishment get_all"
+	@echo "  test-unit-establishment-filter - Tests unitaires establishment filter"
+	@echo "  test-unit-establishment-rate - Tests unitaires establishment rate"
 	@echo "  test-e2e             - Tests end-to-end"
 	@echo "  test-api             - Tests API"
 	@echo "  test-cov             - Tests avec couverture"
@@ -260,4 +348,4 @@ help:
 	@echo "  clean                - Nettoyer les fichiers Python"
 	@echo "  gen-keys             - Générer les clés JWT"
 
-.PHONY: install add-package add-dev-package run start test test-unit test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-unit-city test-unit-city-create test-unit-city-update test-unit-city-get test-unit-city-get-all test-unit-city-delete test-unit-city-filter test-e2e test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb
+.PHONY: install add-package add-dev-package run start test test-unit test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-unit-city test-unit-city-create test-unit-city-update test-unit-city-get test-unit-city-get-all test-unit-city-delete test-unit-city-filter test-unit-domain test-unit-domain-create test-unit-domain-update test-unit-domain-get test-unit-domain-get-all test-unit-domain-delete test-unit-domain-filter test-unit-establishment-type test-unit-establishment-type-create test-unit-establishment-type-update test-unit-establishment-type-get test-unit-establishment-type-get-all test-unit-establishment-type-delete test-unit-establishment-type-filter test-unit-establishment test-unit-establishment-create test-unit-establishment-get test-unit-establishment-update test-unit-establishment-delete test-unit-establishment-get-all test-unit-establishment-filter test-unit-establishment-rate test-e2e test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb

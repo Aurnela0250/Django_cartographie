@@ -135,6 +135,7 @@ class Container(containers.DeclarativeContainer):
         providers.Factory(
             EstablishmentUseCase,
             establishment_repository,
+            rate_repository,
         )
     )
     formation_use_case: providers.Provider[FormationUseCase] = providers.Factory(

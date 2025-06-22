@@ -1,20 +1,21 @@
-from pydantic import Field
+from datetime import datetime
 
-from presentation.schemas.bases.base import BaseSchema
-from presentation.schemas.bases.rate import RateBaseSchema
+from pydantic import BaseModel, Field
 
 
-class RateSchema(RateBaseSchema):
+class CreateRateSchema(BaseModel):
+    rating: float = Field(
+        ..., ge=0.0, le=5.0, description="Rating value between 0.0 and 5.0"
+    )
+
+
+class RateSchema(BaseModel):
     id: int
     establishment_id: int
     user_id: int
     rating: float
+    created_at: datetime
+    updated_at: datetime
 
-
-class CreateRateSchema(BaseSchema):
-    rating: float = Field(
-        default=0,
-        ge=0,
-        le=5,
-        description="Note entre 0 et 5",
-    )
+    class Config:
+        from_attributes = True
