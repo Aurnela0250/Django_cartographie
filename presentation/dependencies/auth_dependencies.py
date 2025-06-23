@@ -11,7 +11,7 @@ from infrastructure.external_services.jwt_service import JWTService
 from presentation.constants import errors_code
 from presentation.exceptions import UnauthorizedException
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="v1/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/token")
 
 
 def get_token_from_header(authorization: Optional[str] = Header(None)) -> str:

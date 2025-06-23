@@ -2,12 +2,19 @@ import logging
 from typing import Optional
 from uuid import UUID
 
+from tortoise.exceptions import DoesNotExist, IntegrityError
+
 from apps.tortoise.user.models import User as TortoiseUser
 from core.entities.filters import UserFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.entities.user import UserEntity
 from core.interfaces.user_repository import IUserRepository
 from infrastructure.db.tortoise.model_to_entity import user_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 
 class UserRepository(IUserRepository):
@@ -41,8 +48,9 @@ class UserRepository(IUserRepository):
             self.logger.error(
                 f"Erreur lors de la conversion du modèle User (ID: {user_model.id}): {str(e)}"
             )
-            raise ValueError(
-                f"Erreur lors de la conversion du modèle vers l'entité: {str(e)}"
+            raise DatabaseException(
+                f"Erreur lors de la conversion du modèle vers l'entité: {str(e)}",
+                cause=e,
             )
 
     async def create(self, data: UserEntity) -> UserEntity:
@@ -57,22 +65,41 @@ class UserRepository(IUserRepository):
         """
         self.logger.info(f"Création d'un nouvel utilisateur avec l'email: {data.email}")
         try:
+            # Étape 1: Créer l'utilisateur avec les champs de base
             user_model = await TortoiseUser.create(
                 email=data.email,
                 password=data.password,
                 active=data.active,
-                updated_by_id=data.updated_by,
+                # created_by et updated_by sont laissés nuls pour l'instant
             )
+
+            # Étape 2: Mettre à jour l'utilisateur avec son propre ID pour l'audit
+            user_model.created_by = user_model
+            user_model.updated_by = user_model
+            await user_model.save()
+
+            # Étape 3: Recharger le modèle pour s'assurer que les relations sont chargées
+            await user_model.fetch_related("created_by", "updated_by")
+
             result = await self._to_entity(user_model)
             self.logger.info(
                 f"Utilisateur créé avec succès - ID: {user_model.id}, Email: {data.email}"
             )
             return result
+        except IntegrityError as e:
+            self.logger.error(
+                f"Erreur d'intégrité lors de la création de l'utilisateur avec l'email {data.email}: {e}"
+            )
+            raise DatabaseIntegrityException(
+                "Un utilisateur avec cet email existe déjà.", cause=e
+            )
         except Exception as e:
             self.logger.error(
-                f"Erreur lors de la création de l'utilisateur avec l'email {data.email}: {str(e)}"
+                f"Erreur inattendue lors de la création de l'utilisateur avec l'email {data.email}: {e}"
             )
-            raise ValueError(f"Erreur lors de la création de l'utilisateur: {str(e)}")
+            raise DatabaseException(
+                "Erreur inattendue lors de la création de l'utilisateur.", cause=e
+            )
 
     async def get(self, id: UUID | int) -> Optional[UserEntity]:
         """
@@ -90,12 +117,17 @@ class UserRepository(IUserRepository):
             result = await self._to_entity(user_model)
             self.logger.debug(f"Utilisateur trouvé avec l'ID: {id}")
             return result
+        except DoesNotExist as e:
+            self.logger.warning(f"Utilisateur non trouvé avec l'ID: {id}")
+            raise DatabaseDoesNotExistException(
+                f"L'utilisateur avec l'ID {id} n'existe pas.", cause=e
+            )
         except Exception as e:
             self.logger.error(
-                f"Erreur lors de la récupération de l'utilisateur avec l'ID: {id} - {str(e)}"
+                f"Erreur inattendue lors de la récupération de l'utilisateur avec l'ID {id}: {e}"
             )
-            raise ValueError(
-                f"Erreur lors de la récupération de l'utilisateur avec l'ID {id}: {str(e)}"
+            raise DatabaseException(
+                "Erreur inattendue lors de la récupération de l'utilisateur.", cause=e
             )
 
     async def get_all(
@@ -155,10 +187,10 @@ class UserRepository(IUserRepository):
             return result
         except Exception as e:
             self.logger.error(
-                f"Erreur lors de la récupération de tous les utilisateurs: {str(e)}"
+                f"Erreur inattendue lors de la récupération de tous les utilisateurs: {e}"
             )
-            raise ValueError(
-                f"Erreur lors de la récupération de tous les utilisateurs: {str(e)}"
+            raise DatabaseException(
+                "Erreur inattendue lors de la récupération des utilisateurs.", cause=e
             )
 
     async def update(self, id: UUID | int, data: UserEntity) -> Optional[UserEntity]:
@@ -188,12 +220,27 @@ class UserRepository(IUserRepository):
                 f"Utilisateur mis à jour avec succès - ID: {id}, Email: {data.email}"
             )
             return result
+        except DoesNotExist as e:
+            self.logger.warning(
+                f"Utilisateur non trouvé pour mise à jour avec l'ID: {id}"
+            )
+            raise DatabaseDoesNotExistException(
+                f"L'utilisateur avec l'ID {id} n'existe pas pour la mise à jour.",
+                cause=e,
+            )
+        except IntegrityError as e:
+            self.logger.error(
+                f"Erreur d'intégrité lors de la mise à jour de l'utilisateur avec l'ID {id}: {e}"
+            )
+            raise DatabaseIntegrityException(
+                "Erreur d'intégrité des données lors de la mise à jour.", cause=e
+            )
         except Exception as e:
             self.logger.error(
-                f"Erreur lors de la mise à jour de l'utilisateur avec l'ID: {id} - {str(e)}"
+                f"Erreur inattendue lors de la mise à jour de l'utilisateur avec l'ID {id}: {e}"
             )
-            raise ValueError(
-                f"Erreur lors de la mise à jour de l'utilisateur avec l'ID {id}: {str(e)}"
+            raise DatabaseException(
+                "Erreur inattendue lors de la mise à jour de l'utilisateur.", cause=e
             )
 
     async def delete(self, id: UUID | int) -> bool:
@@ -212,12 +259,20 @@ class UserRepository(IUserRepository):
             await user_model.delete()
             self.logger.info(f"Utilisateur supprimé avec succès - ID: {id}")
             return True
+        except DoesNotExist as e:
+            self.logger.warning(
+                f"Utilisateur non trouvé pour suppression avec l'ID: {id}"
+            )
+            raise DatabaseDoesNotExistException(
+                f"L'utilisateur avec l'ID {id} n'existe pas pour la suppression.",
+                cause=e,
+            )
         except Exception as e:
             self.logger.error(
-                f"Erreur lors de la suppression de l'utilisateur avec l'ID: {id} - {str(e)}"
+                f"Erreur inattendue lors de la suppression de l'utilisateur avec l'ID {id}: {e}"
             )
-            raise ValueError(
-                f"Erreur lors de la suppression de l'utilisateur avec l'ID {id}: {str(e)}"
+            raise DatabaseException(
+                "Erreur inattendue lors de la suppression de l'utilisateur.", cause=e
             )
 
     async def filter(
@@ -287,8 +342,10 @@ class UserRepository(IUserRepository):
             )
             return result
         except Exception as e:
-            self.logger.error(f"Error filtering users with criteria {filters}: {e}")
-            raise
+            self.logger.error(f"Erreur lors du filtrage des utilisateurs: {e}")
+            raise DatabaseException(
+                "Erreur lors du filtrage des utilisateurs.", cause=e
+            )
 
     async def count(self, **kwargs) -> int:
         """
@@ -309,9 +366,11 @@ class UserRepository(IUserRepository):
             return result
         except Exception as e:
             self.logger.error(
-                f"Erreur lors du comptage des utilisateurs avec les critères {kwargs}: {str(e)}"
+                f"Erreur lors du comptage des utilisateurs avec les critères {kwargs}: {e}"
             )
-            raise ValueError(f"Erreur lors du comptage des utilisateurs: {str(e)}")
+            raise DatabaseException(
+                "Erreur lors du comptage des utilisateurs.", cause=e
+            )
 
     async def get_user_by_email(self, email: str) -> Optional[UserEntity]:
         """
@@ -331,10 +390,15 @@ class UserRepository(IUserRepository):
             result = await self._to_entity(user_model)
             self.logger.debug(f"Utilisateur trouvé avec l'email: {email}")
             return result
+        except DoesNotExist as e:
+            self.logger.warning(f"Utilisateur non trouvé avec l'email: {email}")
+            raise DatabaseDoesNotExistException(
+                f"L'utilisateur avec l'email {email} n'existe pas.", cause=e
+            )
         except Exception as e:
             self.logger.error(
-                f"Erreur lors de la recherche de l'utilisateur avec l'email: {email} - {str(e)}"
+                f"Erreur inattendue lors de la recherche de l'utilisateur avec l'email {email}: {e}"
             )
-            raise ValueError(
-                f"Erreur lors de la récupération de l'utilisateur avec l'email {email}: {str(e)}"
+            raise DatabaseException(
+                "Erreur inattendue lors de la recherche de l'utilisateur.", cause=e
             )

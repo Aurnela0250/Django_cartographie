@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Optional
 
 from core.entities.filters import LevelFilters
 from core.entities.level import LevelEntity
@@ -11,12 +10,12 @@ class ILevelRepository(BaseRepository[LevelEntity]):
     """Repository for operations on levels"""
 
     @abstractmethod
-    async def get_by_acronym(self, acronym: str) -> Optional[LevelEntity]:
+    async def get_by_acronym(self, acronym: str) -> LevelEntity:
         """Retrieves a level by its acronym"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_name(self, name: str) -> Optional[LevelEntity]:
+    async def get_by_name(self, name: str) -> LevelEntity:
         """Retrieves a level by its name"""
         raise NotImplementedError
 

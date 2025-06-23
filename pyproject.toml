@@ -26,6 +26,8 @@ src_folder = "./."
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
+    "polyfactory>=2.21.0",
     "pytest-asyncio>=1.0.0",
     "pytest-cov>=6.2.1",
     "pyyaml>=6.0.2",

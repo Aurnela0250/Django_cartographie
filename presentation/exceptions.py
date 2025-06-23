@@ -130,3 +130,15 @@ class ServiceUnavailableException(ServerException):
     message = errors_message.SERVICE_UNAVAILABLE
     status_code = status.HTTP_503_SERVICE_UNAVAILABLE
     code = errors_code.SERVICE_UNAVAILABLE
+
+
+class DatabaseException(ServerException):
+    """Exception de base pour les erreurs de base de données."""
+
+
+class DatabaseIntegrityException(DatabaseException):
+    """Exception pour les erreurs d'intégrité de la base de données (ex: contrainte unique violée)."""
+
+
+class DatabaseDoesNotExistException(DatabaseException):
+    """Exception levée lorsqu'une ressource n'existe pas dans la base de données."""

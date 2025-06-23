@@ -142,6 +142,7 @@ async def user_to_entity(user: TortoiseUser) -> UserEntity:
         email=user.email,
         password=user.password,
         active=user.active,
+        created_by=user.created_by.id if user.created_by else None,
         updated_by=user.updated_by.id if user.updated_by else None,
         created_at=user.created_at,
         updated_at=user.updated_at,
@@ -279,6 +280,7 @@ async def city_to_entity(city: TortoiseCity) -> CityEntity:
     """
     Convertit un objet City (Tortoise ORM) en CityEntity (Pydantic)
     """
+    await city.fetch_related("region", "created_by", "updated_by")
     return CityEntity(
         id=city.id,
         name=city.name,

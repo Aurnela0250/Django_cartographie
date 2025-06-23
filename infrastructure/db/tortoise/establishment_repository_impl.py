@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 from uuid import UUID
 
-from tortoise.exceptions import DoesNotExist, FieldError
+from tortoise.exceptions import DoesNotExist, FieldError, IntegrityError
 
 from apps.tortoise.establishment.models import Establishment as TortoiseEstablishment
 from core.entities.establishment import EstablishmentEntity
@@ -11,6 +11,11 @@ from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.establishment_repository import IEstablishmentRepository
 from infrastructure.db.tortoise.metadata import EstablishmentToEntityMetadata
 from infrastructure.db.tortoise.model_to_entity import establishment_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,9 +56,12 @@ class EstablishmentRepository(IEstablishmentRepository):
             result = await self._to_entity(establishment_model)
             logger.info(f"Establishment created successfully with ID: {result.id}")
             return result
+        except IntegrityError as e:
+            logger.error(f"Integrity error creating establishment '{data.name}': {e}")
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
             logger.error(f"Error creating establishment '{data.name}': {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get(self, id: UUID | int) -> Optional[EstablishmentEntity]:
         try:
@@ -64,11 +72,12 @@ class EstablishmentRepository(IEstablishmentRepository):
             result = await self._to_entity(establishment_model)
             logger.debug(f"Establishment found: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Establishment with ID {id} not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Establishment with ID {id} not found or error occurred: {e}"
-            )
-            return None
+            logger.error(f"Error getting establishment with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def get_all(
         self, pagination_params: PaginationParams
@@ -121,7 +130,7 @@ class EstablishmentRepository(IEstablishmentRepository):
             return result
         except Exception as e:
             logger.error(f"Error getting all establishments: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def update(
         self, id: UUID | int, data: EstablishmentEntity
@@ -144,11 +153,15 @@ class EstablishmentRepository(IEstablishmentRepository):
             result = await self._to_entity(establishment_model)
             logger.info(f"Establishment updated successfully: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Establishment with ID {id} not found for update: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
+        except IntegrityError as e:
+            logger.error(f"Integrity error updating establishment with ID {id}: {e}")
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Establishment with ID {id} not found or error occurred during update: {e}"
-            )
-            raise
+            logger.error(f"Error updating establishment with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def delete(self, id: UUID | int) -> bool:
         try:
@@ -158,11 +171,12 @@ class EstablishmentRepository(IEstablishmentRepository):
             await establishment_model.delete()
             logger.info(f"Establishment '{establishment_name}' deleted successfully")
             return True
+        except DoesNotExist as e:
+            logger.warning(f"Establishment with ID {id} not found for deletion: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Establishment with ID {id} not found or error occurred during deletion: {e}"
-            )
-            raise
+            logger.error(f"Error deleting establishment with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def filter(
         self,
@@ -223,10 +237,10 @@ class EstablishmentRepository(IEstablishmentRepository):
             logger.error(
                 f"If the field to prefetch on is not a relation, or not found: {e}"
             )
-            raise e
+            raise DatabaseException(cause=e)
         except Exception as e:
             logger.error(f"Error filtering establishments with criteria {filters}: {e}")
-            raise e
+            raise DatabaseException(cause=e)
 
     async def count(self, **kwargs) -> int:
         try:
@@ -239,7 +253,7 @@ class EstablishmentRepository(IEstablishmentRepository):
             return count
         except Exception as e:
             logger.error(f"Error counting establishments with criteria {kwargs}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get_by_name(self, name: str) -> Optional[EstablishmentEntity]:
         try:
@@ -252,9 +266,7 @@ class EstablishmentRepository(IEstablishmentRepository):
             return result
         except DoesNotExist as e:
             logger.warning(f"Establishment with name '{name}' not found: {e}")
-            return None
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Establishment with name '{name}' not found or error occurred: {e}"
-            )
-            return None
+            logger.error(f"Error getting establishment by name '{name}': {e}")
+            raise DatabaseException(cause=e)

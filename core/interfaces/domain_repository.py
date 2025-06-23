@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from core.entities.domain import DomainEntity
 from core.entities.filters import DomainFilters
@@ -9,7 +8,7 @@ from core.interfaces.base_repository import BaseRepository
 
 class IDomainRepository(BaseRepository[DomainEntity], ABC):
     @abstractmethod
-    async def get_by_name(self, name: str) -> Optional[DomainEntity]:
+    async def get_by_name(self, name: str) -> DomainEntity:
         raise NotImplementedError
 
     @abstractmethod

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from core.entities.establishment_type import EstablishmentTypeEntity
 from core.entities.filters import EstablishmentTypeFilters
@@ -9,7 +8,7 @@ from core.interfaces.base_repository import BaseRepository
 
 class IEstablishmentTypeRepository(BaseRepository[EstablishmentTypeEntity], ABC):
     @abstractmethod
-    async def get_by_name(self, name: str) -> Optional[EstablishmentTypeEntity]:
+    async def get_by_name(self, name: str) -> EstablishmentTypeEntity:
         """Retrieves an establishment type by its name"""
         raise NotImplementedError
 

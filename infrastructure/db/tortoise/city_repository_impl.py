@@ -2,12 +2,19 @@ import logging
 from typing import Optional
 from uuid import UUID
 
+from tortoise.exceptions import DoesNotExist, IntegrityError
+
 from apps.tortoise.city.models import City as TortoiseCity
 from core.entities.city import CityEntity
 from core.entities.filters import CityFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.city_repository import ICityRepository
 from infrastructure.db.tortoise.model_to_entity import city_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +63,12 @@ class CityRepository(ICityRepository):
             result = await self._to_entity(city_model)
             logger.info(f"City created successfully with ID: {result.id}")
             return result
+        except IntegrityError as e:
+            logger.error(f"Integrity error creating city '{data.name}': {e}")
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
             logger.error(f"Error creating city '{data.name}': {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get(self, id: UUID | int) -> Optional[CityEntity]:
         """
@@ -78,9 +88,12 @@ class CityRepository(ICityRepository):
             result = await self._to_entity(city_model)
             logger.debug(f"City found: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"City with ID {id} not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(f"City with ID {id} not found or error occurred: {e}")
-            return None
+            logger.error(f"Error getting city with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def get_all(
         self, pagination_params: PaginationParams
@@ -138,7 +151,7 @@ class CityRepository(ICityRepository):
             return result
         except Exception as e:
             logger.error(f"Error getting all cities: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def update(self, id: UUID | int, data: CityEntity) -> CityEntity:
         """
@@ -168,11 +181,15 @@ class CityRepository(ICityRepository):
             result = await self._to_entity(city_model)
             logger.info(f"City updated successfully: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"City with ID {id} not found for update: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
+        except IntegrityError as e:
+            logger.error(f"Integrity error updating city with ID {id}: {e}")
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"City with ID {id} not found or error occurred during update: {e}"
-            )
-            raise
+            logger.error(f"Error updating city with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def delete(self, id: UUID | int) -> bool:
         """
@@ -191,11 +208,12 @@ class CityRepository(ICityRepository):
             await city_model.delete()
             logger.info(f"City '{city_name}' deleted successfully")
             return True
+        except DoesNotExist as e:
+            logger.warning(f"City with ID {id} not found for deletion: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"City with ID {id} not found or error occurred during deletion: {e}"
-            )
-            raise
+            logger.error(f"Error deleting city with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def filter(
         self,
@@ -264,7 +282,7 @@ class CityRepository(ICityRepository):
             return result
         except Exception as e:
             logger.error(f"Error filtering cities with criteria {filters}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def count(self, **kwargs) -> int:
         """
@@ -286,7 +304,7 @@ class CityRepository(ICityRepository):
             return count
         except Exception as e:
             logger.error(f"Error counting cities with criteria {kwargs}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get_by_name(self, name: str) -> Optional[CityEntity]:
         """
@@ -306,6 +324,9 @@ class CityRepository(ICityRepository):
             result = await self._to_entity(city_model)
             logger.debug(f"City found by name: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"City with name '{name}' not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(f"City with name '{name}' not found or error occurred: {e}")
-            return None
+            logger.error(f"Error getting city by name '{name}': {e}")
+            raise DatabaseException(cause=e)

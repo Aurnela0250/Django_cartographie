@@ -17,11 +17,12 @@ CREATE TABLE IF NOT EXISTS "users" (
     "email_verified" BOOL NOT NULL DEFAULT False,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL,
     "updated_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL
 );
 CREATE TABLE IF NOT EXISTS "domains" (
     "id" SERIAL NOT NULL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL UNIQUE,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "created_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL,
@@ -68,7 +69,6 @@ CREATE TABLE IF NOT EXISTS "mentions" (
 CREATE TABLE IF NOT EXISTS "regions" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "name" VARCHAR(100) NOT NULL UNIQUE,
-    "code" VARCHAR(50) UNIQUE,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "created_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL,
@@ -83,20 +83,11 @@ CREATE TABLE IF NOT EXISTS "cities" (
     "region_id" INT NOT NULL REFERENCES "regions" ("id") ON DELETE CASCADE,
     "updated_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL
 );
-CREATE TABLE IF NOT EXISTS "sectors" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
-    "name" VARCHAR(100) NOT NULL UNIQUE,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "city_id" INT NOT NULL REFERENCES "cities" ("id") ON DELETE CASCADE,
-    "created_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL,
-    "updated_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL
-);
 CREATE TABLE IF NOT EXISTS "establishments" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "name" VARCHAR(255) NOT NULL,
     "acronym" VARCHAR(50) UNIQUE,
-    "address" VARCHAR(255) NOT NULL,
+    "address" VARCHAR(255),
     "contacts" JSONB,
     "website" VARCHAR(255),
     "description" TEXT,
@@ -104,9 +95,9 @@ CREATE TABLE IF NOT EXISTS "establishments" (
     "longitude" DOUBLE PRECISION,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "city_id" INT NOT NULL REFERENCES "cities" ("id") ON DELETE CASCADE,
     "created_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL,
     "establishment_type_id" INT NOT NULL REFERENCES "establishment_types" ("id") ON DELETE CASCADE,
-    "sector_id" INT NOT NULL REFERENCES "sectors" ("id") ON DELETE CASCADE,
     "updated_by_id" BIGINT REFERENCES "users" ("id") ON DELETE SET NULL
 );
 CREATE TABLE IF NOT EXISTS "formations" (

@@ -5,7 +5,7 @@ from tortoise.models import Model
 
 class Domain(Model):
     id = fields.IntField(primary_key=True)
-    name = fields.CharField(max_length=255)
+    name = fields.CharField(max_length=255, unique=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
     created_by = fields.ForeignKeyField(

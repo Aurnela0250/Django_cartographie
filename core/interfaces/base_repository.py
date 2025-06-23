@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 from uuid import UUID
 
 from core.entities.pagination import (
@@ -16,7 +16,7 @@ class BaseRepository(Generic[T], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get(self, id: UUID | int) -> Optional[T]:
+    async def get(self, id: UUID | int) -> T:
         pass
 
     @abstractmethod

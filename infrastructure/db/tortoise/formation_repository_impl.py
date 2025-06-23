@@ -2,6 +2,8 @@ import logging
 from typing import Optional
 from uuid import UUID
 
+from tortoise.exceptions import DoesNotExist, IntegrityError
+
 from apps.tortoise.formation.models import Formation as TortoiseFormation
 from core.entities.filters import FormationFilters
 from core.entities.formation import FormationEntity
@@ -9,6 +11,11 @@ from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.formation_repository import IFormationRepository
 from infrastructure.db.tortoise.metadata import FormationToEntityMetadata
 from infrastructure.db.tortoise.model_to_entity import formation_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +41,7 @@ class FormationRepository(IFormationRepository):
             )
         except Exception as e:
             logger.error(f"Error converting formation model to entity: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def create(self, data: FormationEntity) -> FormationEntity:
         try:
@@ -52,9 +59,12 @@ class FormationRepository(IFormationRepository):
             result = await self._to_entity(formation_model)
             logger.info(f"Formation created successfully with ID: {result.id}")
             return result
+        except IntegrityError as e:
+            logger.error(f"Error creating formation '{data.name}': {e}")
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
             logger.error(f"Error creating formation '{data.name}': {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get(self, id: UUID | int) -> Optional[FormationEntity]:
         try:
@@ -65,9 +75,12 @@ class FormationRepository(IFormationRepository):
             result = await self._to_entity(formation_model)
             logger.debug(f"Formation found: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Formation with ID {id} not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(f"Formation with ID {id} not found or error occurred: {e}")
-            return None
+            logger.error(f"Error getting formation with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def get_all(
         self,
@@ -119,7 +132,7 @@ class FormationRepository(IFormationRepository):
             return result
         except Exception as e:
             logger.error(f"Error getting all formations: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def update(self, id: UUID | int, data: FormationEntity) -> FormationEntity:
         try:
@@ -148,11 +161,15 @@ class FormationRepository(IFormationRepository):
             result = await self._to_entity(formation_model)
             logger.info(f"Formation updated successfully: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Formation with ID {id} not found for update: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
+        except IntegrityError as e:
+            logger.error(f"Error updating formation with ID {id}: {e}")
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Formation with ID {id} not found or error occurred during update: {e}"
-            )
-            raise
+            logger.error(f"Error updating formation with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def delete(self, id: UUID | int) -> bool:
         try:
@@ -162,11 +179,12 @@ class FormationRepository(IFormationRepository):
             await formation_model.delete()
             logger.info(f"Formation '{formation_name}' deleted successfully")
             return True
+        except DoesNotExist as e:
+            logger.warning(f"Formation with ID {id} not found for deletion: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Formation with ID {id} not found or error occurred during deletion: {e}"
-            )
-            raise
+            logger.error(f"Error deleting formation with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def filter(
         self,
@@ -228,7 +246,7 @@ class FormationRepository(IFormationRepository):
             return result
         except Exception as e:
             logger.error(f"Error filtering formations with criteria {filters}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def count(self, **kwargs) -> int:
         try:
@@ -241,7 +259,7 @@ class FormationRepository(IFormationRepository):
             return count
         except Exception as e:
             logger.error(f"Error counting formations with criteria {kwargs}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get_by_name(self, name: str) -> Optional[FormationEntity]:
         try:
@@ -252,8 +270,9 @@ class FormationRepository(IFormationRepository):
             result = await self._to_entity(formation_model)
             logger.debug(f"Formation found by name: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Formation with name '{name}' not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Formation with name '{name}' not found or error occurred: {e}"
-            )
-            return None
+            logger.error(f"Error getting formation by name '{name}': {e}")
+            raise DatabaseException(cause=e)

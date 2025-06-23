@@ -2,7 +2,7 @@ import pytest
 
 from core.entities.domain import DomainEntity
 from core.entities.pagination import PaginatedResult
-from presentation.exceptions import InternalServerErrorException
+from presentation.exceptions import DatabaseException, InternalServerErrorException
 
 
 class TestDomainFilterUseCase:
@@ -24,7 +24,11 @@ class TestDomainFilterUseCase:
             # Given
             sample_domain = domain_factory(id=1, name="Science")
             expected_result = PaginatedResult[DomainEntity](
-                items=[sample_domain], total_items=1, page=1, per_page=10, total_pages=1
+                items=[sample_domain],
+                total_items=1,
+                page=1,
+                per_page=10,
+                total_pages=1,
             )
             mock_domain_repository.filter.return_value = expected_result
 
@@ -52,7 +56,11 @@ class TestDomainFilterUseCase:
             """Test for domain filtering with no matching results."""
             # Given
             expected_result = PaginatedResult[DomainEntity](
-                items=[], total_items=0, page=1, per_page=10, total_pages=0
+                items=[],
+                total_items=0,
+                page=1,
+                per_page=10,
+                total_pages=0,
             )
             mock_domain_repository.filter.return_value = expected_result
 
@@ -129,3 +137,24 @@ class TestDomainFilterUseCase:
             mock_domain_repository.filter.assert_called_once_with(
                 pagination_params=pagination_params, filters=domain_filters
             )
+
+        @pytest.mark.asyncio
+        async def test_should_raise_internal_error_on_db_failure(
+            self,
+            domain_use_case,
+            mock_domain_repository,
+            pagination_params,
+            domain_filters,
+        ):
+            """Test for error handling during domain retrieval on generic DB error."""
+            # Given
+            mock_domain_repository.filter.side_effect = DatabaseException(
+                "Database error"
+            )
+
+            # When & Then
+            with pytest.raises(InternalServerErrorException):
+                await domain_use_case.filter(
+                    pagination_params=pagination_params,
+                    filters=domain_filters,
+                )

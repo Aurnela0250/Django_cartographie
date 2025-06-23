@@ -1,0 +1,20 @@
+{
+  "servers": {
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "BSA9ZboH2q4jp6EaV3AxvUm3TvhHOFM"
+      }
+    },
+    "github.com/pashpashpash/perplexity-mcp": {
+      "command": "node",
+      "args": [
+        "/Users/ninotwilrich/Documents/Cline/MCP/perplexity-mcp/build/index.js"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": "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"
+      }
+    }
+  }
+}

@@ -12,7 +12,7 @@ from .endpoints.mention_controller import router as mention_router
 from .endpoints.region_controller import router as region_router
 
 # Router parent avec le préfixe global v1
-v1_router = APIRouter(prefix="/v1")
+v1_router = APIRouter(prefix="/api/v1")
 
 
 v1_router.include_router(auth_router)

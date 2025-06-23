@@ -1,6 +1,7 @@
 import logging
-from typing import Optional
 from uuid import UUID
+
+from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from apps.tortoise.domain.models import Domain as TortoiseDomain
 from core.entities.domain import DomainEntity
@@ -8,6 +9,11 @@ from core.entities.filters import DomainFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.domain_repository import IDomainRepository
 from infrastructure.db.tortoise.model_to_entity import domain_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +40,7 @@ class DomainRepository(IDomainRepository):
             return await domain_to_entity(domain_model)
         except Exception as e:
             logger.error(f"Error converting domain model to entity: {e}")
-            raise
+            raise DatabaseException("Failed to convert domain model to entity", cause=e)
 
     async def create(self, data: DomainEntity) -> DomainEntity:
         """
@@ -52,14 +58,22 @@ class DomainRepository(IDomainRepository):
                 name=data.name,
                 created_by_id=data.created_by,
             )
+            await domain_model.fetch_related("created_by", "updated_by")
             result = await self._to_entity(domain_model)
             logger.info(f"Domain created successfully with ID: {result.id}")
             return result
+        except IntegrityError as e:
+            logger.warning(
+                f"Integrity error creating domain '{data.name}': {e}", exc_info=True
+            )
+            raise DatabaseIntegrityException(
+                f"Domain with name '{data.name}' already exists.", cause=e
+            )
         except Exception as e:
-            logger.error(f"Error creating domain '{data.name}': {e}")
-            raise
+            logger.error(f"Error creating domain '{data.name}': {e}", exc_info=True)
+            raise DatabaseException("Error creating domain", cause=e)
 
-    async def get(self, id: UUID | int) -> Optional[DomainEntity]:
+    async def get(self, id: UUID | int) -> DomainEntity:
         """
         Récupère un domaine par son ID
 
@@ -77,9 +91,17 @@ class DomainRepository(IDomainRepository):
             result = await self._to_entity(domain_model)
             logger.debug(f"Domain found: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Domain with ID {id} not found.")
+            raise DatabaseDoesNotExistException(
+                f"Domain with ID {id} not found.", cause=e
+            )
         except Exception as e:
-            logger.warning(f"Domain with ID {id} not found or error occurred: {e}")
-            return None
+            logger.error(
+                f"An unexpected error occurred while getting domain {id}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseException("Error getting domain by ID", cause=e)
 
     async def get_all(
         self, pagination_params: PaginationParams
@@ -136,8 +158,8 @@ class DomainRepository(IDomainRepository):
             logger.info(f"Retrieved {len(entities)} domains out of {total_count} total")
             return result
         except Exception as e:
-            logger.error(f"Error getting all domains: {e}")
-            raise
+            logger.error(f"Error getting all domains: {e}", exc_info=True)
+            raise DatabaseException("Error getting all domains", cause=e)
 
     async def update(self, id: UUID | int, data: DomainEntity) -> DomainEntity:
         """
@@ -148,7 +170,11 @@ class DomainRepository(IDomainRepository):
             data: Les nouvelles données du domaine
 
         Returns:
-            Optional[DomainEntity]: L'entité Domain mise à jour ou None si non trouvé
+            DomainEntity: L'entité Domain mise à jour
+        Raises:
+            DatabaseDoesNotExistException: Si le domaine n'existe pas
+            DatabaseIntegrityException: Si une contrainte d'intégrité est violée
+            DatabaseException: Pour toute autre erreur de base de données
         """
         try:
             logger.info(f"Updating domain with ID: {id}")
@@ -160,16 +186,30 @@ class DomainRepository(IDomainRepository):
                 domain_model.updated_by_id = data.updated_by
 
             await domain_model.save()
-            await domain_model.refresh_from_db()
+            await domain_model.fetch_related("created_by", "updated_by")
 
             result = await self._to_entity(domain_model)
             logger.info(f"Domain updated successfully: {result.name}")
             return result
-        except Exception as e:
-            logger.warning(
-                f"Domain with ID {id} not found or error occurred during update: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Domain with ID {id} not found for update.")
+            raise DatabaseDoesNotExistException(
+                f"Domain with ID {id} not found.", cause=e
             )
-            raise
+        except IntegrityError as e:
+            logger.warning(
+                f"Integrity error updating domain {id} with name '{data.name}': {e}",
+                exc_info=True,
+            )
+            raise DatabaseIntegrityException(
+                f"A domain with name '{data.name}' may already exist.", cause=e
+            )
+        except Exception as e:
+            logger.error(
+                f"Error updating domain {id}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseException("Error updating domain", cause=e)
 
     async def delete(self, id: UUID | int) -> bool:
         """
@@ -188,11 +228,17 @@ class DomainRepository(IDomainRepository):
             await domain_model.delete()
             logger.info(f"Domain '{domain_name}' deleted successfully")
             return True
-        except Exception as e:
-            logger.warning(
-                f"Domain with ID {id} not found or error occurred during deletion: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Domain with ID {id} not found for deletion.")
+            raise DatabaseDoesNotExistException(
+                f"Domain with ID {id} not found.", cause=e
             )
-            raise
+        except Exception as e:
+            logger.error(
+                f"Error deleting domain {id}: {e}",
+                exc_info=True,
+            )
+            raise DatabaseException("Error deleting domain", cause=e)
 
     async def filter(
         self,
@@ -261,8 +307,10 @@ class DomainRepository(IDomainRepository):
             )
             return result
         except Exception as e:
-            logger.error(f"Error filtering domains with criteria {filters}: {e}")
-            raise
+            logger.error(
+                f"Error filtering domains with criteria {filters}: {e}", exc_info=True
+            )
+            raise DatabaseException("Error filtering domains", cause=e)
 
     async def count(self, **kwargs) -> int:
         """
@@ -274,19 +322,9 @@ class DomainRepository(IDomainRepository):
         Returns:
             int: Le nombre de domaines correspondant aux critères
         """
-        try:
-            logger.debug(f"Counting domains with criteria: {kwargs}")
-            if kwargs:
-                count = await TortoiseDomain.filter(**kwargs).count()
-            else:
-                count = await TortoiseDomain.all().count()
-            logger.debug(f"Domain count: {count}")
-            return count
-        except Exception as e:
-            logger.error(f"Error counting domains with criteria {kwargs}: {e}")
-            raise
+        raise NotImplementedError
 
-    async def get_by_name(self, name: str) -> Optional[DomainEntity]:
+    async def get_by_name(self, name: str) -> DomainEntity:
         """
         Récupère un domaine par son nom
 
@@ -294,7 +332,7 @@ class DomainRepository(IDomainRepository):
             name: Le nom du domaine à récupérer
 
         Returns:
-            Optional[DomainEntity]: L'entité Domain ou None si non trouvé
+            DomainEntity: L'entité Domain ou Raise DoesNotExist si non trouvé
         """
         try:
             logger.debug(f"Getting domain by name: {name}")
@@ -304,8 +342,14 @@ class DomainRepository(IDomainRepository):
             result = await self._to_entity(domain_model)
             logger.debug(f"Domain found by name: {result.name}")
             return result
-        except Exception as e:
-            logger.warning(
-                f"Domain with name '{name}' not found or error occurred: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Domain with name '{name}' not found.")
+            raise DatabaseDoesNotExistException(
+                f"Domain with name '{name}' not found.", cause=e
             )
-            return None
+        except Exception as e:
+            logger.error(
+                f"An unexpected error occurred while getting domain by name '{name}': {e}",
+                exc_info=True,
+            )
+            raise DatabaseException("Error getting domain by name", cause=e)

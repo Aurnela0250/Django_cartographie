@@ -11,7 +11,10 @@ class TestAuthGetCurrentUserUseCase:
 
         @pytest.mark.asyncio
         async def test_should_get_current_user_successfully(
-            self, auth_use_case, mock_auth_repository, user_factory
+            self,
+            auth_use_case,
+            mock_auth_repository,
+            user_factory,
         ):
             """Test for successful retrieval of current user"""
             # Given

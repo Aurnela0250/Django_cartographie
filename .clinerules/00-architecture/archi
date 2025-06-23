@@ -1,0 +1,59 @@
+---
+description: Enforce Clean Architecture principles for the Python backend.
+globs:
+  [
+    "core/**/*.py",
+    "infrastructure/**/*.py",
+    "presentation/**/*.py",
+    "apps/**/*.py",
+  ]
+alwaysApply: true
+---
+
+# Layer Structure
+
+- **Dependency Rule**: Dependencies must only point inwards: `Presentation` -> `Application` -> `Domain`. The `Infrastructure` layer implements interfaces defined in the `Domain` layer.
+- **Separation**: Keep business logic strictly separate from frameworks (FastAPI, Tortoise-ORM).
+- **Interfaces**: Define abstractions (interfaces) in the `core/interfaces` directory to decouple layers.
+
+# Domain Layer (`core/entities` and `core/interfaces`)
+
+- **Entities (`core/entities`)**:
+  - Represent core business concepts.
+  - Must be plain Python objects (Pydantic models are acceptable for data validation).
+  - Must NOT depend on any framework or external library (e.g., no Tortoise-ORM models).
+- **Interfaces (`core/interfaces`)**:
+  - Define contracts for data repositories (e.g., `ICityRepository`).
+  - These interfaces are implemented by the `Infrastructure` layer.
+
+# Application Layer (`core/use_cases`)
+
+- **Use Cases**:
+  - Orchestrate the flow of data between the `Domain` and `Infrastructure` layers.
+  - Contain application-specific business rules.
+  - Should be the only entry point to interact with the `Domain`.
+  - Must depend on `Domain` interfaces, not concrete implementations.
+
+# Infrastructure Layer (`infrastructure/` and `apps/tortoise/`)
+
+- **Repositories (`infrastructure/db/`)**:
+  - Implement the repository interfaces defined in `core/interfaces`.
+  - Contain all data access logic (e.g., Tortoise-ORM queries).
+  - Translate between ORM models (`apps/tortoise/`) and `Domain` entities.
+- **ORM Models (`apps/tortoise/`)**:
+  - Define the database schema.
+  - These models are an implementation detail and must NOT leak into the `Domain` or `Application` layers.
+- **External Services (`infrastructure/external_services/`)**:
+  - Isolate and implement integrations with third-party services (e.g., Redis, JWT).
+
+# Presentation Layer (`presentation/`)
+
+- **API Endpoints (`presentation/api/`)**:
+  - Handle HTTP requests and responses.
+  - Use dependency injection to get `Application` layer use cases.
+  - Responsible for input validation and data serialization/deserialization.
+- **Schemas (`presentation/schemas/`)**:
+  - Define the structure of API data (DTOs).
+  - Used to validate incoming data and format outgoing responses.
+- **Exceptions (`presentation/exceptions.py`)**:
+  - Define custom exceptions for handling HTTP errors.

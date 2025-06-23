@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Optional
 
 from core.entities.filters import RegionFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
@@ -11,7 +10,7 @@ class IRegionRepository(BaseRepository[RegionEntity]):
     """Repository pour les opérations sur les régions"""
 
     @abstractmethod
-    async def get_by_name(self, name: str) -> Optional[RegionEntity]:
+    async def get_by_name(self, name: str) -> RegionEntity:
         """Récupère une région par son nom"""
         raise NotImplementedError
 

@@ -11,12 +11,12 @@ class IAuthRepository(BaseRepository[UserEntity]):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_user_by_email(self, email: str) -> UserEntity | None:
+    async def get_user_by_email(self, email: str) -> UserEntity:
         """Get user by email address."""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_user_by_id(self, user_id: int) -> UserEntity | None:
+    async def get_user_by_id(self, user_id: int) -> UserEntity:
         """Get user by ID."""
         raise NotImplementedError
 

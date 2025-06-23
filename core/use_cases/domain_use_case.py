@@ -1,5 +1,6 @@
 import logging
 
+from tortoise.exceptions import IntegrityError, OperationalError
 from tortoise.transactions import atomic
 
 from core.entities.domain import DomainEntity
@@ -8,6 +9,9 @@ from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.domain_repository import IDomainRepository
 from presentation.exceptions import (
     ConflictException,
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
     InternalServerErrorException,
     NotFoundException,
 )
@@ -26,16 +30,13 @@ class DomainUseCase:
     @atomic()
     async def create(self, domain_data: DomainEntity) -> DomainEntity:
         try:
-            existing_domain = await self.domain_repository.get_by_name(domain_data.name)
-            if existing_domain:
-                self.logger.warning(
-                    f"Domain with name '{domain_data.name}' already exists"
-                )
-                raise ConflictException()
-            created_domain = await self.domain_repository.create(domain_data)
-            return created_domain
-        except ConflictException as e:
-            raise e
+            return await self.domain_repository.create(domain_data)
+        except IntegrityError:
+            self.logger.warning(f"Domain with name '{domain_data.name}' already exists")
+            raise ConflictException()
+        except OperationalError as e:
+            self.logger.error(f"Database error during domain creation: {str(e)}")
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during domain creation: {str(e)}")
             raise InternalServerErrorException(cause=e)
@@ -43,12 +44,12 @@ class DomainUseCase:
     @atomic()
     async def get(self, domain_id: int) -> DomainEntity:
         try:
-            domain = await self.domain_repository.get(domain_id)
-            if not domain:
-                raise NotFoundException()
-            return domain
-        except NotFoundException as e:
-            raise e
+            return await self.domain_repository.get(domain_id)
+        except DatabaseDoesNotExistException as e:
+            raise NotFoundException(cause=e)
+        except DatabaseException as e:
+            self.logger.error(f"Database error during domain retrieval: {str(e)}")
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during domain retrieval: {str(e)}")
             raise InternalServerErrorException(cause=e)
@@ -57,19 +58,22 @@ class DomainUseCase:
     async def update(self, domain_id: int, domain_data: DomainEntity) -> DomainEntity:
         try:
             existing_domain = await self.domain_repository.get(domain_id)
-            if not existing_domain:
-                raise NotFoundException()
-            if domain_data.name != existing_domain.name:
-                name_exists = await self.domain_repository.get_by_name(domain_data.name)
-                if name_exists and name_exists.id != domain_id:
-                    self.logger.warning(
-                        f"Cannot update: Domain with name '{domain_data.name}' already exists"
-                    )
-                    raise ConflictException()
-            updated_domain = await self.domain_repository.update(domain_id, domain_data)
-            return updated_domain
-        except (NotFoundException, ConflictException) as e:
-            raise e
+
+            if domain_data.name == existing_domain.name:
+                return existing_domain
+
+            return await self.domain_repository.update(domain_id, domain_data)
+
+        except DatabaseDoesNotExistException as e:
+            raise NotFoundException(cause=e)
+        except DatabaseIntegrityException as e:
+            self.logger.warning(
+                f"A domain with name '{domain_data.name}' may already exist."
+            )
+            raise ConflictException(cause=e)
+        except DatabaseException as e:
+            self.logger.error(f"Database error during domain retrieval: {str(e)}")
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during domain update: {str(e)}")
             raise InternalServerErrorException(cause=e)
@@ -77,13 +81,12 @@ class DomainUseCase:
     @atomic()
     async def delete(self, domain_id: int) -> bool:
         try:
-            existing_domain = await self.domain_repository.get(domain_id)
-            if not existing_domain:
-                raise NotFoundException()
-            result = await self.domain_repository.delete(domain_id)
-            return result
-        except NotFoundException as e:
-            raise e
+            return await self.domain_repository.delete(domain_id)
+        except DatabaseDoesNotExistException as e:
+            raise NotFoundException(cause=e)
+        except DatabaseException as e:
+            self.logger.error(f"Database error during domain deletion: {str(e)}")
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during domain deletion: {str(e)}")
             raise InternalServerErrorException(cause=e)
@@ -98,6 +101,9 @@ class DomainUseCase:
                 pagination_params=pagination_params
             )
             return domains
+        except DatabaseException as e:
+            self.logger.error(f"Database error during domain retrieval: {str(e)}")
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during domains retrieval: {str(e)}")
             raise InternalServerErrorException(cause=e)
@@ -114,6 +120,9 @@ class DomainUseCase:
                 filters=filters,
             )
             return domains
+        except DatabaseException as e:
+            self.logger.error(f"Database error during domains filtering: {str(e)}")
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during domains filtering: {str(e)}")
             raise InternalServerErrorException(cause=e)

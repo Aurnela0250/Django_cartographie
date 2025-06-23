@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from core.entities.filters import MentionFilters
 from core.entities.mention import MentionEntity
@@ -10,7 +9,7 @@ from core.interfaces.base_repository import BaseRepository
 class IMentionRepository(BaseRepository[MentionEntity], ABC):
 
     @abstractmethod
-    async def get_by_name(self, name: str) -> Optional[MentionEntity]:
+    async def get_by_name(self, name: str) -> MentionEntity:
         raise NotImplementedError
 
     @abstractmethod

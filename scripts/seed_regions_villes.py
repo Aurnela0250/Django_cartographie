@@ -1,15 +1,19 @@
-# Ce script suppose que Django est déjà configuré (settings chargés)
+#!/usr/bin/env python3
+"""
+Script de seed pour les régions et villes de Madagascar
+"""
+import asyncio
 import os
+import sys
 
-import django
+# Ajouter le répertoire parent au path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from apps.city.models import City
-from apps.region.models import Region
+from tortoise import Tortoise
 
-# Adapter ce chemin si besoin
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Django_cartographie.settings")
-django.setup()
-
+from apps.tortoise.city.models import City
+from apps.tortoise.region.models import Region
+from config.settings import TORTOISE_ORM
 
 data = {
     "provinces": [
@@ -134,14 +138,75 @@ data = {
     ]
 }
 
-for province in data["provinces"]:
-    for region_data in province["regions"]:
-        region_name = region_data["nom"]
-        region, created = Region.objects.get_or_create(name=region_name)
-        print(f"{'Créée' if created else 'Déjà existante'} région : {region_name}")
 
-        for ville_name in region_data["villes"]:
-            city, created = City.objects.get_or_create(name=ville_name, region=region)
-            print(
-                f"    {'Créée' if created else 'Déjà existante'} ville : {ville_name}"
-            )
+async def seed_regions_and_cities():
+    """Seed les régions et villes dans la base de données"""
+    print("🌱 Démarrage du seeding des régions et villes...")
+
+    # Initialiser Tortoise ORM
+    await Tortoise.init(config=TORTOISE_ORM)
+
+    try:
+        # Compter les éléments existants
+        existing_regions = await Region.all().count()
+        existing_cities = await City.all().count()
+        print(f"📊 Régions existantes: {existing_regions}")
+        print(f"📊 Villes existantes: {existing_cities}")
+
+        regions_created = 0
+        regions_existing = 0
+        cities_created = 0
+        cities_existing = 0
+
+        for province in data["provinces"]:
+            print(f"\n🏛️  Province: {province['nom']}")
+
+            for region_data in province["regions"]:
+                region_name = region_data["nom"]
+
+                # Vérifier si la région existe déjà
+                existing_region = await Region.filter(name=region_name).first()
+
+                if existing_region:
+                    print(f"✅ Région déjà existante: {region_name}")
+                    region = existing_region
+                    regions_existing += 1
+                else:
+                    # Créer la nouvelle région
+                    region = await Region.create(name=region_name)
+                    print(f"✨ Région créée: {region_name}")
+                    regions_created += 1
+
+                # Traiter les villes de cette région
+                for ville_name in region_data["villes"]:
+                    # Vérifier si la ville existe déjà
+                    existing_city = await City.filter(name=ville_name).first()
+
+                    if existing_city:
+                        print(f"    ✅ Ville déjà existante: {ville_name}")
+                        cities_existing += 1
+                    else:
+                        # Créer la nouvelle ville
+                        await City.create(name=ville_name, region=region)
+                        print(f"    ✨ Ville créée: {ville_name}")
+                        cities_created += 1
+
+        # Statistiques finales
+        print("\n🎉 Seeding terminé!")
+        print(f"   - Régions créées: {regions_created}")
+        print(f"   - Régions déjà existantes: {regions_existing}")
+        print(f"   - Villes créées: {cities_created}")
+        print(f"   - Villes déjà existantes: {cities_existing}")
+        print(f"   - Total des régions: {await Region.all().count()}")
+        print(f"   - Total des villes: {await City.all().count()}")
+
+    except Exception as e:
+        print(f"❌ Erreur lors du seeding: {e}")
+        raise
+    finally:
+        # Fermer les connexions
+        await Tortoise.close_connections()
+
+
+if __name__ == "__main__":
+    asyncio.run(seed_regions_and_cities())

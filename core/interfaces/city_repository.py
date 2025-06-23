@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Optional
 
 from core.entities.city import CityEntity
 from core.entities.filters import CityFilters
@@ -11,7 +10,7 @@ class ICityRepository(BaseRepository[CityEntity]):
     """Repository pour les opérations sur les villes"""
 
     @abstractmethod
-    async def get_by_name(self, name: str) -> Optional[CityEntity]:
+    async def get_by_name(self, name: str) -> CityEntity:
         """Récupère une ville par son nom"""
         raise NotImplementedError
 

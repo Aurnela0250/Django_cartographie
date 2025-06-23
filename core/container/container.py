@@ -100,8 +100,8 @@ class Container(containers.DeclarativeContainer):
     )
 
     # Service singletons
-    redis_service: providers.Provider[RedisService] = providers.Singleton(RedisService)
-    jwt_service: providers.Provider[JWTService] = providers.Singleton(
+    redis_service: providers.Provider[RedisService] = providers.Factory(RedisService)
+    jwt_service: providers.Provider[JWTService] = providers.Factory(
         JWTService,
         redis_service=redis_service,
     )

@@ -16,18 +16,6 @@ class DomainFilters(BaseModel):
     id: Optional[int] = Field(default=None, description="ID exact du domaine")
     name: Optional[str] = Field(default=None, description="Nom exact du domaine")
 
-    # Filtres de recherche textuelle
-    name_contains: Optional[str] = Field(
-        default=None,
-        description="Recherche partielle dans le nom (insensible à la casse)",
-    )
-    name_starts_with: Optional[str] = Field(
-        default=None, description="Nom commençant par cette chaîne"
-    )
-    name_ends_with: Optional[str] = Field(
-        default=None, description="Nom se terminant par cette chaîne"
-    )
-
     # Filtres sur les utilisateurs
     created_by: Optional[int] = Field(
         default=None, description="ID de l'utilisateur qui a créé le domaine"
@@ -68,13 +56,7 @@ class DomainFilters(BaseModel):
         if self.id is not None:
             orm_dict["id"] = self.id
         if self.name is not None:
-            orm_dict["name"] = self.name
-        if self.name_contains is not None:
-            orm_dict["name__icontains"] = self.name_contains
-        if self.name_starts_with is not None:
-            orm_dict["name__startswith"] = self.name_starts_with
-        if self.name_ends_with is not None:
-            orm_dict["name__endswith"] = self.name_ends_with
+            orm_dict["name__icontains"] = self.name
         if self.created_by is not None:
             orm_dict["created_by"] = self.created_by
         if self.updated_by is not None:
@@ -435,7 +417,7 @@ class EstablishmentFilters(BaseModel):
         if self.id is not None:
             orm_dict["id"] = self.id
         if self.name is not None:
-            orm_dict["name"] = self.name
+            orm_dict["name__icontains"] = self.name
         if self.acronym is not None:
             orm_dict["acronym"] = self.acronym
         if self.establishment_type_id is not None:
@@ -587,7 +569,7 @@ class EstablishmentTypeFilters(BaseModel):
         if self.id is not None:
             orm_dict["id"] = self.id
         if self.name is not None:
-            orm_dict["name"] = self.name
+            orm_dict["name__icontains"] = self.name
 
         # Filtres de recherche textuelle
         if self.name_contains is not None:

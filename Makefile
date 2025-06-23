@@ -80,6 +80,39 @@ test:
 test-unit:
 	$(UV) run pytest $(TEST_PATH)unit/ $(PYTEST_OPTS)
 
+test-integration:
+	$(UV) run pytest $(TEST_PATH)integration/ $(PYTEST_OPTS)
+
+test-int-domain: docker-check-postgres
+	@echo "🧪 Configuration de l'environnement de test d'intégration..."
+	@echo "📋 Création de la base de données de test si nécessaire..."
+	$(UV) run pytest $(TEST_PATH)integration/domain/ $(PYTEST_OPTS)
+
+test-int-domain-create: docker-check-postgres
+	@echo "🧪 Configuration de l'environnement de test d'intégration..."
+	@echo "📋 Création de la base de données de test si nécessaire..."
+	$(UV) run pytest $(TEST_PATH)integration/domain/test_create_domain_repository.py $(PYTEST_OPTS)
+
+test-int-domain-delete: docker-check-postgres
+	@echo "🧪 Configuration de l'environnement de test d'intégration..."
+	@echo "📋 Création de la base de données de test si nécessaire..."
+	$(UV) run pytest $(TEST_PATH)integration/domain/test_delete_domain_repository.py $(PYTEST_OPTS)
+
+test-int-domain-get: docker-check-postgres
+	@echo "🧪 Configuration de l'environnement de test d'intégration..."
+	@echo "📋 Création de la base de données de test si nécessaire..."
+	$(UV) run pytest $(TEST_PATH)integration/domain/test_get_domain_repository.py $(PYTEST_OPTS)
+
+test-int-domain-get-all: docker-check-postgres
+	@echo "🧪 Configuration de l'environnement de test d'intégration..."
+	@echo "📋 Création de la base de données de test si nécessaire..."
+	$(UV) run pytest $(TEST_PATH)integration/domain/test_list_domain_repository.py $(PYTEST_OPTS)
+
+test-int-domain-update: docker-check-postgres
+	@echo "🧪 Configuration de l'environnement de test d'intégration..."
+	@echo "📋 Création de la base de données de test si nécessaire..."
+	$(UV) run pytest $(TEST_PATH)integration/domain/test_update_domain_repository.py $(PYTEST_OPTS)
+
 test-unit-auth:
 	$(UV) run pytest $(TEST_PATH)unit/auth/ $(PYTEST_OPTS)
 
@@ -123,22 +156,22 @@ test-unit-domain:
 	$(UV) run pytest $(TEST_PATH)unit/domain/ $(PYTEST_OPTS)
 
 test-unit-domain-create:
-	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_create_use_case.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_create_domain_use_case.py $(PYTEST_OPTS)
 
 test-unit-domain-update:
-	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_update_use_case.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_update_domain_use_case.py $(PYTEST_OPTS)
 
 test-unit-domain-get:
-	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_get_use_case.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_get_domain_use_case.py $(PYTEST_OPTS)
 
 test-unit-domain-get-all:
-	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_get_all_use_case.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_get_all_domain_use_case.py $(PYTEST_OPTS)
 
 test-unit-domain-delete:
-	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_delete_use_case.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_delete_domain_use_case.py $(PYTEST_OPTS)
 
 test-unit-domain-filter:
-	$(UV) run pytest $(TEST_PATH)unit/domain/test_domain_filter_use_case.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_filter_domain_use_case.py $(PYTEST_OPTS)
 
 test-unit-establishment-type:
 	$(UV) run pytest $(TEST_PATH)unit/establishment_type/ $(PYTEST_OPTS)
@@ -188,6 +221,27 @@ test-unit-establishment-rate:
 test-e2e:
 	$(UV) run pytest $(TEST_PATH)e2e/ $(PYTEST_OPTS)
 
+test-e2e-city:
+	$(UV) run pytest $(TEST_PATH)e2e/city/ $(PYTEST_OPTS)
+
+test-e2e-city-create:
+	$(UV) run pytest $(TEST_PATH)e2e/city/test_city_create_api.py $(PYTEST_OPTS)
+
+test-e2e-city-get:
+	$(UV) run pytest $(TEST_PATH)e2e/city/test_city_get_api.py $(PYTEST_OPTS)
+
+test-e2e-city-get-all:
+	$(UV) run pytest $(TEST_PATH)e2e/city/test_city_get_all_api.py $(PYTEST_OPTS)
+
+test-e2e-city-update:
+	$(UV) run pytest $(TEST_PATH)e2e/city/test_city_update_api.py $(PYTEST_OPTS)
+
+test-e2e-city-delete:
+	$(UV) run pytest $(TEST_PATH)e2e/city/test_city_delete_api.py $(PYTEST_OPTS)
+
+test-e2e-city-filter:
+	$(UV) run pytest $(TEST_PATH)e2e/city/test_city_filter_api.py $(PYTEST_OPTS)
+
 test-all:
 	$(UV) run pytest $(TEST_PATH) $(PYTEST_OPTS)
 
@@ -233,6 +287,10 @@ aerich-upgrade:
 	@echo "🚀 Applying migrations (Aerich)..."
 	$(UV) run aerich upgrade
 
+aerich-upgrade-fake:
+	@echo "🚀 Faking migrations (Aerich)..."
+	$(UV) run aerich upgrade --fake
+
 aerich-downgrade:
 	@echo "⏪ Rolling back last migration (Aerich)..."
 	@echo "Current status:"
@@ -272,6 +330,31 @@ clean:
 shell:
 	$(UV) run python
 
+# Scripts de seeding
+seed-domains: docker-check-postgres
+	@echo "🌱 Seeding des domaines..."
+	$(UV) run python scripts/seed_domains.py
+
+seed-levels: docker-check-postgres
+	@echo "🎓 Seeding des niveaux..."
+	$(UV) run python scripts/seed_levels.py
+
+seed-mentions: docker-check-postgres
+	@echo "🎯 Seeding des mentions..."
+	$(UV) run python scripts/seed_mentions.py
+
+seed-academic: docker-check-postgres
+	@echo "📚 Seeding complet des données académiques..."
+	$(UV) run python scripts/seed_all_academic.py
+
+seed-academic-stats: docker-check-postgres
+	@echo "📊 Statistiques des données académiques..."
+	$(UV) run python scripts/seed_all_academic.py --stats-only
+
+seed-regions-cities: docker-check-postgres
+	@echo "🏛️  Seeding des régions et villes..."
+	$(UV) run python scripts/seed_regions_villes.py
+
 # Aide
 help:
 	@echo "Commandes disponibles:"
@@ -288,6 +371,9 @@ help:
 	@echo "Tests:"
 	@echo "  test                 - Lancer tous les tests"
 	@echo "  test-unit            - Tests unitaires"
+	@echo "  test-integration     - Tests d'intégration"
+	@echo "  test-int-domain      - Tests d'intégration pour le module Domain"
+	@echo "  test-int-domain-create - Tests d'intégration pour le module Domain create"
 	@echo "  test-unit-auth       - Tests unitaires d'authentification"
 	@echo "  test-unit-auth-signup - Tests unitaires signup"
 	@echo "  test-unit-auth-login - Tests unitaires login"
@@ -342,10 +428,18 @@ help:
 	@echo "  docker-start         - Démarrer les services Docker"
 	@echo "  docker-stop          - Arrêter les services Docker"
 	@echo ""
+	@echo "Scripts de seeding:"
+	@echo "  seed-domains         - Seeder les domaines d'étude"
+	@echo "  seed-levels          - Seeder les niveaux d'étude"
+	@echo "  seed-mentions        - Seeder les mentions d'étude"
+	@echo "  seed-academic        - Seeder toutes les données académiques"
+	@echo "  seed-academic-stats  - Afficher les statistiques des données académiques"
+	@echo "  seed-regions-cities  - Seeder les régions et villes de Madagascar"
+	@echo ""
 	@echo "Utilitaires:"
 	@echo "  lint                 - Vérifier le code"
 	@echo "  format               - Formater le code"
 	@echo "  clean                - Nettoyer les fichiers Python"
 	@echo "  gen-keys             - Générer les clés JWT"
 
-.PHONY: install add-package add-dev-package run start test test-unit test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-unit-city test-unit-city-create test-unit-city-update test-unit-city-get test-unit-city-get-all test-unit-city-delete test-unit-city-filter test-unit-domain test-unit-domain-create test-unit-domain-update test-unit-domain-get test-unit-domain-get-all test-unit-domain-delete test-unit-domain-filter test-unit-establishment-type test-unit-establishment-type-create test-unit-establishment-type-update test-unit-establishment-type-get test-unit-establishment-type-get-all test-unit-establishment-type-delete test-unit-establishment-type-filter test-unit-establishment test-unit-establishment-create test-unit-establishment-get test-unit-establishment-update test-unit-establishment-delete test-unit-establishment-get-all test-unit-establishment-filter test-unit-establishment-rate test-e2e test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb
+.PHONY: install add-package add-dev-package run start test test-unit test-integration test-int-domain test-int-domain-create test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-unit-city test-unit-city-create test-unit-city-update test-unit-city-get test-unit-city-get-all test-unit-city-delete test-unit-city-filter test-unit-domain test-unit-domain-create test-unit-domain-update test-unit-domain-get test-unit-domain-get-all test-unit-domain-delete test-unit-domain-filter test-unit-establishment-type test-unit-establishment-type-create test-unit-establishment-type-update test-unit-establishment-type-get test-unit-establishment-type-get-all test-unit-establishment-type-delete test-unit-establishment-type-filter test-unit-establishment test-unit-establishment-create test-unit-establishment-get test-unit-establishment-update test-unit-establishment-delete test-unit-establishment-get-all test-unit-establishment-filter test-unit-establishment-rate test-e2e test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb seed-domains seed-levels seed-mentions seed-academic seed-academic-stats seed-domains seed-levels seed-mentions seed-academic seed-academic-stats

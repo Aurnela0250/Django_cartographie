@@ -2,12 +2,19 @@ import logging
 from typing import Optional
 from uuid import UUID
 
+from tortoise.exceptions import DoesNotExist, IntegrityError
+
 from apps.tortoise.region.models import Region as TortoiseRegion
 from core.entities.filters import RegionFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.entities.region import RegionEntity
 from core.interfaces.region_repository import IRegionRepository
 from infrastructure.db.tortoise.model_to_entity import region_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +32,7 @@ class RegionRepository(IRegionRepository):
             return await region_to_entity(region_model)
         except Exception as e:
             logger.error(f"Error converting region model to entity: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def create(self, data: RegionEntity) -> RegionEntity:
         try:
@@ -37,9 +44,14 @@ class RegionRepository(IRegionRepository):
             result = await self._to_entity(region_model)
             logger.info(f"Region created successfully with ID: {result.id}")
             return result
+        except IntegrityError as e:
+            logger.error(
+                f"Error creating region '{data.name}' due to integrity error: {e}"
+            )
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
             logger.error(f"Error creating region '{data.name}': {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get(self, id: UUID | int) -> Optional[RegionEntity]:
         try:
@@ -50,9 +62,12 @@ class RegionRepository(IRegionRepository):
             result = await self._to_entity(region_model)
             logger.debug(f"Region found: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Region with ID {id} not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(f"Region with ID {id} not found or error occurred: {e}")
-            return None
+            logger.error(f"Error getting region with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def get_all(
         self, pagination_params: PaginationParams
@@ -101,7 +116,7 @@ class RegionRepository(IRegionRepository):
             return result
         except Exception as e:
             logger.error(f"Error getting all regions: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def update(self, id: UUID | int, data: RegionEntity) -> RegionEntity:
         try:
@@ -118,11 +133,19 @@ class RegionRepository(IRegionRepository):
             result = await self._to_entity(region_model)
             logger.info(f"Region updated successfully: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Region with ID {id} not found for update: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
+        except IntegrityError as e:
+            logger.error(
+                f"Error updating region '{data.name}' due to integrity error: {e}"
+            )
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
             logger.warning(
                 f"Region with ID {id} not found or error occurred during update: {e}"
             )
-            raise
+            raise DatabaseException(cause=e)
 
     async def delete(self, id: UUID | int) -> bool:
         try:
@@ -132,11 +155,14 @@ class RegionRepository(IRegionRepository):
             await region_model.delete()
             logger.info(f"Region '{region_name}' deleted successfully")
             return True
+        except DoesNotExist as e:
+            logger.warning(f"Region with ID {id} not found for deletion: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
             logger.warning(
                 f"Region with ID {id} not found or error occurred during deletion: {e}"
             )
-            raise
+            raise DatabaseException(cause=e)
 
     async def filter(
         self,
@@ -192,7 +218,7 @@ class RegionRepository(IRegionRepository):
             return result
         except Exception as e:
             logger.error(f"Error filtering regions with criteria {filters}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def count(self, **kwargs) -> int:
         try:
@@ -205,7 +231,7 @@ class RegionRepository(IRegionRepository):
             return count
         except Exception as e:
             logger.error(f"Error counting regions with criteria {kwargs}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get_by_name(self, name: str) -> Optional[RegionEntity]:
         try:
@@ -216,8 +242,9 @@ class RegionRepository(IRegionRepository):
             result = await self._to_entity(region_model)
             logger.debug(f"Region found by name: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Region with name '{name}' not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Region with name '{name}' not found or error occurred: {e}"
-            )
-            return None
+            logger.error(f"Error getting region by name '{name}': {e}")
+            raise DatabaseException(cause=e)

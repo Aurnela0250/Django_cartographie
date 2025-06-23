@@ -2,6 +2,8 @@ import logging
 from typing import Optional
 from uuid import UUID
 
+from tortoise.exceptions import DoesNotExist, IntegrityError
+
 from apps.tortoise.establishment_type.models import (
     EstablishmentType as TortoiseEstablishmentType,
 )
@@ -10,6 +12,11 @@ from core.entities.filters import EstablishmentTypeFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.establishment_type_repository import IEstablishmentTypeRepository
 from infrastructure.db.tortoise.model_to_entity import establishment_type_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +36,9 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             return await establishment_type_to_entity(establishment_type_model)
         except Exception as e:
             logger.error(f"Error converting establishment type model to entity: {e}")
-            raise
+            raise DatabaseException(
+                "Failed to convert establishment type model to entity", cause=e
+            )
 
     async def create(self, data: EstablishmentTypeEntity) -> EstablishmentTypeEntity:
         try:
@@ -41,9 +50,16 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             result = await self._to_entity(establishment_type_model)
             logger.info(f"Establishment type created successfully with ID: {result.id}")
             return result
+        except IntegrityError as e:
+            logger.warning(
+                f"Integrity error creating establishment type '{data.name}': {e}"
+            )
+            raise DatabaseIntegrityException(
+                f"Establishment type '{data.name}' already exists.", cause=e
+            )
         except Exception as e:
             logger.error(f"Error creating establishment type '{data.name}': {e}")
-            raise
+            raise DatabaseException("Error creating establishment type", cause=e)
 
     async def get(self, id: UUID | int) -> Optional[EstablishmentTypeEntity]:
         try:
@@ -54,11 +70,14 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             result = await self._to_entity(establishment_type_model)
             logger.debug(f"Establishment type found: {result.name}")
             return result
-        except Exception as e:
-            logger.warning(
-                f"Establishment type with ID {id} not found or error occurred: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Establishment type with ID {id} not found.")
+            raise DatabaseDoesNotExistException(
+                f"Establishment type with ID {id} not found.", cause=e
             )
-            return None
+        except Exception as e:
+            logger.error(f"Error getting establishment type with ID {id}: {e}")
+            raise DatabaseException("Error getting establishment type", cause=e)
 
     async def get_all(
         self, pagination_params: PaginationParams
@@ -111,7 +130,7 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             return result
         except Exception as e:
             logger.error(f"Error getting all establishment types: {e}")
-            raise
+            raise DatabaseException("Error getting all establishment types", cause=e)
 
     async def update(
         self, id: UUID | int, data: EstablishmentTypeEntity
@@ -130,11 +149,21 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             result = await self._to_entity(establishment_type_model)
             logger.info(f"Establishment type updated successfully: {result.name}")
             return result
-        except Exception as e:
-            logger.warning(
-                f"Establishment type with ID {id} not found or error occurred during update: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Establishment type with ID {id} not found for update.")
+            raise DatabaseDoesNotExistException(
+                f"Establishment type with ID {id} not found.", cause=e
             )
-            raise
+        except IntegrityError as e:
+            logger.warning(
+                f"Integrity error updating establishment type with ID {id}: {e}"
+            )
+            raise DatabaseIntegrityException(
+                f"Establishment type name '{data.name}' may already exist.", cause=e
+            )
+        except Exception as e:
+            logger.error(f"Error updating establishment type with ID {id}: {e}")
+            raise DatabaseException("Error updating establishment type", cause=e)
 
     async def delete(self, id: UUID | int) -> bool:
         try:
@@ -146,11 +175,22 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
                 f"Establishment type '{establishment_type_name}' deleted successfully"
             )
             return True
-        except Exception as e:
-            logger.warning(
-                f"Establishment type with ID {id} not found or error occurred during deletion: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Establishment type with ID {id} not found for deletion.")
+            raise DatabaseDoesNotExistException(
+                f"Establishment type with ID {id} not found.", cause=e
             )
-            raise
+        except IntegrityError as e:
+            logger.error(
+                f"Integrity error deleting establishment type with ID {id}: {e}"
+            )
+            raise DatabaseIntegrityException(
+                "Cannot delete establishment type due to existing relationships.",
+                cause=e,
+            )
+        except Exception as e:
+            logger.error(f"Error deleting establishment type with ID {id}: {e}")
+            raise DatabaseException("Error deleting establishment type", cause=e)
 
     async def filter(
         self,
@@ -213,7 +253,7 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             logger.error(
                 f"Error filtering establishment types with criteria {filters}: {e}"
             )
-            raise
+            raise DatabaseException("Error filtering establishment types", cause=e)
 
     async def count(self, **kwargs) -> int:
         try:
@@ -228,7 +268,7 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             logger.error(
                 f"Error counting establishment types with criteria {kwargs}: {e}"
             )
-            raise
+            raise DatabaseException("Error counting establishment types", cause=e)
 
     async def get_by_name(self, name: str) -> Optional[EstablishmentTypeEntity]:
         try:
@@ -239,8 +279,11 @@ class EstablishmentTypeRepository(IEstablishmentTypeRepository):
             result = await self._to_entity(establishment_type_model)
             logger.debug(f"Establishment type found by name: {result.name}")
             return result
-        except Exception as e:
-            logger.warning(
-                f"Establishment type with name '{name}' not found or error occurred: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Establishment type with name '{name}' not found.")
+            raise DatabaseDoesNotExistException(
+                f"Establishment type with name '{name}' not found.", cause=e
             )
-            return None
+        except Exception as e:
+            logger.error(f"Error getting establishment type by name '{name}': {e}")
+            raise DatabaseException("Error getting establishment type by name", cause=e)

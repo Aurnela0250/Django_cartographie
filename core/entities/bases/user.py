@@ -11,6 +11,7 @@ class UserBaseEntity(BaseEntity):
     email: str
     password: str
     active: bool = True
+    created_by: Optional[int] = None
     updated_by: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

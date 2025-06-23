@@ -65,6 +65,7 @@ app = FastAPI(
     description="API FastAPI with SQLModel and Alembic migrations",
     version="1.0.0",
     lifespan=lifespan,
+    swagger_ui_parameters={"persistAuthorization": True},
 )
 
 container = Container()

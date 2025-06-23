@@ -8,6 +8,12 @@ class User(Model):
     password = fields.CharField(max_length=255)
     active = fields.BooleanField(default=True)
     email_verified = fields.BooleanField(default=False)
+    created_by = fields.ForeignKeyField(
+        "models.User",
+        related_name="created_users",
+        null=True,
+        on_delete=fields.SET_NULL,
+    )
     updated_by = fields.ForeignKeyField(
         "models.User",
         related_name="updated_users",

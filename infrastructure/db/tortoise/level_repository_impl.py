@@ -2,12 +2,19 @@ import logging
 from typing import Optional
 from uuid import UUID
 
+from tortoise.exceptions import DoesNotExist, IntegrityError
+
 from apps.tortoise.level.models import Level as TortoiseLevel
 from core.entities.filters import LevelFilters
 from core.entities.level import LevelEntity
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.level_repository import ILevelRepository
 from infrastructure.db.tortoise.model_to_entity import level_to_entity
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +32,7 @@ class LevelRepository(ILevelRepository):
             return await level_to_entity(level_model)
         except Exception as e:
             logger.error(f"Error converting level model to entity: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def create(self, data: LevelEntity) -> LevelEntity:
         try:
@@ -38,9 +45,14 @@ class LevelRepository(ILevelRepository):
             result = await self._to_entity(level_model)
             logger.info(f"Level created successfully with ID: {result.id}")
             return result
+        except IntegrityError as e:
+            logger.error(
+                f"Error creating level '{data.name}' due to integrity error: {e}"
+            )
+            raise DatabaseIntegrityException(cause=e)
         except Exception as e:
             logger.error(f"Error creating level '{data.name}': {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get(self, id: UUID | int) -> Optional[LevelEntity]:
         try:
@@ -51,9 +63,12 @@ class LevelRepository(ILevelRepository):
             result = await self._to_entity(level_model)
             logger.debug(f"Level found: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Level with ID {id} not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(f"Level with ID {id} not found or error occurred: {e}")
-            return None
+            logger.error(f"Error getting level with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def get_all(
         self, pagination_params: PaginationParams
@@ -102,7 +117,7 @@ class LevelRepository(ILevelRepository):
             return result
         except Exception as e:
             logger.error(f"Error getting all levels: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def update(self, id: UUID | int, data: LevelEntity) -> LevelEntity:
         try:
@@ -121,11 +136,17 @@ class LevelRepository(ILevelRepository):
             result = await self._to_entity(level_model)
             logger.info(f"Level updated successfully: {result.name}")
             return result
-        except Exception as e:
-            logger.warning(
-                f"Level with ID {id} not found or error occurred during update: {e}"
+        except DoesNotExist as e:
+            logger.warning(f"Level with ID {id} not found for update: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
+        except IntegrityError as e:
+            logger.error(
+                f"Error updating level with ID {id} due to integrity error: {e}"
             )
-            raise
+            raise DatabaseIntegrityException(cause=e)
+        except Exception as e:
+            logger.error(f"Error updating level with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def delete(self, id: UUID | int) -> bool:
         try:
@@ -135,11 +156,12 @@ class LevelRepository(ILevelRepository):
             await level_model.delete()
             logger.info(f"Level '{level_name}' deleted successfully")
             return True
+        except DoesNotExist as e:
+            logger.warning(f"Level with ID {id} not found for deletion: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Level with ID {id} not found or error occurred during deletion: {e}"
-            )
-            raise
+            logger.error(f"Error deleting level with ID {id}: {e}")
+            raise DatabaseException(cause=e)
 
     async def filter(
         self,
@@ -196,7 +218,7 @@ class LevelRepository(ILevelRepository):
             return result
         except Exception as e:
             logger.error(f"Error filtering levels with criteria {filters}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def count(self, **kwargs) -> int:
         try:
@@ -209,7 +231,7 @@ class LevelRepository(ILevelRepository):
             return count
         except Exception as e:
             logger.error(f"Error counting levels with criteria {kwargs}: {e}")
-            raise
+            raise DatabaseException(cause=e)
 
     async def get_by_name(self, name: str) -> Optional[LevelEntity]:
         try:
@@ -220,9 +242,12 @@ class LevelRepository(ILevelRepository):
             result = await self._to_entity(level_model)
             logger.debug(f"Level found by name: {result.name}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Level with name '{name}' not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(f"Level with name '{name}' not found or error occurred: {e}")
-            return None
+            logger.error(f"Error getting level by name '{name}': {e}")
+            raise DatabaseException(cause=e)
 
     async def get_by_acronym(self, acronym: str) -> Optional[LevelEntity]:
         try:
@@ -233,8 +258,9 @@ class LevelRepository(ILevelRepository):
             result = await self._to_entity(level_model)
             logger.debug(f"Level found by acronym: {result.acronym}")
             return result
+        except DoesNotExist as e:
+            logger.warning(f"Level with acronym '{acronym}' not found: {e}")
+            raise DatabaseDoesNotExistException(cause=e)
         except Exception as e:
-            logger.warning(
-                f"Level with acronym '{acronym}' not found or error occurred: {e}"
-            )
-            return None
+            logger.error(f"Error getting level by acronym '{acronym}': {e}")
+            raise DatabaseException(cause=e)

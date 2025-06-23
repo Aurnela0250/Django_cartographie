@@ -2,6 +2,7 @@ import pytest
 
 from core.entities.pagination import PaginatedResult, PaginationParams
 from presentation.exceptions import InternalServerErrorException
+from tests.factories import DomainFactory
 
 
 class TestDomainGetAllUseCase:
@@ -21,12 +22,16 @@ class TestDomainGetAllUseCase:
             """Test for successful retrieval of all domains."""
             # Given
             sample_domains = [
-                domain_factory(id=1, name="Science"),
-                domain_factory(id=2, name="Mathematics"),
-                domain_factory(id=3, name="Literature"),
+                DomainFactory.build(),
+                DomainFactory.build(),
+                DomainFactory.build(),
             ]
             expected_result = PaginatedResult(
-                items=sample_domains, total_items=3, page=1, per_page=10, total_pages=1
+                items=sample_domains,
+                total_items=3,
+                page=1,
+                per_page=10,
+                total_pages=1,
             )
             mock_domain_repository.get_all.return_value = expected_result
 
@@ -54,7 +59,11 @@ class TestDomainGetAllUseCase:
             """Test for retrieval of all domains with an empty result."""
             # Given
             empty_result = PaginatedResult(
-                items=[], total_items=0, page=1, per_page=10, total_pages=0
+                items=[],
+                total_items=0,
+                page=1,
+                per_page=10,
+                total_pages=0,
             )
             mock_domain_repository.get_all.return_value = empty_result
 
@@ -83,11 +92,15 @@ class TestDomainGetAllUseCase:
             # Given
             custom_pagination = PaginationParams(page=2, per_page=5)
             sample_domains = [
-                domain_factory(id=1, name="Science"),
-                domain_factory(id=2, name="Mathematics"),
+                DomainFactory.build(),
+                DomainFactory.build(),
             ]
             expected_result = PaginatedResult(
-                items=sample_domains, total_items=3, page=2, per_page=5, total_pages=1
+                items=sample_domains,
+                total_items=3,
+                page=2,
+                per_page=5,
+                total_pages=1,
             )
             mock_domain_repository.get_all.return_value = expected_result
 
@@ -154,12 +167,19 @@ class TestDomainGetAllUseCase:
 
     @pytest.mark.asyncio
     async def test_get_all_empty_result(
-        self, domain_use_case, mock_domain_repository, pagination_params
+        self,
+        domain_use_case,
+        mock_domain_repository,
+        pagination_params,
     ):
         """Test de récupération de tous les domaines avec résultat vide"""
         # Arrange
         empty_result = PaginatedResult(
-            items=[], total_items=0, page=1, per_page=10, total_pages=0
+            items=[],
+            total_items=0,
+            page=1,
+            per_page=10,
+            total_pages=0,
         )
         mock_domain_repository.get_all.return_value = empty_result
 

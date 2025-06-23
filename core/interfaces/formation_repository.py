@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from core.entities.filters import FormationFilters
 from core.entities.formation import FormationEntity
@@ -9,7 +8,7 @@ from core.interfaces.base_repository import BaseRepository
 
 class IFormationRepository(BaseRepository[FormationEntity], ABC):
     @abstractmethod
-    async def get_by_name(self, name: str) -> Optional[FormationEntity]:
+    async def get_by_name(self, name: str) -> FormationEntity:
         """Récupère une formation par son intitulé."""
         raise NotImplementedError
 

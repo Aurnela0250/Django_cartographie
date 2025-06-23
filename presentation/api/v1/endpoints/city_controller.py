@@ -1,7 +1,5 @@
-from typing import Annotated
-
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path
 
 from core.container.container import Container
 from core.entities.city import CityEntity
@@ -22,6 +20,7 @@ from presentation.exceptions import (
     ConflictException,
     InternalServerErrorException,
     NotFoundException,
+    UnauthorizedException,
 )
 from presentation.schemas.city import (
     CitySchema,
@@ -52,16 +51,43 @@ async def create(
     city_use_case: CityUseCase = Depends(Provide[Container.city_use_case]),
     user: UserEntity = Depends(get_current_user),
 ):
-    from core.entities.city import CityEntity
 
     try:
         city_entity = CityEntity(**city_data.model_dump(), created_by=user.id)
         city = await city_use_case.create(city_entity)
+        print(city)
         return CitySchema.model_validate(city)
     except ConflictException as e:
         raise e
     except Exception as e:
         raise InternalServerErrorException(cause=e)
+
+
+@router.get(
+    "/filter/",
+    response_model=PaginatedResultSchema[CitySchema],
+    status_code=200,
+    responses=filter_cities_responses,
+)
+@inject
+async def filter(
+    *,
+    pagination: PaginationParamsSchema = Depends(),
+    filters: CityFilters = Depends(),
+    city_use_case: CityUseCase = Depends(
+        Provide[Container.city_use_case],
+    ),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page, per_page=pagination.per_page
+    )
+    result = await city_use_case.filter(pagination_params, filters)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        CitySchema,
+        CitySchema.model_validate,
+    )
 
 
 @router.get(
@@ -101,10 +127,7 @@ async def get(
 @inject
 async def get_all(
     *,
-    pagination: Annotated[
-        PaginationParamsSchema,
-        Query(),
-    ],
+    pagination: PaginationParamsSchema = Depends(),
     city_use_case: CityUseCase = Depends(
         Provide[Container.city_use_case],
     ),
@@ -143,14 +166,13 @@ async def update(
 ):
 
     try:
-        city_entity = CityEntity(
-            **city_data.model_dump(),
-            updated_by=user.id,
-        )
-        updated_city = await city_use_case.update(
-            city_id,
-            city_entity,
-        )
+        if user.id is None:
+            raise UnauthorizedException(
+                message="Could not validate credentials for update action"
+            )
+
+        update_payload = city_data.model_dump(exclude_unset=True)
+        updated_city = await city_use_case.update(city_id, update_payload, user.id)
         return CitySchema.model_validate(updated_city)
     except ConflictException as e:
         raise ConflictException(cause=e)
@@ -182,36 +204,3 @@ async def deletew(
         raise NotFoundException(cause=e)
     except Exception as e:
         raise InternalServerErrorException(cause=e)
-
-
-@router.get(
-    "/filter/",
-    response_model=PaginatedResultSchema[CitySchema],
-    status_code=200,
-    responses=filter_cities_responses,
-)
-@inject
-async def filter(
-    *,
-    pagination: Annotated[
-        PaginationParamsSchema,
-        Query(),
-    ],
-    filters: Annotated[
-        CityFilters,
-        Query(),
-    ],
-    city_use_case: CityUseCase = Depends(
-        Provide[Container.city_use_case],
-    ),
-    user: UserEntity = Depends(get_current_user),
-):
-    pagination_params = PaginationParams(
-        page=pagination.page, per_page=pagination.per_page
-    )
-    result = await city_use_case.filter(pagination_params, filters)
-    return PaginatedResultSchema.from_domain_result(
-        result,
-        CitySchema,
-        CitySchema.model_validate,
-    )

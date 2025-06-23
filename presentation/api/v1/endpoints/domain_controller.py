@@ -54,6 +54,30 @@ async def create(
 
 
 @router.get(
+    "/filter/",
+    response_model=PaginatedResultSchema[DomainSchema],
+    status_code=200,
+)
+@inject
+async def filter(
+    *,
+    pagination: PaginationParamsSchema = Depends(),
+    filters: DomainFilters = Depends(),
+    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
+    user: UserEntity = Depends(get_current_user),
+):
+    pagination_params = PaginationParams(
+        page=pagination.page, per_page=pagination.per_page
+    )
+    result = await domain_use_case.filter(pagination_params, filters)
+    return PaginatedResultSchema.from_domain_result(
+        result,
+        DomainSchema,
+        DomainSchema.model_validate,
+    )
+
+
+@router.get(
     "/{domain_id}/",
     response_model=DomainSchema,
     status_code=200,
@@ -147,33 +171,3 @@ async def delete(
         raise NotFoundException(cause=e)
     except Exception as e:
         raise InternalServerErrorException(cause=e)
-
-
-@router.get(
-    "/filter/",
-    response_model=PaginatedResultSchema[DomainSchema],
-    status_code=200,
-)
-@inject
-async def filter(
-    *,
-    pagination: Annotated[
-        PaginationParamsSchema,
-        Query(),
-    ],
-    filters: Annotated[
-        DomainFilters,
-        Query(),
-    ],
-    domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
-    user: UserEntity = Depends(get_current_user),
-):
-    pagination_params = PaginationParams(
-        page=pagination.page, per_page=pagination.per_page
-    )
-    result = await domain_use_case.filter(pagination_params, filters)
-    return PaginatedResultSchema.from_domain_result(
-        result,
-        DomainSchema,
-        DomainSchema.model_validate,
-    )

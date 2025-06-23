@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Optional
 
 from core.entities.filters import UserFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
@@ -10,7 +9,7 @@ from core.interfaces.base_repository import BaseRepository
 class IUserRepository(BaseRepository[UserEntity]):
 
     @abstractmethod
-    async def get_user_by_email(self, email: str) -> Optional[UserEntity]:
+    async def get_user_by_email(self, email: str) -> UserEntity:
         raise NotImplementedError
 
     @abstractmethod
