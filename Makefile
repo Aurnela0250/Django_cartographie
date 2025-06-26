@@ -103,10 +103,10 @@ test-int-domain-get: docker-check-postgres
 	@echo "📋 Création de la base de données de test si nécessaire..."
 	$(UV) run pytest $(TEST_PATH)integration/domain/test_get_domain_repository.py $(PYTEST_OPTS)
 
-test-int-domain-get-all: docker-check-postgres
+test-int-domain-get-filter: docker-check-postgres
 	@echo "🧪 Configuration de l'environnement de test d'intégration..."
 	@echo "📋 Création de la base de données de test si nécessaire..."
-	$(UV) run pytest $(TEST_PATH)integration/domain/test_list_domain_repository.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)integration/domain/test_filter_domain_repository.py $(PYTEST_OPTS)
 
 test-int-domain-update: docker-check-postgres
 	@echo "🧪 Configuration de l'environnement de test d'intégration..."
@@ -171,7 +171,49 @@ test-unit-domain-delete:
 	$(UV) run pytest $(TEST_PATH)unit/domain/test_delete_domain_use_case.py $(PYTEST_OPTS)
 
 test-unit-domain-filter:
-	$(UV) run pytest $(TEST_PATH)unit/domain/test_filter_domain_use_case.py $(PYTEST_OPTS)
+	$(UV) run pytest $(TEST_PATH)unit/domain/test_filter_domain_use_case.py $(TEST_PATH)unit/domain/test_domain_filters.py $(PYTEST_OPTS)
+
+test-unit-mention:
+	$(UV) run pytest $(TEST_PATH)unit/mention/ $(PYTEST_OPTS)
+
+test-unit-mention-create:
+	$(UV) run pytest $(TEST_PATH)unit/mention/test_create_mention_use_case.py $(PYTEST_OPTS)
+
+test-unit-mention-get:
+	$(UV) run pytest $(TEST_PATH)unit/mention/test_get_mention_use_case.py $(PYTEST_OPTS)
+
+test-unit-mention-get-all:
+	$(UV) run pytest $(TEST_PATH)unit/mention/test_get_all_mentions_use_case.py $(PYTEST_OPTS)
+
+test-unit-mention-update:
+	$(UV) run pytest $(TEST_PATH)unit/mention/test_update_mention_use_case.py $(PYTEST_OPTS)
+
+test-unit-mention-delete:
+	$(UV) run pytest $(TEST_PATH)unit/mention/test_delete_mention_use_case.py $(PYTEST_OPTS)
+
+test-unit-mention-filter:
+	$(UV) run pytest $(TEST_PATH)unit/mention/test_filter_mentions_use_case.py $(PYTEST_OPTS)
+
+test-unit-region:
+	$(UV) run pytest $(TEST_PATH)unit/region/ $(PYTEST_OPTS)
+
+test-unit-region-create:
+	$(UV) run pytest $(TEST_PATH)unit/region/test_create_region_use_case.py $(PYTEST_OPTS)
+
+test-unit-level:
+	$(UV) run pytest $(TEST_PATH)unit/level/ $(PYTEST_OPTS)
+
+test-unit-level-create:
+	$(UV) run pytest $(TEST_PATH)unit/level/test_create_level_use_case.py $(PYTEST_OPTS)
+
+test-unit-level-get:
+	$(UV) run pytest $(TEST_PATH)unit/level/test_get_level_use_case.py $(PYTEST_OPTS)
+
+test-unit-level-update:
+	$(UV) run pytest $(TEST_PATH)unit/level/test_update_level_use_case.py $(PYTEST_OPTS)
+
+test-unit-level-delete:
+	$(UV) run pytest $(TEST_PATH)unit/level/test_delete_level_use_case.py $(PYTEST_OPTS)
 
 test-unit-establishment-type:
 	$(UV) run pytest $(TEST_PATH)unit/establishment_type/ $(PYTEST_OPTS)
@@ -241,6 +283,30 @@ test-e2e-city-delete:
 
 test-e2e-city-filter:
 	$(UV) run pytest $(TEST_PATH)e2e/city/test_city_filter_api.py $(PYTEST_OPTS)
+
+test-e2e-domain: docker-check-postgres
+	@echo "🧪 Lancement des tests E2E pour le module Domain..."
+	$(UV) run pytest $(TEST_PATH)e2e/domain/ $(PYTEST_OPTS)
+
+test-e2e-domain-create: docker-check-postgres
+	@echo "🧪 Lancement des tests E2E pour la création de Domain..."
+	$(UV) run pytest $(TEST_PATH)e2e/domain/test_create_domain_controller.py $(PYTEST_OPTS)
+
+test-e2e-domain-update: docker-check-postgres
+	@echo "🧪 Lancement des tests E2E pour la mise à jour de Domain..."
+	$(UV) run pytest $(TEST_PATH)e2e/domain/test_update_domain_controller.py $(PYTEST_OPTS)
+
+test-e2e-domain-filter: docker-check-postgres
+	@echo "🧪 Lancement des tests E2E pour le filtre Domain..."
+	$(UV) run pytest $(TEST_PATH)e2e/domain/test_filter_domains_controller.py $(PYTEST_OPTS)
+
+test-e2e-domain-get: docker-check-postgres
+	@echo "🧪 Lancement des tests E2E pour GET Domain..."
+	$(UV) run pytest $(TEST_PATH)e2e/domain/test_get_domain_controller.py $(PYTEST_OPTS)
+
+test-e2e-domain-get-all: docker-check-postgres
+	@echo "🧪 Lancement des tests E2E pour GET ALL Domain..."
+	$(UV) run pytest $(TEST_PATH)e2e/domain/test_get_all_domains_controller.py $(PYTEST_OPTS)
 
 test-all:
 	$(UV) run pytest $(TEST_PATH) $(PYTEST_OPTS)
@@ -394,6 +460,13 @@ help:
 	@echo "  test-unit-domain-get-all - Tests unitaires domain get_all"
 	@echo "  test-unit-domain-delete - Tests unitaires domain delete"
 	@echo "  test-unit-domain-filter - Tests unitaires domain filter"
+	@echo "  test-unit-mention      - Tests unitaires mention"
+	@echo "  test-unit-mention-create - Tests unitaires mention create"
+	@echo "  test-unit-level        - Tests unitaires level"
+	@echo "  test-unit-level-create - Tests unitaires level create"
+	@echo "  test-unit-level-get    - Tests unitaires level get"
+	@echo "  test-unit-level-update - Tests unitaires level update"
+	@echo "  test-unit-level-delete - Tests unitaires level delete"
 	@echo "  test-unit-establishment-type - Tests unitaires establishment_type"
 	@echo "  test-unit-establishment-type-create - Tests unitaires establishment_type create"
 	@echo "  test-unit-establishment-type-update - Tests unitaires establishment_type update"
@@ -410,6 +483,12 @@ help:
 	@echo "  test-unit-establishment-filter - Tests unitaires establishment filter"
 	@echo "  test-unit-establishment-rate - Tests unitaires establishment rate"
 	@echo "  test-e2e             - Tests end-to-end"
+	@echo "  test-e2e-domain      - Tests E2E pour le module Domain"
+	@echo "  test-e2e-domain-create - Tests E2E création Domain"
+	@echo "  test-e2e-domain-update - Tests E2E mise à jour Domain"
+	@echo "  test-e2e-domain-filter - Tests E2E filtre Domain"
+	@echo "  test-e2e-domain-get    - Tests E2E GET Domain"
+	@echo "  test-e2e-domain-get-all - Tests E2E GET ALL Domain"
 	@echo "  test-api             - Tests API"
 	@echo "  test-cov             - Tests avec couverture"
 	@echo ""
@@ -441,5 +520,5 @@ help:
 	@echo "  format               - Formater le code"
 	@echo "  clean                - Nettoyer les fichiers Python"
 	@echo "  gen-keys             - Générer les clés JWT"
+.PHONY: install add-package add-dev-package run start test test-unit test-integration test-int-domain test-int-domain-create test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-unit-city test-unit-city-create test-unit-city-update test-unit-city-get test-unit-city-get-all test-unit-city-delete test-unit-city-filter test-unit-domain test-unit-domain-create test-unit-domain-update test-unit-domain-get test-unit-domain-get-all test-unit-domain-delete test-unit-domain-filter test-unit-mention test-unit-mention-create test-unit-level test-unit-level-create test-unit-level-get test-unit-level-update test-unit-level-delete test-unit-establishment-type test-unit-establishment-type-create test-unit-establishment-type-update test-unit-establishment-type-get test-unit-establishment-type-get-all test-unit-establishment-type-delete test-unit-establishment-type-filter test-unit-establishment test-unit-establishment-create test-unit-establishment-get test-unit-establishment-update test-unit-establishment-delete test-unit-establishment-get-all test-unit-establishment-filter test-unit-establishment-rate test-e2e test-e2e-domain test-e2e-domain-create test-e2e-domain-update test-e2e-domain-filter test-e2e-domain-get test-e2e-domain-get-all test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb seed-domains seed-levels seed-mentions seed-academic seed-academic-stats seed-domains seed-levels seed-mentions seed-academic seed-academic-stats
 
-.PHONY: install add-package add-dev-package run start test test-unit test-integration test-int-domain test-int-domain-create test-unit-auth test-unit-auth-signup test-unit-auth-login test-unit-auth-refresh test-unit-auth-current-user test-unit-auth-logout test-unit-city test-unit-city-create test-unit-city-update test-unit-city-get test-unit-city-get-all test-unit-city-delete test-unit-city-filter test-unit-domain test-unit-domain-create test-unit-domain-update test-unit-domain-get test-unit-domain-get-all test-unit-domain-delete test-unit-domain-filter test-unit-establishment-type test-unit-establishment-type-create test-unit-establishment-type-update test-unit-establishment-type-get test-unit-establishment-type-get-all test-unit-establishment-type-delete test-unit-establishment-type-filter test-unit-establishment test-unit-establishment-create test-unit-establishment-get test-unit-establishment-update test-unit-establishment-delete test-unit-establishment-get-all test-unit-establishment-filter test-unit-establishment-rate test-e2e test-repo test-api test-all test-cov test-ci lint format clean shell help docker-start docker-stop docker-restart docker-check-redis docker-check-postgres gen-keys aerich-status aerich-heads aerich-migrate aerich-upgrade aerich-downgrade aerich-history aerich-init aerich-init-db aerich-inspectdb seed-domains seed-levels seed-mentions seed-academic seed-academic-stats seed-domains seed-levels seed-mentions seed-academic seed-academic-stats

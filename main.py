@@ -42,6 +42,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Configuration globale des logs pour les tests
+logging.getLogger("tortoise").setLevel(logging.WARNING)
+logging.getLogger("aiosqlite").setLevel(logging.WARNING)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
