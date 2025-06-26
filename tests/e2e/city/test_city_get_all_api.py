@@ -1,10 +1,9 @@
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from core.entities.city import CityEntity
 from core.entities.region import RegionEntity
 from main import container
-from tests.e2e.conftest import get_authenticated_user_token
 
 # Mark all tests in this module as e2e
 pytestmark = pytest.mark.e2e
@@ -17,11 +16,10 @@ class TestGetAllCities:
 
     @pytest.fixture(autouse=True)
     @pytest.mark.asyncio
-    async def setup_method(self, client: TestClient):
+    async def setup_method(self, authenticated_async_client: AsyncClient):
         """
         Setup test data before each test method.
         """
-        token = await get_authenticated_user_token(client)
         region_use_case = container.region_use_case()
         city_use_case = container.city_use_case()
         user_use_case = container.auth_use_case()
@@ -51,18 +49,18 @@ class TestGetAllCities:
         @pytest.mark.asyncio
         async def test_should_get_all_cities_paginated(
             self,
-            client: TestClient,
+            authenticated_async_client: AsyncClient,
         ):
             """
             Verify that cities can be listed with pagination.
             """
             # Given
-            token = await get_authenticated_user_token(client)
-            headers = {"Authorization": f"Bearer {token}"}
             params = {"page": 2, "per_page": 5}
 
             # When
-            response = client.get("/api/v1/cities/", headers=headers, params=params)
+            response = await authenticated_async_client.get(
+                "/api/v1/cities/", params=params
+            )
 
             # Then
             assert response.status_code == 200, response.text
@@ -81,13 +79,13 @@ class TestGetAllCities:
 
         @pytest.mark.asyncio
         async def test_should_return_401_for_unauthenticated_user(
-            self, client: TestClient
+            self, async_client: AsyncClient
         ):
             """
             Verify that an unauthenticated user cannot list cities.
             """
             # When
-            response = client.get("/api/v1/cities/")
+            response = await async_client.get("/api/v1/cities/")
 
             # Then
             assert response.status_code == 401, response.text

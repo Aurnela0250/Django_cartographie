@@ -1,10 +1,9 @@
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from core.entities.city import CityEntity
 from core.entities.region import RegionEntity
 from main import container
-from tests.e2e.conftest import get_authenticated_user_token
 
 # Mark all tests in this module as e2e
 pytestmark = pytest.mark.e2e
@@ -19,11 +18,10 @@ class TestGetCity:
 
     @pytest.fixture(autouse=True)
     @pytest.mark.asyncio
-    async def setup_method(self, client: TestClient):
+    async def setup_method(self, authenticated_async_client: AsyncClient):
         """
         Setup test data before each test method.
         """
-        token = await get_authenticated_user_token(client)
         region_use_case = container.region_use_case()
         city_use_case = container.city_use_case()
         user_use_case = container.auth_use_case()
@@ -50,19 +48,14 @@ class TestGetCity:
         @pytest.mark.asyncio
         async def test_should_get_city_successfully(
             self,
-            client: TestClient,
+            authenticated_async_client: AsyncClient,
         ):
             """
             Verify that a city can be retrieved successfully by its ID.
             """
-            # Given
-            token = await get_authenticated_user_token(client)
-            headers = {"Authorization": f"Bearer {token}"}
-
             # When
-            response = client.get(
+            response = await authenticated_async_client.get(
                 f"/api/v1/cities/{TestGetCity.city_to_get.id}/",
-                headers=headers,
             )
 
             # Then
@@ -78,19 +71,18 @@ class TestGetCity:
         """
 
         @pytest.mark.asyncio
-        async def test_should_return_404_when_city_not_found(self, client: TestClient):
+        async def test_should_return_404_when_city_not_found(
+            self, authenticated_async_client: AsyncClient
+        ):
             """
             Verify that a 404 Not Found error is returned for a non-existent city ID.
             """
             # Given
-            token = await get_authenticated_user_token(client)
             non_existent_city_id = 99999
-            headers = {"Authorization": f"Bearer {token}"}
 
             # When
-            response = client.get(
+            response = await authenticated_async_client.get(
                 f"/api/v1/cities/{non_existent_city_id}/",
-                headers=headers,
             )
 
             # Then
@@ -101,7 +93,7 @@ class TestGetCity:
 
         @pytest.mark.asyncio
         async def test_should_return_401_for_unauthenticated_user(
-            self, client: TestClient
+            self, async_client: AsyncClient
         ):
             """
             Verify that an unauthenticated user cannot retrieve a city.
@@ -110,7 +102,7 @@ class TestGetCity:
             city_id = 1
 
             # When
-            response = client.get(f"/api/v1/cities/{city_id}/")
+            response = await async_client.get(f"/api/v1/cities/{city_id}/")
 
             # Then
             assert response.status_code == 401, response.text

@@ -1,11 +1,10 @@
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from core.entities.city import CityEntity
 from core.entities.region import RegionEntity
 from main import container
 from presentation.schemas.city import UpdateCitySchema
-from tests.e2e.conftest import get_authenticated_user_token
 
 # Mark all tests in this module as e2e
 pytestmark = pytest.mark.e2e
@@ -21,11 +20,10 @@ class TestUpdateCity:
 
     @pytest.fixture(autouse=True)
     @pytest.mark.asyncio
-    async def setup_method(self, client: TestClient):
+    async def setup_method(self, authenticated_async_client: AsyncClient):
         """
         Setup test data before each test method.
         """
-        token = await get_authenticated_user_token(client)
         region_use_case = container.region_use_case()
         city_use_case = container.city_use_case()
         user_use_case = container.auth_use_case()
@@ -56,20 +54,17 @@ class TestUpdateCity:
         @pytest.mark.asyncio
         async def test_should_update_city_successfully(
             self,
-            client: TestClient,
+            authenticated_async_client: AsyncClient,
         ):
             """
             Verify that a city can be updated successfully with valid data.
             """
             # Given
-            token = await get_authenticated_user_token(client)
             update_data = UpdateCitySchema(name="Updated City Name")
-            headers = {"Authorization": f"Bearer {token}"}
 
             # When
-            response = client.put(
+            response = await authenticated_async_client.put(
                 f"/api/v1/cities/{TestUpdateCity.city_to_update.id}/",
-                headers=headers,
                 json=update_data.model_dump(),
             )
 
@@ -93,20 +88,17 @@ class TestUpdateCity:
         @pytest.mark.asyncio
         async def test_should_return_409_when_name_already_exists(
             self,
-            client: TestClient,
+            authenticated_async_client: AsyncClient,
         ):
             """
             Verify that updating a city with a name that already exists returns a 409 Conflict error.
             """
             # Given
-            token = await get_authenticated_user_token(client)
             update_data = UpdateCitySchema(name=TestUpdateCity.existing_city.name)
-            headers = {"Authorization": f"Bearer {token}"}
 
             # When
-            response = client.put(
+            response = await authenticated_async_client.put(
                 f"/api/v1/cities/{TestUpdateCity.city_to_update.id}/",
-                headers=headers,
                 json=update_data.model_dump(),
             )
 
@@ -116,20 +108,19 @@ class TestUpdateCity:
             assert response_data["code"] == "conflict"
 
         @pytest.mark.asyncio
-        async def test_should_return_404_when_city_not_found(self, client: TestClient):
+        async def test_should_return_404_when_city_not_found(
+            self, authenticated_async_client: AsyncClient
+        ):
             """
             Verify that updating a non-existent city returns a 404 Not Found error.
             """
             # Given
-            token = await get_authenticated_user_token(client)
             non_existent_city_id = 99999
             update_data = UpdateCitySchema(name="Any Name")
-            headers = {"Authorization": f"Bearer {token}"}
 
             # When
-            response = client.put(
+            response = await authenticated_async_client.put(
                 f"/api/v1/cities/{non_existent_city_id}/",
-                headers=headers,
                 json=update_data.model_dump(),
             )
 
@@ -140,7 +131,7 @@ class TestUpdateCity:
 
         @pytest.mark.asyncio
         async def test_should_return_401_for_unauthenticated_user(
-            self, client: TestClient
+            self, async_client: AsyncClient
         ):
             """
             Verify that an unauthenticated user cannot update a city.
@@ -150,7 +141,9 @@ class TestUpdateCity:
             update_data = {"name": "Any Name"}
 
             # When
-            response = client.put(f"/api/v1/cities/{city_id}/", json=update_data)
+            response = await async_client.put(
+                f"/api/v1/cities/{city_id}/", json=update_data
+            )
 
             # Then
             assert response.status_code == 401, response.text

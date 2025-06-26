@@ -1,10 +1,9 @@
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from core.entities.city import CityEntity
 from core.entities.region import RegionEntity
 from main import container
-from tests.e2e.conftest import get_authenticated_user_token
 
 # Mark all tests in this module as e2e
 pytestmark = pytest.mark.e2e
@@ -20,13 +19,10 @@ class TestFilterCities:
 
     @pytest.fixture(autouse=True)
     @pytest.mark.asyncio
-    async def setup_and_teardown(self, client: TestClient):
+    async def setup_and_teardown(self, authenticated_async_client: AsyncClient):
         """
         Set up data for tests and reset container afterwards.
         """
-        # Setup: Create the user first to ensure it exists.
-        await get_authenticated_user_token(client)
-
         auth_use_case = container.auth_use_case()
         user = await auth_use_case.auth_repository.get_user_by_email("test@example.com")
         assert user is not None
@@ -67,18 +63,18 @@ class TestFilterCities:
         """
 
         @pytest.mark.asyncio
-        async def test_should_filter_by_name(self, client: TestClient):
+        async def test_should_filter_by_name(
+            self, authenticated_async_client: AsyncClient
+        ):
             """
             Verify that cities can be filtered by name.
             """
             # Given
-            token = await get_authenticated_user_token(client)
-            headers = {"Authorization": f"Bearer {token}"}
             params = {"name": "Pa"}  # Partial name search
 
             # When
-            response = client.get(
-                "/api/v1/cities/filter/?name=Pa", headers=headers, params=params
+            response = await authenticated_async_client.get(
+                "/api/v1/cities/filter/?name=Pa", params=params
             )
 
             # Then
@@ -91,18 +87,18 @@ class TestFilterCities:
             assert "previousPage" in response_data
 
         @pytest.mark.asyncio
-        async def test_should_filter_by_region_id(self, client: TestClient):
+        async def test_should_filter_by_region_id(
+            self, authenticated_async_client: AsyncClient
+        ):
             """
             Verify that cities can be filtered by region ID.
             """
             # Given
-            token = await get_authenticated_user_token(client)
-            headers = {"Authorization": f"Bearer {token}"}
             params = {"region_id": TestFilterCities.region2_id}
 
             # When
-            response = client.get(
-                "/api/v1/cities/filter/", headers=headers, params=params
+            response = await authenticated_async_client.get(
+                "/api/v1/cities/filter/", params=params
             )
 
             # Then
@@ -115,18 +111,18 @@ class TestFilterCities:
             assert "previousPage" in response_data
 
         @pytest.mark.asyncio
-        async def test_should_filter_by_name_and_region(self, client: TestClient):
+        async def test_should_filter_by_name_and_region(
+            self, authenticated_async_client: AsyncClient
+        ):
             """
             Verify that cities can be filtered by both name and region ID.
             """
             # Given
-            token = await get_authenticated_user_token(client)
-            headers = {"Authorization": f"Bearer {token}"}
             params = {"name": "L", "region_id": TestFilterCities.region1_id}
 
             # When
-            response = client.get(
-                "/api/v1/cities/filter/", headers=headers, params=params
+            response = await authenticated_async_client.get(
+                "/api/v1/cities/filter/", params=params
             )
 
             # Then
@@ -144,13 +140,13 @@ class TestFilterCities:
 
         @pytest.mark.asyncio
         async def test_should_return_401_for_unauthenticated_user(
-            self, client: TestClient
+            self, async_client: AsyncClient
         ):
             """
             Verify that an unauthenticated user cannot filter cities.
             """
             # When
-            response = client.get("/api/v1/cities/filter/")
+            response = await async_client.get("/api/v1/cities/filter/")
 
             # Then
             assert response.status_code == 401, response.text

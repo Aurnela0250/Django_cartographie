@@ -1,12 +1,11 @@
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from core.entities.city import CityEntity
 from core.entities.region import RegionEntity
 from main import container
 from presentation.constants import errors_code
 from presentation.schemas.city import CreateCitySchema
-from tests.e2e.conftest import get_authenticated_user_token
 
 # Mark all tests in this module as e2e
 pytestmark = pytest.mark.e2e
@@ -48,22 +47,19 @@ class TestCreateCity:
         @pytest.mark.asyncio
         async def test_should_create_city_successfully(
             self,
-            client: TestClient,
+            authenticated_async_client: AsyncClient,
         ):
             """
             Verify that a city can be created successfully with valid data.
             """
             # Given
-            token = await get_authenticated_user_token(client)
             city_data = CreateCitySchema(
                 name="New E2E City", region_id=TestCreateCity.region_id
             )
-            headers = {"Authorization": f"Bearer {token}"}
 
             # When
-            response = client.post(
+            response = await authenticated_async_client.post(
                 "/api/v1/cities/",
-                headers=headers,
                 json=city_data.model_dump(),
             )
 
@@ -88,14 +84,13 @@ class TestCreateCity:
         @pytest.mark.asyncio
         async def test_should_return_409_when_city_already_exists(
             self,
-            client: TestClient,
+            authenticated_async_client: AsyncClient,
         ):
             """
             Verify that creating a city with a name that already exists returns a 409 Conflict error.
             """
             # Given
             # 1. Create an existing city
-            token = await get_authenticated_user_token(client)
             city_use_case = container.city_use_case()
             user_use_case = container.auth_use_case()
             user = await user_use_case.auth_repository.get_user_by_email(
@@ -116,12 +111,10 @@ class TestCreateCity:
                 name=existing_city.name,
                 region_id=TestCreateCity.region_id,
             )
-            headers = {"Authorization": f"Bearer {token}"}
 
             # When
-            response = client.post(
+            response = await authenticated_async_client.post(
                 "/api/v1/cities/",
-                headers=headers,
                 json=city_data.model_dump(),
             )
 
@@ -132,19 +125,18 @@ class TestCreateCity:
             assert "already exists" in response_data["message"]
 
         @pytest.mark.asyncio
-        async def test_should_return_422_for_invalid_payload(self, client: TestClient):
+        async def test_should_return_422_for_invalid_payload(
+            self, authenticated_async_client: AsyncClient
+        ):
             """
             Verify that an invalid payload returns a 422 Unprocessable Entity error.
             """
             # Given
-            token = await get_authenticated_user_token(client)
             invalid_data = {"name": "Test"}  # Missing region_id
-            headers = {"Authorization": f"Bearer {token}"}
 
             # When
-            response = client.post(
+            response = await authenticated_async_client.post(
                 "/api/v1/cities/",
-                headers=headers,
                 json=invalid_data,
             )
 
@@ -158,7 +150,7 @@ class TestCreateCity:
 
         @pytest.mark.asyncio
         async def test_should_return_401_for_unauthenticated_user(
-            self, client: TestClient
+            self, async_client: AsyncClient
         ):
             """
             Verify that an unauthenticated user cannot create a city.
@@ -167,7 +159,7 @@ class TestCreateCity:
             city_data = {"name": "Any City", "region_id": 999}
 
             # When
-            response = client.post("/api/v1/cities/", json=city_data)
+            response = await async_client.post("/api/v1/cities/", json=city_data)
 
             # Then
             assert response.status_code == 401, response.text
