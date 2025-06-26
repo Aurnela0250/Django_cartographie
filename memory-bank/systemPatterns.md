@@ -46,3 +46,55 @@ Le flux de contrôle suit la "Règle de Dépendance" : les dépendances ne peuve
 - Le `use_case` retourne le résultat à la couche `presentation`, qui le formate et le renvoie en tant que réponse HTTP.
 
 Ce patron de conception garantit que le système est testable, maintenable et évolutif.
+
+### Gestion des erreurs
+
+Les erreurs sont gérées à l'aide d'exceptions personnalisées dans la couche `core/exceptions.py`. Ces exceptions sont capturées dans les contrôleurs et transformées en réponses HTTP appropriées.
+
+#### Traduction des exceptions d'infrastructure
+
+Un pattern clé est la traduction des exceptions spécifiques de l'infrastructure (comme `tortoise.exceptions.DoesNotExist`) en exceptions applicatives standardisées (comme `NotFoundException`). Cette traduction se produit dans les use cases :
+
+```python
+try:
+    # Appel au repository
+except DatabaseDoesNotExistException as e:
+    raise NotFoundException(cause=e)
+except DatabaseIntegrityException as e:
+    raise ConflictException(cause=e)
+except Exception as e:
+    raise InternalServerErrorException(cause=e)
+```
+
+### Transactions
+
+Les opérations qui modifient plusieurs entités utilisent le décorateur `@atomic` de Tortoise ORM pour garantir l'intégrité des données :
+
+```python
+@atomic()
+async def update(self, domain_id: int, domain_data: DomainEntity) -> DomainEntity:
+    # Logique métier
+```
+
+### Tests unitaires
+
+L'approche TDD est strictement suivie avec :
+
+- Mocking des repositories avec `unittest.mock.Mock(spec=IDomainRepository)`
+- Vérification des appels attendus aux méthodes du repository
+- Tests des cas limites et de gestion d'erreurs
+- Utilisation de `AsyncMock` pour les méthodes asynchrones
+
+---
+
+### [2025-06-24] - Convention de Test
+
+#### Structure des Tests
+
+- **Arrange/Act/Assert** : Chaque test suit ce modèle pour une lisibilité et une maintenance claires.
+- **Classes Imbriquées** : Les cas de test sont organisés en classes `TestSuccess` et `TestFailures` pour séparer les scénarios de réussite et d'échec.
+
+#### Configuration des Tests
+
+- **`conftest.py` Local** : Chaque module de test peut avoir son propre `conftest.py` pour les fixtures locales, favorisant l'encapsulation.
+- **`Makefile`** : Un `Makefile` centralise les commandes de test, simplifiant l'exécution des tests (`make test`, `make test-unit`, `make test-integration`).
