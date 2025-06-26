@@ -1,12 +1,16 @@
 from unittest.mock import Mock
 
 import pytest
-from tortoise.exceptions import IntegrityError, OperationalError
 
 from core.entities.domain import DomainEntity
 from core.interfaces.domain_repository import IDomainRepository
 from core.use_cases.domain_use_case import DomainUseCase
-from presentation.exceptions import ConflictException, InternalServerErrorException
+from presentation.exceptions import (
+    ConflictException,
+    DatabaseException,
+    DatabaseIntegrityException,
+    InternalServerErrorException,
+)
 
 
 class TestCreateDomainUseCase:
@@ -39,7 +43,9 @@ class TestCreateDomainUseCase:
         # Given
         domain_name = "Test Domain"
         domain_to_create = DomainEntity(name=domain_name)
-        mock_domain_repository.create.side_effect = IntegrityError("Duplicate entry")
+        mock_domain_repository.create.side_effect = DatabaseIntegrityException(
+            "Duplicate entry"
+        )
 
         # When / Then
         with pytest.raises(ConflictException):
@@ -52,7 +58,7 @@ class TestCreateDomainUseCase:
         # Given
         domain_name = "Test Domain"
         domain_to_create = DomainEntity(name=domain_name)
-        mock_domain_repository.create.side_effect = OperationalError("DB error")
+        mock_domain_repository.create.side_effect = DatabaseException("DB error")
 
         # When / Then
         with pytest.raises(InternalServerErrorException):

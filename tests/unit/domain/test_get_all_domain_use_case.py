@@ -2,7 +2,7 @@ import pytest
 
 from core.entities.pagination import PaginatedResult, PaginationParams
 from presentation.exceptions import InternalServerErrorException
-from tests.factories import DomainFactory
+from tests.factories import DomainEntityFactory
 
 
 class TestDomainGetAllUseCase:
@@ -22,9 +22,9 @@ class TestDomainGetAllUseCase:
             """Test for successful retrieval of all domains."""
             # Given
             sample_domains = [
-                DomainFactory.build(),
-                DomainFactory.build(),
-                DomainFactory.build(),
+                DomainEntityFactory.build(),
+                DomainEntityFactory.build(),
+                DomainEntityFactory.build(),
             ]
             expected_result = PaginatedResult(
                 items=sample_domains,
@@ -92,8 +92,8 @@ class TestDomainGetAllUseCase:
             # Given
             custom_pagination = PaginationParams(page=2, per_page=5)
             sample_domains = [
-                DomainFactory.build(),
-                DomainFactory.build(),
+                DomainEntityFactory.build(),
+                DomainEntityFactory.build(),
             ]
             expected_result = PaginatedResult(
                 items=sample_domains,

@@ -110,6 +110,41 @@ class TestDomainFilterUseCase:
                 pagination_params=pagination_params, filters=domain_filters
             )
 
+        @pytest.mark.asyncio
+        async def test_should_filter_domains_by_name(
+            self,
+            domain_use_case,
+            mock_domain_repository,
+            domain_factory,
+            pagination_params,
+            domain_filters,
+        ):
+            """Test for successful domain filtering by name."""
+            # Given
+            domain_filters.name = "Science"
+            sample_domain = domain_factory(id=1, name="Science")
+            expected_result = PaginatedResult[DomainEntity](
+                items=[sample_domain],
+                total_items=1,
+                page=1,
+                per_page=10,
+                total_pages=1,
+            )
+            mock_domain_repository.filter.return_value = expected_result
+
+            # When
+            result = await domain_use_case.filter(
+                pagination_params=pagination_params, filters=domain_filters
+            )
+
+            # Then
+            assert result == expected_result
+            assert len(result.items) == 1
+            assert result.items[0].name == "Science"
+            mock_domain_repository.filter.assert_called_once_with(
+                pagination_params=pagination_params, filters=domain_filters
+            )
+
     class TestFailures:
         """Tests for failure cases."""
 

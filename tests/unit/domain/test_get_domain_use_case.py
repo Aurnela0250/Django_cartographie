@@ -6,7 +6,7 @@ from presentation.exceptions import (
     InternalServerErrorException,
     NotFoundException,
 )
-from tests.factories import DomainFactory
+from tests.factories import DomainEntityFactory
 
 
 class TestDomainGetUseCase:
@@ -18,7 +18,7 @@ class TestDomainGetUseCase:
     ):
         """Test for successful domain retrieval."""
         # Given
-        expected_domain = DomainFactory.build()
+        expected_domain = DomainEntityFactory.build()
         mock_domain_repository.get.return_value = expected_domain
 
         # When

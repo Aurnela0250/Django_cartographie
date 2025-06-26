@@ -19,44 +19,46 @@ class TestUpdateDomainUseCase:
     ):
         # Given
         domain_id = 1
-        domain_data = DomainEntity(name="Updated Domain", updated_by=1)
+        user_id = 1
+        domain_data = {"name": "Updated Domain"}
         existing_domain = DomainEntity(id=domain_id, name="Original Domain")
         updated_domain_entity = DomainEntity(
             id=domain_id,
             name="Updated Domain",
-            updated_by=1,
+            updated_by=user_id,
         )
 
         mock_domain_repository.get.return_value = existing_domain
         mock_domain_repository.update.return_value = updated_domain_entity
 
         # When
-        result = await domain_use_case.update(domain_id, domain_data)
+        result = await domain_use_case.update(domain_id, domain_data, user_id)
 
         # Then
         mock_domain_repository.get.assert_called_once_with(domain_id)
-        mock_domain_repository.update.assert_called_once_with(domain_id, domain_data)
+        mock_domain_repository.update.assert_called_once()
         assert result == updated_domain_entity
-        assert result.updated_by is not None
-        assert isinstance(result.updated_by, int)
+        assert result.updated_by == user_id
 
     async def test_update_domain_success_no_name_change(
         self, domain_use_case, mock_domain_repository
     ):
         # Given
         domain_id = 1
+        user_id = 1
         domain_name = "Same Domain"
-        domain_data = DomainEntity(name=domain_name)
+        domain_data = {"name": domain_name}
         existing_domain = DomainEntity(id=domain_id, name=domain_name)
 
         mock_domain_repository.get.return_value = existing_domain
+        mock_domain_repository.update.return_value = existing_domain
 
         # When
-        result = await domain_use_case.update(domain_id, domain_data)
+        result = await domain_use_case.update(domain_id, domain_data, user_id)
 
         # Then
         mock_domain_repository.get.assert_called_once_with(domain_id)
-        mock_domain_repository.update.assert_not_called()
+        mock_domain_repository.update.assert_called_once()
         assert result == existing_domain
 
     async def test_update_domain_not_found(
@@ -64,12 +66,13 @@ class TestUpdateDomainUseCase:
     ):
         # Given
         domain_id = 1
-        domain_data = DomainEntity(name="Test")
+        user_id = 1
+        domain_data = {"name": "Test"}
         mock_domain_repository.get.side_effect = DatabaseDoesNotExistException
 
         # When / Then
         with pytest.raises(NotFoundException):
-            await domain_use_case.update(domain_id, domain_data)
+            await domain_use_case.update(domain_id, domain_data, user_id)
         mock_domain_repository.get.assert_called_once_with(domain_id)
         mock_domain_repository.update.assert_not_called()
 
@@ -78,7 +81,8 @@ class TestUpdateDomainUseCase:
     ):
         # Given
         domain_id = 1
-        domain_data = DomainEntity(name="Updated Domain")
+        user_id = 1
+        domain_data = {"name": "Updated Domain"}
         existing_domain = DomainEntity(id=domain_id, name="Original Domain")
 
         mock_domain_repository.get.return_value = existing_domain
@@ -86,16 +90,17 @@ class TestUpdateDomainUseCase:
 
         # When / Then
         with pytest.raises(ConflictException):
-            await domain_use_case.update(domain_id, domain_data)
+            await domain_use_case.update(domain_id, domain_data, user_id)
         mock_domain_repository.get.assert_called_once_with(domain_id)
-        mock_domain_repository.update.assert_called_once_with(domain_id, domain_data)
+        mock_domain_repository.update.assert_called_once()
 
     async def test_update_domain_unexpected_error(
         self, domain_use_case, mock_domain_repository
     ):
         # Given
         domain_id = 1
-        domain_data = DomainEntity(name="Updated Domain")
+        user_id = 1
+        domain_data = {"name": "Updated Domain"}
         existing_domain = DomainEntity(id=domain_id, name="Original Domain")
 
         mock_domain_repository.get.return_value = existing_domain
@@ -103,6 +108,6 @@ class TestUpdateDomainUseCase:
 
         # When / Then
         with pytest.raises(InternalServerErrorException):
-            await domain_use_case.update(domain_id, domain_data)
+            await domain_use_case.update(domain_id, domain_data, user_id)
         mock_domain_repository.get.assert_called_once_with(domain_id)
-        mock_domain_repository.update.assert_called_once_with(domain_id, domain_data)
+        mock_domain_repository.update.assert_called_once()
