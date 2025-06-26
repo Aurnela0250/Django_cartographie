@@ -8,6 +8,8 @@ from core.entities.pagination import PaginatedResult, PaginationParams
 from core.interfaces.mention_repository import IMentionRepository
 from presentation.exceptions import (
     ConflictException,
+    DatabaseDoesNotExistException,
+    DatabaseIntegrityException,
     InternalServerErrorException,
     NotFoundException,
 )
@@ -29,77 +31,58 @@ class MentionUseCase:
         mention_data: MentionEntity,
     ) -> MentionEntity:
         try:
-            existing_mention = await self.mention_repository.get_by_name(
-                mention_data.name
-            )
-            if existing_mention:
-                self.logger.warning(
-                    f"Mention with name '{mention_data.name}' already exists"
-                )
-                raise ConflictException()
-            created_mention = await self.mention_repository.create(mention_data)
-            return created_mention
-        except ConflictException as e:
-            raise e
+            return await self.mention_repository.create(mention_data)
+        except DatabaseIntegrityException as e:
+            self.logger.warning(f"Conflict creating mention '{mention_data.name}': {e}")
+            raise ConflictException(str(e))
         except Exception as e:
-            self.logger.error(f"Unexpected error during mention creation: {str(e)}")
-            raise InternalServerErrorException(cause=e)
+            self.logger.error(f"Failed to create mention: {e}")
+            raise InternalServerErrorException(str(e))
 
     @atomic()
     async def get(self, mention_id: int) -> MentionEntity:
         try:
-            mention = await self.mention_repository.get(mention_id)
-            if not mention:
-                raise NotFoundException()
-            return mention
-        except NotFoundException as e:
-            raise e
+            return await self.mention_repository.get(mention_id)
+        except DatabaseDoesNotExistException as e:
+            self.logger.warning(f"Mention with id {mention_id} not found: {e}")
+            raise NotFoundException(str(e))
         except Exception as e:
-            self.logger.error(f"Unexpected error during mention retrieval: {str(e)}")
-            raise InternalServerErrorException(cause=e)
+            self.logger.error(f"Failed to get mention {mention_id}: {e}")
+            raise InternalServerErrorException(str(e))
 
     @atomic()
     async def update(
         self,
         mention_id: int,
-        mention_data: MentionEntity,
+        mention_data: dict,
     ) -> MentionEntity:
         try:
-            existing_mention = await self.mention_repository.get(mention_id)
-            if not existing_mention:
-                raise NotFoundException()
-            if mention_data.name != existing_mention.name:
-                name_exists = await self.mention_repository.get_by_name(
-                    mention_data.name
-                )
-                if name_exists and name_exists.id != mention_id:
-                    self.logger.warning(
-                        f"Cannot update: Mention with name '{mention_data.name}' already exists"
-                    )
-                    raise ConflictException()
-            updated_mention = await self.mention_repository.update(
-                mention_id, mention_data
+            mention_entity = MentionEntity(**mention_data)
+            return await self.mention_repository.update(mention_id, mention_entity)
+        except DatabaseDoesNotExistException as e:
+            self.logger.warning(
+                f"Mention with id {mention_id} not found on update: {e}"
             )
-            return updated_mention
-        except (NotFoundException, ConflictException) as e:
-            raise e
+            raise NotFoundException(str(e))
+        except DatabaseIntegrityException as e:
+            self.logger.warning(f"Conflict updating mention {mention_id}: {e}")
+            raise ConflictException(str(e))
         except Exception as e:
-            self.logger.error(f"Unexpected error during mention update: {str(e)}")
-            raise InternalServerErrorException(cause=e)
+            self.logger.error(f"Failed to update mention {mention_id}: {e}")
+            raise InternalServerErrorException(str(e))
 
     @atomic()
     async def delete(self, mention_id: int) -> bool:
         try:
-            existing_mention = await self.mention_repository.get(mention_id)
-            if not existing_mention:
-                raise NotFoundException()
-            result = await self.mention_repository.delete(mention_id)
-            return result
-        except NotFoundException as e:
-            raise e
+            return await self.mention_repository.delete(mention_id)
+        except DatabaseDoesNotExistException as e:
+            self.logger.warning(
+                f"Mention with id {mention_id} not found on delete: {e}"
+            )
+            raise NotFoundException(str(e))
         except Exception as e:
-            self.logger.error(f"Unexpected error during mention deletion: {str(e)}")
-            raise InternalServerErrorException(cause=e)
+            self.logger.error(f"Failed to delete mention {mention_id}: {e}")
+            raise InternalServerErrorException(str(e))
 
     @atomic()
     async def get_all(

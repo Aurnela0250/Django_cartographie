@@ -6,6 +6,9 @@ from core.entities.filters import RegionFilters
 from core.entities.pagination import PaginatedResult, PaginationParams
 from core.entities.region import RegionEntity
 from core.interfaces.region_repository import IRegionRepository
+from infrastructure.db.tortoise.region_repository_impl import (
+    DatabaseIntegrityException,
+)
 from presentation.exceptions import (
     ConflictException,
     InternalServerErrorException,
@@ -26,19 +29,14 @@ class RegionUseCase:
     @atomic()
     async def create(self, region_data: RegionEntity) -> RegionEntity:
         try:
-            existing_region = await self.region_repository.get_by_name(region_data.name)
-            if existing_region:
-                self.logger.warning(
-                    f"Region with name '{region_data.name}' already exists"
-                )
-                raise ConflictException()
-            # Suppression de la vérification d'unicité sur le code, car l'attribut 'code' n'existe pas
-            created_region = await self.region_repository.create(region_data)
-            return created_region
-        except ConflictException as e:
-            raise e
+            return await self.region_repository.create(region_data)
+        except DatabaseIntegrityException as e:
+            self.logger.warning(f"Conflict creating region: {e}")
+            raise ConflictException(
+                f"Region with name '{region_data.name}' already exists."
+            )
         except Exception as e:
-            self.logger.error(f"Unexpected error during region creation: {str(e)}")
+            self.logger.error(f"Unexpected error during region creation: {e}")
             raise InternalServerErrorException(cause=e)
 
     @atomic()

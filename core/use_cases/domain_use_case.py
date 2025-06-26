@@ -1,6 +1,5 @@
 import logging
 
-from tortoise.exceptions import IntegrityError, OperationalError
 from tortoise.transactions import atomic
 
 from core.entities.domain import DomainEntity
@@ -31,14 +30,16 @@ class DomainUseCase:
     async def create(self, domain_data: DomainEntity) -> DomainEntity:
         try:
             return await self.domain_repository.create(domain_data)
-        except IntegrityError:
-            self.logger.warning(f"Domain with name '{domain_data.name}' already exists")
-            raise ConflictException()
-        except OperationalError as e:
-            self.logger.error(f"Database error during domain creation: {str(e)}")
+        except DatabaseIntegrityException as e:
+            self.logger.warning(
+                f"Conflict creating domain with name '{domain_data.name}': {e}"
+            )
+            raise ConflictException(cause=e)
+        except DatabaseException as e:
+            self.logger.error(f"Database error during domain creation: {e}")
             raise InternalServerErrorException(cause=e)
         except Exception as e:
-            self.logger.error(f"Unexpected error during domain creation: {str(e)}")
+            self.logger.error(f"Unexpected error during domain creation: {e}")
             raise InternalServerErrorException(cause=e)
 
     @atomic()
@@ -55,20 +56,31 @@ class DomainUseCase:
             raise InternalServerErrorException(cause=e)
 
     @atomic()
-    async def update(self, domain_id: int, domain_data: DomainEntity) -> DomainEntity:
+    async def update(
+        self,
+        domain_id: int,
+        domain_data: dict,
+        user_id: int,
+    ) -> DomainEntity:
         try:
             existing_domain = await self.domain_repository.get(domain_id)
+            domain_data.update(
+                {
+                    "id": existing_domain.id,
+                    "created_by": existing_domain.created_by,
+                    "updated_by": user_id,
+                    "created_at": existing_domain.created_at,
+                }
+            )
+            domain_to_entity = DomainEntity(**domain_data)
 
-            if domain_data.name == existing_domain.name:
-                return existing_domain
-
-            return await self.domain_repository.update(domain_id, domain_data)
+            return await self.domain_repository.update(domain_id, domain_to_entity)
 
         except DatabaseDoesNotExistException as e:
             raise NotFoundException(cause=e)
         except DatabaseIntegrityException as e:
             self.logger.warning(
-                f"A domain with name '{domain_data.name}' may already exist."
+                f"A domain with name '{domain_data.get('name')}' may already exist."
             )
             raise ConflictException(cause=e)
         except DatabaseException as e:

@@ -11,7 +11,12 @@ from infrastructure.external_services.bcrypt_service import BcryptService
 from infrastructure.external_services.jwt_service import JWTService
 from presentation.constants import errors_code
 from presentation.exceptions import (
+    BcryptHashPasswordException,
+    BcryptVerifyPasswordException,
     ConflictException,
+    DatabaseDoesNotExistException,
+    DatabaseException,
+    DatabaseIntegrityException,
     InternalServerErrorException,
     UnauthorizedException,
 )
@@ -30,26 +35,27 @@ class AuthUseCase:
         self.logger = logging.getLogger(__name__)
 
     @atomic()
-    async def signup(self, email: str, password: str) -> UserEntity:
+    async def signup(
+        self,
+        email: str,
+        password: str,
+    ) -> UserEntity:
         try:
-            # Check if email already exists
-            existing_user = await self.auth_repository.get_user_by_email(email)
-            if existing_user:
-                # Log without revealing the exact email in production logs
-                self.logger.info("Signup attempt with existing account")
-                raise ConflictException()
-
             # Hash the password before storing
             hashed_password = await self.bcrypt_service.hash_password(password)
 
             user_created = await self.auth_repository.signup(
-                email=email, hashed_password=hashed_password
+                email=email,
+                hashed_password=hashed_password,
             )
 
             return user_created
-        except ConflictException as e:
+        except DatabaseIntegrityException as e:
             self.logger.warning(f"Signup failed for existing email {email}: {e}")
-            raise e
+            raise ConflictException(cause=e)
+        except BcryptHashPasswordException as e:
+            self.logger.error(f"Error hashing password during signup: {str(e)}")
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.error(f"Unexpected error during signup: {str(e)}")
             raise InternalServerErrorException(cause=e)
@@ -59,12 +65,10 @@ class AuthUseCase:
         try:
             user = await self.auth_repository.get_user_by_email(login)
 
-            if not user:
-                raise UnauthorizedException(code=errors_code.INVALID_CREDENTIALS)
-
             # Verify the password first
             is_password_valid = await self.bcrypt_service.verify_password(
-                password, user.password
+                password,
+                user.password,
             )
 
             if not is_password_valid:
@@ -91,11 +95,16 @@ class AuthUseCase:
                 refresh_token=token.refresh_token,
                 user=user,
             )
+        except DatabaseDoesNotExistException as e:
+            raise UnauthorizedException(cause=e, code=errors_code.INVALID_CREDENTIALS)
         except UnauthorizedException as e:
             self.logger.warning(f"Login failed for user {login}: {e}")
             raise e  # Preserve the original exception with its code
-        except InternalServerErrorException as e:
-            raise e
+        except BcryptVerifyPasswordException as e:
+            self.logger.error(f"Error verifying password during login: {str(e)}")
+            raise InternalServerErrorException(cause=e)
+        except DatabaseException as e:
+            raise InternalServerErrorException(cause=e)
         except Exception as e:
             self.logger.warning(f"Unexpected error during login: {e}")
             raise InternalServerErrorException(cause=e)
@@ -116,8 +125,6 @@ class AuthUseCase:
 
             # Vérifier que l'utilisateur existe avant de générer de nouveaux tokens
             user_found = await self.auth_repository.get_user_by_id(user_id)
-            if not user_found:
-                raise UnauthorizedException(code=errors_code.INVALID_TOKEN)
             if not user_found.id:
                 raise InternalServerErrorException()
 
@@ -136,9 +143,11 @@ class AuthUseCase:
                 refresh_token=new_token.refresh_token,
                 user=user_found,
             )
+        except DatabaseDoesNotExistException as e:
+            raise UnauthorizedException(cause=e, code=errors_code.INVALID_TOKEN)
         except UnauthorizedException as e:
             self.logger.warning(f"Token refresh failed: {e}")
-            raise e  # Preserve the original exception with its code
+            raise e
         except Exception as e:
             self.logger.error(f"Unexpected error during token refresh: {e}")
             raise InternalServerErrorException(cause=e)
@@ -148,14 +157,12 @@ class AuthUseCase:
         try:
             user = await self.auth_repository.get_user_by_id(user_id)
 
-            if not user:
-                raise UnauthorizedException(code=errors_code.INVALID_TOKEN)
             if not user.id:
                 raise InternalServerErrorException()
 
             return user
-        except UnauthorizedException as e:
-            raise e
+        except DatabaseDoesNotExistException as e:
+            raise UnauthorizedException(code=errors_code.INVALID_TOKEN, cause=e)
         except Exception as e:
             print(f"Unexpected error during getting current user {e}")
             raise InternalServerErrorException(cause=e)
