@@ -161,7 +161,11 @@ class DomainRepository(IDomainRepository):
             logger.error(f"Error getting all domains: {e}", exc_info=True)
             raise DatabaseException("Error getting all domains", cause=e)
 
-    async def update(self, id: UUID | int, data: DomainEntity) -> DomainEntity:
+    async def update(
+        self,
+        id: UUID | int,
+        data: DomainEntity,
+    ) -> DomainEntity:
         """
         Met à jour un domaine existant
 
@@ -269,17 +273,11 @@ class DomainRepository(IDomainRepository):
             if filter_dict:
                 query = query.filter(**filter_dict)
 
-            domain_models = await query.offset(offset).limit(limit)
-
-            # Compter le total avec les mêmes filtres
             total_count = (
-                await TortoiseDomain.filter(**filter_dict).count()
-                if filter_dict
-                else await TortoiseDomain.all().count()
-            )
-
+                await query.count()
+            )  # Compter le total avec les mêmes filtres, mais avant pagination
+            domain_models = await query.offset(offset).limit(limit)
             entities = [await self._to_entity(model) for model in domain_models]
-
             total_pages = (
                 total_count + pagination_params.per_page - 1
             ) // pagination_params.per_page

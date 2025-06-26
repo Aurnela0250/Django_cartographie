@@ -124,6 +124,7 @@ class MentionRepository(IMentionRepository):
             mention_model = await TortoiseMention.get(id=id)
 
             mention_model.name = data.name
+            mention_model.domain_id = data.domain_id
             if data.updated_by is not None:
                 mention_model.updated_by_id = data.updated_by
 

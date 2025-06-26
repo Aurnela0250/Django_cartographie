@@ -74,8 +74,8 @@ class UserRepository(IUserRepository):
             )
 
             # Étape 2: Mettre à jour l'utilisateur avec son propre ID pour l'audit
-            user_model.created_by = user_model
-            user_model.updated_by = user_model
+            user_model.created_by_id = user_model.id
+            user_model.updated_by_id = user_model.id
             await user_model.save()
 
             # Étape 3: Recharger le modèle pour s'assurer que les relations sont chargées

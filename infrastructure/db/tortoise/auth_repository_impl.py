@@ -37,18 +37,20 @@ class AuthRepository(IAuthRepository):
                 cause=e,
             )
 
-    async def signup(self, email: str, hashed_password: str) -> UserEntity:
+    async def signup(
+        self,
+        email: str,
+        hashed_password: str,
+    ) -> UserEntity:
         """
         Créer un nouvel utilisateur avec email et mot de passe hashé
         """
         try:
-            logger.info(f"Tentative de création d'utilisateur avec email: {email}")
             user = await TortoiseUser.create(
                 email=email,
                 password=hashed_password,
                 active=True,
             )
-            logger.info(f"Utilisateur créé avec succès, ID: {user.id}")
             return await self._to_entity(user)
         except IntegrityError as e:
             logger.error(
@@ -70,12 +72,7 @@ class AuthRepository(IAuthRepository):
         Récupérer un utilisateur par son email
         """
         try:
-            logger.debug(f"Recherche d'utilisateur par email: {email}")
-            user = await TortoiseUser.filter(email=email).first()
-            if not user:
-                logger.debug(f"Aucun utilisateur trouvé pour l'email: {email}")
-                return None
-            logger.debug(f"Utilisateur trouvé avec ID: {user.id}")
+            user = await TortoiseUser.get(email=email)
             return await self._to_entity(user)
         except DoesNotExist as e:
             logger.debug(f"Aucun utilisateur trouvé pour l'email: {email}")
@@ -93,9 +90,7 @@ class AuthRepository(IAuthRepository):
         Récupérer un utilisateur par son ID
         """
         try:
-            logger.debug(f"Recherche d'utilisateur par ID: {user_id}")
             user = await TortoiseUser.get(pk=user_id)
-            logger.debug(f"Utilisateur trouvé avec email: {user.email}")
             return await self._to_entity(user)
         except DoesNotExist as e:
             logger.debug(f"Aucun utilisateur trouvé pour l'ID: {user_id}")
@@ -108,7 +103,11 @@ class AuthRepository(IAuthRepository):
                 "Erreur inattendue lors de la récupération de l'utilisateur.", cause=e
             )
 
-    async def update_password(self, user_id: int, hashed_password: str) -> bool:
+    async def update_password(
+        self,
+        user_id: int,
+        hashed_password: str,
+    ) -> bool:
         """
         Mettre à jour le mot de passe d'un utilisateur
         """
@@ -143,16 +142,9 @@ class AuthRepository(IAuthRepository):
         Supprimer un utilisateur par son ID
         """
         try:
-            logger.info(f"Tentative de suppression de l'utilisateur ID: {user_id}")
-            rows_deleted = await TortoiseUser.filter(id=user_id).delete()
-            if rows_deleted == 0:
-                logger.warning(
-                    f"Aucun utilisateur trouvé pour la suppression, ID: {user_id}"
-                )
-                raise DatabaseDoesNotExistException(
-                    "L'utilisateur à supprimer n'existe pas."
-                )
-            logger.info(f"Utilisateur supprimé avec succès, ID: {user_id}")
+            user_model = await TortoiseUser.get(id=user_id)
+
+            await user_model.delete()
             return True
         except DoesNotExist as e:
             logger.warning(
