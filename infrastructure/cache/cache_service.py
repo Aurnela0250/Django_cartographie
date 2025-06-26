@@ -126,9 +126,12 @@ class CacheService:
         if cached_data:
             self.logger.info(f"Cache hit for {self.entity_name} list: {cache_key}")
             try:
-                # TypeAdapter is needed for generic types like PaginatedResultSchema[SchemaType]
                 adapter = TypeAdapter(response_schema_type)
-                return adapter.validate_json(cached_data)
+                cached_result = adapter.validate_json(cached_data)
+                self.logger.debug(
+                    f"Retrieved {len(cached_result.items)} items from cache for key: {cache_key}"
+                )
+                return cached_result
             except Exception as e:
                 self.logger.error(
                     f"Error parsing cached list for {self.entity_name} from key {cache_key}: {e}"
@@ -177,6 +180,9 @@ class CacheService:
             self.redis_service.set(cache_key, data.model_dump_json(), exp=ttl_to_use)
             self.logger.info(
                 f"Cache set for {self.entity_name} list: {cache_key} with TTL {ttl_to_use}s"
+            )
+            self.logger.debug(
+                f"Cached data contains {len(data.items)} items for key: {cache_key}"
             )
         except Exception as e:
             self.logger.error(

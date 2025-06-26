@@ -2,6 +2,11 @@ import asyncio
 
 from passlib.context import CryptContext
 
+from presentation.exceptions import (
+    BcryptHashPasswordException,
+    BcryptVerifyPasswordException,
+)
+
 
 class BcryptService:
     """
@@ -37,7 +42,9 @@ class BcryptService:
             return hashed
 
         except Exception as e:
-            raise Exception(f"Erreur lors du hachage du mot de passe: {str(e)}")
+            raise BcryptHashPasswordException(
+                f"Erreur lors du hachage du mot de passe: {str(e)}"
+            )
 
     async def verify_password(self, password: str, hashed_password: str) -> bool:
         """
@@ -63,4 +70,6 @@ class BcryptService:
             )
 
         except Exception as e:
-            raise Exception(f"Erreur lors de la vérification du mot de passe: {str(e)}")
+            raise BcryptVerifyPasswordException(
+                f"Erreur lors de la vérification du mot de passe: {str(e)}"
+            )
