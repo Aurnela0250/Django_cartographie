@@ -1,0 +1,4 @@
+- Verifier que si l'utilisateur n'est pas authentifie alors on Reçoi un satus code `401` et body.code `unauthorized `(json)
+- Verifie que si l'utlisateur est authentifie mais le token est invalide alors on reçoi invalide `401` et body.code `invalid_token `(json)
+- Verifie que si l'utlisateur est authentifie mais le token est expire alors on reçoi invalide `401` et body.code `token_expired `(json)
+- Verifie que si l'utlisateur est authentifie mais le token est revoqué alors on reçoi invalide `401` et body.code `token_revoked `(json). Ici utiliser `/logout` pour revoquer le token.
