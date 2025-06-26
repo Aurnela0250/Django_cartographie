@@ -142,3 +142,11 @@ class DatabaseIntegrityException(DatabaseException):
 
 class DatabaseDoesNotExistException(DatabaseException):
     """Exception levée lorsqu'une ressource n'existe pas dans la base de données."""
+
+
+class BcryptHashPasswordException(ServerException):
+    """Exception levée lors d'une erreur de hachage de mot de passe avec bcrypt."""
+
+
+class BcryptVerifyPasswordException(ServerException):
+    """Exception levée lors d'une erreur de vérification de mot de passe avec bcrypt."""

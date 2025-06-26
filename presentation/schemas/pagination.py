@@ -1,6 +1,6 @@
 from typing import Callable, Generic, List, Optional, Type, TypeVar
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from core.entities.pagination import PaginatedResult
 from presentation.schemas.bases.base import BaseSchema
@@ -14,7 +14,14 @@ class PaginationParamsSchema(BaseSchema):
 
     page: int = Field(1, ge=1, description="Numéro de la page (commence à 1)")
     per_page: int = Field(
-        10, ge=1, le=100, description="Nombre d'éléments par page (max 100)"
+        10,
+        ge=1,
+        le=100,
+        description="Nombre d'éléments par page (max 100)",
+    )
+
+    model_config = ConfigDict(
+        alias_generator=None,
     )
 
 

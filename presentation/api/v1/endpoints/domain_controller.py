@@ -9,11 +9,13 @@ from core.entities.filters import DomainFilters
 from core.entities.pagination import PaginationParams
 from core.entities.user import UserEntity
 from core.use_cases.domain_use_case import DomainUseCase
+from presentation.constants import errors_code
 from presentation.dependencies.auth_dependencies import get_current_user
 from presentation.exceptions import (
     ConflictException,
     InternalServerErrorException,
     NotFoundException,
+    UnauthorizedException,
 )
 from presentation.schemas.domain import (
     CreateDomainSchema,
@@ -66,9 +68,8 @@ async def filter(
     domain_use_case: DomainUseCase = Depends(Provide[Container.domain_use_case]),
     user: UserEntity = Depends(get_current_user),
 ):
-    pagination_params = PaginationParams(
-        page=pagination.page, per_page=pagination.per_page
-    )
+    pagination_params = PaginationParams.model_validate(pagination.model_dump())
+
     result = await domain_use_case.filter(pagination_params, filters)
     return PaginatedResultSchema.from_domain_result(
         result,
@@ -138,12 +139,20 @@ async def update(
     user: UserEntity = Depends(get_current_user),
 ):
     try:
-        domain_entity = DomainEntity(
-            **domain_data.model_dump(),
-            updated_by=user.id,
-        )
-        updated_domain = await domain_use_case.update(domain_id, domain_entity)
+        update_data = domain_data.model_dump(exclude_unset=True)
+        if not update_data:
+            existing_domain = await domain_use_case.get(domain_id)
+            return DomainSchema.model_validate(existing_domain)
+
+        if user.id is None:
+            raise UnauthorizedException(
+                code=errors_code.INVALID_TOKEN,
+            )
+
+        updated_domain = await domain_use_case.update(domain_id, update_data, user.id)
         return DomainSchema.model_validate(updated_domain)
+    except UnauthorizedException as e:
+        raise e
     except ConflictException as e:
         raise ConflictException(cause=e)
     except NotFoundException as e:

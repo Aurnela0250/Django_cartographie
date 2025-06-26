@@ -12,9 +12,7 @@ class DomainSchema(DomainBaseSchema):
 
 class CreateDomainSchema(BaseSchema):
     name: str = Field(..., max_length=100)
-    description: Optional[str] = None
 
 
 class UpdateDomainSchema(BaseSchema):
     name: Optional[str] = Field(None, max_length=100)
-    description: Optional[str] = None
