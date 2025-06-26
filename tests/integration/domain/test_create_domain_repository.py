@@ -4,7 +4,7 @@ from core.container.container import Container
 from core.interfaces.domain_repository import IDomainRepository
 from core.interfaces.user_repository import IUserRepository
 from presentation.exceptions import DatabaseIntegrityException
-from tests.factories import DomainFactory, UserFactory
+from tests.factories import DomainEntityFactory, UserEntityFactory
 
 pytestmark = pytest.mark.integration
 
@@ -19,12 +19,12 @@ async def test_create_and_get_domain(container: Container):
     user_repository: IUserRepository = container.user_repository()
 
     # 1. Créer un utilisateur prérequis
-    user_entity = UserFactory.build()
+    user_entity = UserEntityFactory.build()
     created_user = await user_repository.create(user_entity)
     assert created_user.id is not None
 
     # 2. Créer une entité de domaine en liant l'utilisateur créé
-    domain_entity = DomainFactory.build(
+    domain_entity = DomainEntityFactory.build(
         created_by=created_user.id,
         updated_by=created_user.id,
     )
@@ -54,15 +54,15 @@ async def test_create_domain_with_existing_name_raises_error(container: Containe
     user_repository: IUserRepository = container.user_repository()
 
     # 1. Créer un utilisateur et un premier domaine
-    user_entity = UserFactory.build()
+    user_entity = UserEntityFactory.build()
     created_user = await user_repository.create(user_entity)
-    domain_entity = DomainFactory.build(
+    domain_entity = DomainEntityFactory.build(
         created_by=created_user.id, updated_by=created_user.id
     )
     await domain_repository.create(domain_entity)
 
     # 2. Tenter de créer un autre domaine avec le même nom
-    duplicate_domain_entity = DomainFactory.build(
+    duplicate_domain_entity = DomainEntityFactory.build(
         name=domain_entity.name,  # Utilise le même nom
         created_by=created_user.id,
         updated_by=created_user.id,
@@ -84,7 +84,7 @@ async def test_create_domain_with_non_existing_user_raises_integrity_error(
 
     # 1. Créer une entité de domaine avec un ID utilisateur non existant
     non_existing_user_id = 999999
-    domain_entity = DomainFactory.build(
+    domain_entity = DomainEntityFactory.build(
         created_by=non_existing_user_id, updated_by=non_existing_user_id
     )
 

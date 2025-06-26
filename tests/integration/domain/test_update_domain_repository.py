@@ -1,11 +1,14 @@
 import pytest
-from tortoise import exceptions
 
 from core.container.container import Container
 from core.entities.domain import DomainEntity
 from core.interfaces.domain_repository import IDomainRepository
 from core.interfaces.user_repository import IUserRepository
-from tests.factories import DomainFactory, UserFactory
+from presentation.exceptions import (
+    DatabaseDoesNotExistException,
+    DatabaseIntegrityException,
+)
+from tests.factories import DomainEntityFactory, UserEntityFactory
 
 pytestmark = pytest.mark.integration
 
@@ -24,14 +27,14 @@ async def test_update_domain_should_succeed(
     user_repository: IUserRepository = container.user_repository()
 
     # Create the creator and the initial domain
-    creator_entity = UserFactory.build()
+    creator_entity = UserEntityFactory.build()
     creator = await user_repository.create(creator_entity)
-    initial_domain_entity = DomainFactory.build(created_by=creator.id)
+    initial_domain_entity = DomainEntityFactory.build(created_by=creator.id)
     created_domain = await domain_repository.create(initial_domain_entity)
     assert created_domain.id is not None
 
     # Create the user who will perform the update
-    updater_entity = UserFactory.build()
+    updater_entity = UserEntityFactory.build()
     updater = await user_repository.create(updater_entity)
     new_name = "Updated Domain Name"
 
@@ -73,10 +76,10 @@ async def test_update_domain_with_non_existent_id_should_raise_exception(
     # Arrange
     domain_repository: IDomainRepository = container.domain_repository()
     non_existent_domain_id = 999999
-    domain_to_update = DomainFactory.build()
+    domain_to_update = DomainEntityFactory.build()
 
     # Act & Assert
-    with pytest.raises(exceptions.DoesNotExist):
+    with pytest.raises(DatabaseDoesNotExistException):
         await domain_repository.update(non_existent_domain_id, domain_to_update)
 
 
@@ -93,17 +96,17 @@ async def test_update_domain_with_existing_name_should_raise_integrity_error(
     user_repository: IUserRepository = container.user_repository()
 
     # Create a user
-    user_entity = UserFactory.build()
+    user_entity = UserEntityFactory.build()
     user = await user_repository.create(user_entity)
 
     # Create the first domain with a specific name
-    existing_domain_entity = DomainFactory.build(
+    existing_domain_entity = DomainEntityFactory.build(
         name="Domaine Existant", created_by=user.id
     )
     await domain_repository.create(existing_domain_entity)
 
     # Create the second domain to be updated
-    domain_to_update_entity = DomainFactory.build(
+    domain_to_update_entity = DomainEntityFactory.build(
         name="Domaine à Mettre à Jour", created_by=user.id
     )
     domain_to_update = await domain_repository.create(domain_to_update_entity)
@@ -118,7 +121,7 @@ async def test_update_domain_with_existing_name_should_raise_integrity_error(
     )
 
     # Act & Assert
-    with pytest.raises(exceptions.IntegrityError):
+    with pytest.raises(DatabaseIntegrityException):
         await domain_repository.update(domain_to_update.id, update_data)
 
 
@@ -135,9 +138,9 @@ async def test_update_domain_with_non_existent_user_should_raise_integrity_error
     user_repository: IUserRepository = container.user_repository()
 
     # Create a user and a domain
-    user_entity = UserFactory.build()
+    user_entity = UserEntityFactory.build()
     user = await user_repository.create(user_entity)
-    domain_entity = DomainFactory.build(created_by=user.id)
+    domain_entity = DomainEntityFactory.build(created_by=user.id)
     domain = await domain_repository.create(domain_entity)
     assert domain.id is not None
 
@@ -150,5 +153,5 @@ async def test_update_domain_with_non_existent_user_should_raise_integrity_error
     )
 
     # Act & Assert
-    with pytest.raises(exceptions.IntegrityError):
+    with pytest.raises(DatabaseIntegrityException):
         await domain_repository.update(domain.id, update_data)
