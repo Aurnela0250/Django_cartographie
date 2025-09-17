@@ -7,6 +7,8 @@ from pydantic import ValidationError as PydanticValidationError
 from core.domain.entities.pagination import PaginationParams
 from core.domain.entities.region_entity import RegionEntity
 from core.use_cases.region_use_case import RegionUseCase
+from infrastructure.cache.cache_service import CacheService
+from infrastructure.cache.cache_utils import cache_response
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
 from presentation.exceptions import (
@@ -31,6 +33,12 @@ class RegionController:
         self.unit_of_work = DjangoUnitOfWork()
         self.region_use_case = RegionUseCase(self.unit_of_work)
         self.logger = logging.getLogger(__name__)
+        from infrastructure.external_services.redis_service import RedisService
+
+        self.redis_service = RedisService()
+        self.cache_service = CacheService(
+            redis_service=self.redis_service, entity_name="region", logger=self.logger
+        )
 
     @http_get(
         "",
@@ -42,29 +50,28 @@ class RegionController:
         summary="Récupérer toutes les régions",
         description="Renvoie la liste de toutes les régions disponibles avec pagination optionnelle",
     )
+    @cache_response(
+        cache_type="list",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=PaginatedResultSchema[RegionOut],
+        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        ),
+    )
     def get_all_regions(
         self,
         request,
         pagination: Query[PaginationParamsSchema],
     ):
-        """Récupère toutes les régions avec pagination optionnelle"""
-        try:
-
-            pagination_params = PaginationParams(
-                page=pagination.page, per_page=pagination.per_page
-            )
-
-            result = self.region_use_case.get_all_regions(pagination_params)
-
-            return 200, PaginatedResultSchema.from_domain_result(
-                result,
-                RegionOut,
-                RegionOut.model_validate,
-            )
-
-        except Exception as e:
-            self.logger.error(f"Error retrieving all regions: {str(e)}")
-            raise InternalServerError()
+        pagination_params = PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        )
+        result = self.region_use_case.get_all_regions(pagination_params)
+        return PaginatedResultSchema.from_domain_result(
+            result,
+            RegionOut,
+            RegionOut.model_validate,
+        )
 
     @http_get(
         "/{region_id}",
@@ -73,17 +80,15 @@ class RegionController:
         summary="Récupérer une région par son ID",
         description="Renvoie les détails d'une région spécifiée par son ID",
     )
+    @cache_response(
+        cache_type="item",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=RegionOut,
+        get_id=lambda self, region_id, **kwargs: region_id,
+    )
     def get_region(self, region_id: int):
-        """Récupère une région par son ID"""
-        try:
-            region = self.region_use_case.get_region(region_id)
-            return 200, RegionOut.model_validate(region)
-        except NotFoundError:
-            self.logger.warning(f"Region with ID {region_id} not found")
-            raise
-        except Exception as e:
-            self.logger.error(f"Error retrieving region {region_id}: {str(e)}")
-            raise InternalServerError()
+        region = self.region_use_case.get_region(region_id)
+        return RegionOut.model_validate(region)
 
     @http_post(
         "",

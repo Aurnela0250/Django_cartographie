@@ -1,4 +1,5 @@
 import logging
+
 from ninja import Query
 from ninja_extra import (
     api_controller,
@@ -11,8 +12,11 @@ from ninja_extra import (
 from core.domain.entities.establishment_entity import EstablishmentEntity
 from core.domain.entities.pagination import PaginationParams
 from core.use_cases.establishment_use_case import EstablishmentUseCase
+from infrastructure.cache.cache_service import CacheService
+from infrastructure.cache.cache_utils import cache_response
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
+from infrastructure.external_services.redis_service import RedisService
 from presentation.exceptions import (
     ConflictError,
     DatabaseError,
@@ -39,6 +43,13 @@ class EstablishmentController:
         self.unit_of_work = DjangoUnitOfWork()
         self.establishment_use_case = EstablishmentUseCase(self.unit_of_work)
         self.logger = logging.getLogger(__name__)
+        # Initialiser RedisService et CacheService
+        self.redis_service = RedisService()
+        self.cache_service = CacheService(
+            redis_service=self.redis_service,
+            entity_name="establishment",
+            logger=self.logger,
+        )
 
     @http_post(
         "",
@@ -59,6 +70,8 @@ class EstablishmentController:
             establishment = self.establishment_use_case.create_establishment(
                 entity_data
             )
+            # Invalidation du cache des listes
+            self.cache_service.invalidate_list_caches()
             return 201, EstablishmentSchema.from_orm(establishment)
         except ConflictError as e:
             raise e
@@ -80,27 +93,45 @@ class EstablishmentController:
         pagination: Query[PaginationParamsSchema],
     ):
         """Filtrer les établissements selon différents critères"""
-        try:
-            pagination_params = PaginationParams(
-                page=pagination.page, per_page=pagination.per_page
-            )
+        domain_pagination_params = PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        )
+        filter_str = CacheService.generate_filter_cache_key_string(filter_params)
 
-            establishments = self.establishment_use_case.filter_establishments(
+        # Essayer de récupérer depuis le cache
+        cached_data = self.cache_service.get_paginated_list(
+            pagination_params=domain_pagination_params,
+            response_schema_type=PaginatedResultSchema[EstablishmentSchema],
+            filter_str=filter_str,
+        )
+        if cached_data:
+            return 200, cached_data
+
+        # Si cache miss
+        try:
+            establishments_result = self.establishment_use_case.filter_establishments(
                 name=filter_params.name,
                 acronyme=filter_params.acronyme,
                 establishment_type_id=filter_params.establishment_type_id,
                 city_id=filter_params.city_id,
                 region_id=filter_params.region_id,
                 domain_id=filter_params.domain_id,
-                level_id=filter_params.level_id,  # Ajout du paramètre
-                pagination_params=pagination_params,
+                level_id=filter_params.level_id,
+                pagination_params=domain_pagination_params,
             )
 
-            return 200, PaginatedResultSchema.from_domain_result(
-                establishments,
+            response_schema = PaginatedResultSchema.from_domain_result(
+                establishments_result,
                 EstablishmentSchema,
                 EstablishmentSchema.model_validate,
             )
+            # Mettre en cache le résultat
+            self.cache_service.set_paginated_list(
+                pagination_params=domain_pagination_params,
+                data=response_schema,
+                filter_str=filter_str,
+            )
+            return 200, response_schema
         except ValidationError as e:
             self.logger.warning(f"Validation error occurred: {e}")
             raise e
@@ -111,13 +142,18 @@ class EstablishmentController:
         "/{establishment_id}",
         response=EstablishmentSchema,
     )
+    @cache_response(
+        cache_type="item",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=EstablishmentSchema,
+        get_id=lambda self, establishment_id, **kwargs: establishment_id,
+    )
     def get_establishment(self, establishment_id: int):
         """Get an establishment by ID"""
         try:
             establishment = self.establishment_use_case.get_establishment(
                 establishment_id
             )
-
             return EstablishmentSchema.from_orm(establishment)
         except NotFoundError as e:
             raise e
@@ -140,7 +176,6 @@ class EstablishmentController:
             current_establishment = self.establishment_use_case.get_establishment(
                 establishment_id
             )
-
             # Update with new data, keeping existing values for fields not in the update
             update_data = current_establishment.model_dump()
             update_data.update(establishment_data.model_dump(exclude_unset=True))
@@ -151,6 +186,9 @@ class EstablishmentController:
             updated_establishment = self.establishment_use_case.update_establishment(
                 establishment_id, entity_to_update
             )
+            # Invalidation des caches
+            self.cache_service.invalidate_detail_cache(establishment_id)
+            self.cache_service.invalidate_list_caches()
             return EstablishmentSchema.from_orm(updated_establishment)
         except NotFoundError as e:
             raise e
@@ -171,6 +209,9 @@ class EstablishmentController:
         """Delete an establishment"""
         try:
             self.establishment_use_case.delete_establishment(establishment_id)
+            # Invalidation des caches
+            self.cache_service.invalidate_detail_cache(establishment_id)
+            self.cache_service.invalidate_list_caches()
             return 204, None
         except NotFoundError as e:
             raise e
@@ -181,6 +222,14 @@ class EstablishmentController:
         "",
         response=PaginatedResultSchema[EstablishmentSchema],
     )
+    @cache_response(
+        cache_type="list",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=PaginatedResultSchema[EstablishmentSchema],
+        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        ),
+    )
     def get_all_establishments(
         self,
         request,
@@ -188,20 +237,17 @@ class EstablishmentController:
     ):
         """Get all establishments"""
         try:
-            pagination_params = PaginationParams(
+            domain_pagination_params = PaginationParams(
                 page=pagination.page, per_page=pagination.per_page
             )
-
-            establishments = self.establishment_use_case.get_all_establishments(
-                pagination_params
+            establishments_result = self.establishment_use_case.get_all_establishments(
+                domain_pagination_params
             )
-
-            return 200, PaginatedResultSchema.from_domain_result(
-                establishments,
+            return PaginatedResultSchema.from_domain_result(
+                establishments_result,
                 EstablishmentSchema,
                 EstablishmentSchema.model_validate,
             )
-
         except ValidationError as e:
             self.logger.warning(f"Validation error occurred: {e}")
             raise e
@@ -220,28 +266,26 @@ class EstablishmentController:
     ):
         """Noter un établissement (un utilisateur ne peut voter qu'une fois par établissement)"""
         try:
-            # Récupération de la valeur du rating
             rating_value = rating_data.rating
-
-            # Récupération de l'ID de l'utilisateur depuis le token JWT
             user_id = request.auth.get("user_id")
 
-            # Appel au use case pour noter l'établissement
             success = self.establishment_use_case.rate_establishment(
                 establishment_id=establishment_id, user_id=user_id, rating=rating_value
             )
 
-            # Si la notation a réussi, retourner un code 201 (Created)
             if success:
                 self.logger.info(
                     f"Établissement {establishment_id} noté avec succès par l'utilisateur {user_id}"
                 )
+                self.cache_service.invalidate_detail_cache(establishment_id)
+                self.cache_service.invalidate_list_caches()
                 return 201, None
             else:
-                # Si l'utilisateur a déjà noté cet établissement, retourner un code 409 (Conflict)
                 self.logger.warning(
-                    f"L'utilisateur {user_id} a déjà noté l'établissement {establishment_id}"
+                    f"L'utilisateur {user_id} a déjà noté l'établissement {establishment_id} ou autre conflit."
                 )
+                # Correction: Passer explicitement le message et None pour les headers
+                # Le message métier est loggué, la réponse API reste standardisée
                 raise ConflictError()
 
         except NotFoundError as e:
@@ -250,11 +294,13 @@ class EstablishmentController:
         except ValidationError as e:
             self.logger.warning(f"Erreur de validation: {e}")
             raise e
-        except ConflictError:
-            self.logger.warning("L'utilisateur a déjà voté pour cet établissement")
-            raise
+        except ConflictError as e:
+            self.logger.warning(f"Conflit lors de la notation: {e}")
+            raise e
         except Exception as e:
             self.logger.error(
                 f"Erreur lors de la notation de l'établissement: {e}", exc_info=True
             )
             raise InternalServerError()
+            raise InternalServerError()
+            self.logger.warning(f"Conflit lors de la notation: {e}")

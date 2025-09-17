@@ -6,6 +6,8 @@ from ninja_extra.permissions import IsAuthenticated
 
 from core.domain.entities.pagination import PaginationParams
 from core.use_cases.mention_use_case import MentionUseCase
+from infrastructure.cache.cache_service import CacheService
+from infrastructure.cache.cache_utils import cache_response
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
 from presentation.schemas.error_schema import ErrorResponseSchema
@@ -31,6 +33,12 @@ class MentionController:
         self.unit_of_work = DjangoUnitOfWork()
         self.mention_use_case = MentionUseCase(self.unit_of_work)
         self.logger = logging.getLogger(__name__)
+        from infrastructure.external_services.redis_service import RedisService
+
+        self.redis_service = RedisService()
+        self.cache_service = CacheService(
+            redis_service=self.redis_service, entity_name="mention", logger=self.logger
+        )
 
     @http_post(
         "",
@@ -59,13 +67,16 @@ class MentionController:
             500: ErrorResponseSchema,
         },
     )
+    @cache_response(
+        cache_type="item",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=MentionSchema,
+        get_id=lambda self, request, mention_id, **kwargs: mention_id,
+    )
     def get_mention(self, request, mention_id: int):
         """Retrieves a specific mention by its ID."""
-        try:
-            mention = self.mention_use_case.get(mention_id)
-            return MentionSchema.from_orm(mention)
-        except Exception as e:
-            raise e
+        mention = self.mention_use_case.get(mention_id)
+        return MentionSchema.from_orm(mention)
 
     @http_get(
         "",
@@ -74,26 +85,29 @@ class MentionController:
             500: ErrorResponseSchema,
         },
     )
+    @cache_response(
+        cache_type="list",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=PaginatedResultSchema[MentionSchema],
+        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        ),
+    )
     def get_all_mentions(
         self,
         request,
         pagination: Query[PaginationParamsSchema],
     ):
         """Retrieves all mentions."""
-        try:
-            pagination_params = PaginationParams(
-                page=pagination.page, per_page=pagination.per_page
-            )
-
-            mentions = self.mention_use_case.get_all(pagination_params)
-
-            return 200, PaginatedResultSchema.from_domain_result(
-                mentions,
-                MentionSchema,
-                MentionSchema.model_validate,
-            )
-        except Exception as e:
-            raise e
+        pagination_params = PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        )
+        mentions = self.mention_use_case.get_all(pagination_params)
+        return PaginatedResultSchema.from_domain_result(
+            mentions,
+            MentionSchema,
+            MentionSchema.model_validate,
+        )
 
     @http_put(
         "/{mention_id}",

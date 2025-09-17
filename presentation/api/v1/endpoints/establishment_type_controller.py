@@ -4,6 +4,8 @@ from ninja_extra import api_controller, http_delete, http_get, http_post, http_p
 from core.domain.entities.establishment_type_entity import EstablishmentTypeEntity
 from core.domain.entities.pagination import PaginationParams
 from core.use_cases.establishment_type_use_case import EstablishmentTypeUseCase
+from infrastructure.cache.cache_service import CacheService
+from infrastructure.cache.cache_utils import cache_response
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
 from presentation.exceptions import (
@@ -29,6 +31,13 @@ class EstablishmentTypeController:
     def __init__(self):
         self.unit_of_work = DjangoUnitOfWork()
         self.establishment_type_use_case = EstablishmentTypeUseCase(self.unit_of_work)
+        from infrastructure.external_services.redis_service import RedisService
+
+        self.redis_service = RedisService()
+        self.cache_service = CacheService(
+            redis_service=self.redis_service,
+            entity_name="establishment_type",
+        )
 
     @http_post(
         "",
@@ -63,19 +72,17 @@ class EstablishmentTypeController:
         "/{establishment_type_id}",
         response=EstablishmentTypeSchema,
     )
+    @cache_response(
+        cache_type="item",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=EstablishmentTypeSchema,
+        get_id=lambda self, establishment_type_id, **kwargs: establishment_type_id,
+    )
     def get_establishment_type(self, establishment_type_id: int):
-        """Get an establishment type by ID"""
-        try:
-            establishment_type = (
-                self.establishment_type_use_case.get_establishment_type(
-                    establishment_type_id
-                )
-            )
-            return EstablishmentTypeSchema.from_orm(establishment_type)
-        except NotFoundError as e:
-            raise e
-        except Exception:
-            raise InternalServerError()
+        establishment_type = self.establishment_type_use_case.get_establishment_type(
+            establishment_type_id
+        )
+        return EstablishmentTypeSchema.from_orm(establishment_type)
 
     @http_put(
         "/{establishment_type_id}",
@@ -140,28 +147,29 @@ class EstablishmentTypeController:
         "",
         response=PaginatedResultSchema[EstablishmentTypeSchema],
     )
+    @cache_response(
+        cache_type="list",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=PaginatedResultSchema[EstablishmentTypeSchema],
+        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        ),
+    )
     def get_all_establishment_types(
         self,
         request,
         pagination: Query[PaginationParamsSchema],
     ):
-        """Get all establishment types"""
-        try:
-            pagination_params = PaginationParams(
-                page=pagination.page, per_page=pagination.per_page
+        pagination_params = PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        )
+        establishment_types = (
+            self.establishment_type_use_case.get_all_establishment_types(
+                pagination_params
             )
-
-            establishment_types = (
-                self.establishment_type_use_case.get_all_establishment_types(
-                    pagination_params
-                )
-            )
-
-            return 200, PaginatedResultSchema.from_domain_result(
-                establishment_types,
-                EstablishmentTypeSchema,
-                EstablishmentTypeSchema.model_validate,
-            )
-
-        except Exception:
-            raise InternalServerError()
+        )
+        return PaginatedResultSchema.from_domain_result(
+            establishment_types,
+            EstablishmentTypeSchema,
+            EstablishmentTypeSchema.model_validate,
+        )

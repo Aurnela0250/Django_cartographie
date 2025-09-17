@@ -3,6 +3,8 @@ from ninja_extra import api_controller, http_delete, http_get, http_post, http_p
 
 from core.domain.entities.pagination import PaginationParams
 from core.use_cases.city_use_case import CityUseCase
+from infrastructure.cache.cache_service import CacheService
+from infrastructure.cache.cache_utils import cache_response
 from infrastructure.db.django_unit_of_work import DjangoUnitOfWork
 from infrastructure.external_services.jwt_service import jwt_auth
 from presentation.exceptions import (
@@ -31,6 +33,13 @@ class CityController:
     def __init__(self):
         self.unit_of_work = DjangoUnitOfWork()
         self.city_use_case = CityUseCase(self.unit_of_work)
+        from infrastructure.external_services.redis_service import RedisService
+
+        self.redis_service = RedisService()
+        self.cache_service = CacheService(
+            redis_service=self.redis_service,
+            entity_name="city",
+        )
 
     @http_post(
         "",
@@ -67,14 +76,15 @@ class CityController:
             500: ErrorResponseSchema,
         },
     )
+    @cache_response(
+        cache_type="item",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=CitySchema,
+        get_id=lambda self, request, city_id, **kwargs: city_id,
+    )
     def get_city(self, request, city_id: int):
-        try:
-            city = self.city_use_case.get(city_id)
-            return CitySchema.from_orm(city)
-        except NotFoundError:
-            raise NotFoundError()
-        except Exception:
-            raise InternalServerError()
+        city = self.city_use_case.get(city_id)
+        return CitySchema.from_orm(city)
 
     @http_get(
         "",
@@ -84,19 +94,24 @@ class CityController:
             500: ErrorResponseSchema,
         },
     )
+    @cache_response(
+        cache_type="list",
+        cache_service=lambda self, *a, **kw: self.cache_service,
+        schema_type=PaginatedResultSchema[CitySchema],
+        get_pagination=lambda self, request, pagination, **kwargs: PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        ),
+    )
     def get_all_cities(self, request, pagination: Query[PaginationParamsSchema]):
-        try:
-            pagination_params = PaginationParams(
-                page=pagination.page, per_page=pagination.per_page
-            )
-            result = self.city_use_case.get_all(pagination_params)
-            return 200, PaginatedResultSchema.from_domain_result(
-                result,
-                CitySchema,
-                CitySchema.from_orm,
-            )
-        except Exception:
-            raise InternalServerError()
+        pagination_params = PaginationParams(
+            page=pagination.page, per_page=pagination.per_page
+        )
+        result = self.city_use_case.get_all(pagination_params)
+        return PaginatedResultSchema.from_domain_result(
+            result,
+            CitySchema,
+            CitySchema.from_orm,
+        )
 
     @http_put(
         "/{city_id}",
